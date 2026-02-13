@@ -13,8 +13,9 @@ datasource db {
   provider = "postgresql"
 }
 
-enum Status {
+enum Account_Status {
   USER
+  VENDOR
   ADMIN
 }
 
@@ -84,16 +85,17 @@ model User {
   password  String  
   first_name  String
   last_name String
-  account_status Status
+  account_status Account_Status
+  verified_account Boolean @default(false)
   photo_url String
   created_at DateTime @default(now())
   current_location  Coords?
   search_location Location?
-  listings Listings?
-  orders Orders?
+  listings Listing?
+  orders Order?
 }
 
-model Listings {
+model Listing {
   id  Int @id @default(autoincrement())
   userId Int @unique
   user   User @relation(fields: [userId], references: [id])
@@ -108,7 +110,7 @@ model Listings {
 }
 
 model Coords {
-  id        Int @id @default(autoincrement())
+  id  Int @id @default(autoincrement())
   userId Int  @unique
   user   User @relation(fields: [userId], references: [id])
   latitude Float
@@ -120,13 +122,13 @@ model Location {
   userId    Int?     @unique
   user      User?    @relation(fields: [userId], references: [id])
   listingId Int?     @unique
-  listing   Listings? @relation(fields: [listingId], references: [id])
+  listing   Listing? @relation(fields: [listingId], references: [id])
   city      String
   state     USState
 }
 
 
-model Orders {
+model Order {
   id  Int @id @default(autoincrement())
   created_at DateTime @default(now())
   userId Int  @unique
