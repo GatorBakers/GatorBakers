@@ -1,5 +1,8 @@
-import React, { useState } from 'react';
-import './LogInPage.css';
+import { useState } from 'react';
+import AuthCard from '../components/AuthCard';
+import AuthInput from '../components/AuthInput';
+import AuthButton from '../components/AuthButton';
+import AuthFooter from '../components/AuthFooter';
 
 interface LoginPageProps {
     onSwitchToSignUp: () => void;
@@ -9,45 +12,35 @@ const LoginPage = ({ onSwitchToSignUp }: LoginPageProps) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    const handleLogin = async (e: React.SubmitEvent<HTMLFormElement>) => {
+    const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         console.log({email, password});
     }
     
     return (
-        <div className="auth-page">
-      <form className="auth-card" onSubmit={handleLogin}>
-        <h1 className="auth-logo">Bake</h1>
-        <p className="auth-subtitle">Welcome Back</p>
-
-        <input
+      <AuthCard subtitle="Welcome Back" onSubmit={handleLogin}>
+        <AuthInput
           type="email"
-          className="auth-input"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
 
-        <input
+        <AuthInput
           type="password"
-          className="auth-input"
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
 
-        <button type="submit" className="auth-button">
-          Log In
-        </button>
+        <AuthButton label="Log In" />
 
-        <p className="auth-footer">
-          Dont have an account?{" "}
-          <a href="#" className="auth-link" onClick={onSwitchToSignUp}>
-            Sign Up
-          </a>
-        </p>
-      </form>
-    </div>
+        <AuthFooter
+          message="Dont have an account?"
+          linkText="Sign Up"
+          onLinkClick={onSwitchToSignUp}
+        />
+      </AuthCard>
     );
 }
 

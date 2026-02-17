@@ -5,6 +5,7 @@ import LoginPage from './pages/LogInPage';
 function App() {
 
   return (
+    // TODO: Add sign up page
     <LoginPage onSwitchToSignUp={() => {}} />
   )
 }
