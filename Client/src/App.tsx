@@ -1,11 +1,11 @@
 import './App.css'
 
+import LoginPage from './pages/LogInPage';
+
 function App() {
 
   return (
-    <>
-      <h1>Hello World</h1>
-    </>
+    <LoginPage onSwitchToSignUp={() => {}} />
   )
 }
 
