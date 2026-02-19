@@ -1,16 +1,18 @@
+import { Link } from 'react-router-dom';
+
 interface AuthFooterProps {
   message: string;
   linkText: string;
-  onLinkClick: () => void;
+  linkTo: string;
 }
 
-const AuthFooter = ({ message, linkText, onLinkClick }: AuthFooterProps) => {
+const AuthFooter = ({ message, linkText, linkTo }: AuthFooterProps) => {
   return (
     <p className="auth-footer">
       {message}{" "}
-      <a href="#" className="auth-link" onClick={onLinkClick}>
+      <Link to={linkTo} className="auth-link">
         {linkText}
-      </a>
+      </Link>
     </p>
   );
 };

@@ -4,11 +4,7 @@ import AuthInput from '../components/AuthInput';
 import AuthButton from '../components/AuthButton';
 import AuthFooter from '../components/AuthFooter';
 
-interface LoginPageProps {
-    onSwitchToSignUp: () => void;
-}
-
-const LoginPage = ({ onSwitchToSignUp }: LoginPageProps) => {
+const LoginPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
@@ -38,7 +34,7 @@ const LoginPage = ({ onSwitchToSignUp }: LoginPageProps) => {
         <AuthFooter
           message="Dont have an account?"
           linkText="Sign Up"
-          onLinkClick={onSwitchToSignUp}
+          linkTo="/signup"
         />
       </AuthCard>
     );
