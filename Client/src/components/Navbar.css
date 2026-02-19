@@ -1,0 +1,77 @@
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 32px;
+    border-bottom: 1px solid #e8e0da;
+    background-color: #fff;
+}
+
+.navbar-logo {
+    font-family: 'Georgia', serif;
+    font-style: italic;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #8b6b52;
+    text-decoration: none;
+}
+
+.navbar-center {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+}
+
+.navbar-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    text-decoration: none;
+    color: #8b6b52;
+    font-size: 0.85rem;
+    font-weight: 500;
+    padding-bottom: 8px;
+    border-bottom: 3px solid transparent;
+    transition: border-color 0.2s ease;
+}
+
+.navbar-link.active {
+    border-bottom: 3px solid #8b6b52;
+}
+
+.navbar-icon {
+    width: 24px;
+    height: 24px;
+}
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.navbar-messages {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+.navbar-messages .navbar-icon {
+    width: 22px;
+    height: 22px;
+}
+
+.navbar-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: #8b6b52;
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+}
