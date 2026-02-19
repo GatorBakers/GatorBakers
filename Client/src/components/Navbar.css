@@ -55,6 +55,13 @@
     display: flex;
     align-items: center;
     text-decoration: none;
+    padding-bottom: 8px;
+    border-bottom: 3px solid transparent;
+    transition: border-color 0.2s ease;
+}
+
+.navbar-messages.active {
+    border-bottom: 3px solid #8b6b52;
 }
 
 .navbar-messages .navbar-icon {
