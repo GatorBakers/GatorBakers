@@ -27,6 +27,8 @@ const Navbar = () => {
                 </NavLink>
             </div>
 
+            {/* TODO: Place active indicator for messages and profile pages */}
+
             <div className="navbar-right">
                 <NavLink to="/messages" className="navbar-messages">
                     <img src={MessagesIcon} alt="Messages" className="navbar-icon" />
