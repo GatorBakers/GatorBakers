@@ -1,4 +1,4 @@
-import { PrismaClient } from "./generated/prisma";
+import { PrismaClient } from "@prisma/client";
 import express, { Request, Response } from "express";
 import cors from "cors";
 
