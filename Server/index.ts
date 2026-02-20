@@ -3,7 +3,7 @@ import { PrismaClient } from "./generated/prisma";
 import express, { Request, Response } from "express";
 import { PrismaPg } from "@prisma/adapter-pg";
 import cors from "cors";
-import bcrypt from 'bcrypt';
+import bcrypt from "bcrypt";
 
 const saltRounds = 10;
 const adapter = new PrismaPg({
@@ -30,6 +30,7 @@ app.post("/register", async (req: Request, res: Response) => {
     data: {
       email: email,
       password: hashedPassword,
+      account_status: "USER",
       first_name: first_name,
       last_name: last_name,
     },
