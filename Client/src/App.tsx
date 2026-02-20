@@ -1,5 +1,5 @@
 import './App.css'
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import MainLayout from './MainLayout';
 import AuthLayout from './AuthLayout';
 
@@ -13,6 +13,7 @@ function App() {
       <Routes>
         {/* Main Layout */}
         <Route element={<MainLayout />}>
+          <Route path="/" element={<Navigate to="/login" replace/>} />
           <Route path="/discover" element={<></>} /> {/* TODO: Add Discover Page */}
           <Route path="/search" element={<></>} /> {/* TODO: Add Search Page */}
           <Route path="/orders" element={<></>} /> {/* TODO: Add Orders Page */}
