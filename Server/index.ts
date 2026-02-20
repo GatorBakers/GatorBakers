@@ -38,4 +38,22 @@ app.post("/register", async (req: Request, res: Response) => {
   res.json(user);
 });
 
+app.post("/login", async (req: Request, res: Response) => {
+  const { email, password } = req.body;
+  const user = await prisma.user.findUnique({
+    where: {
+      email: email,
+    },
+  });
+  if (!user) {
+    return res.json("Invalid username or password");
+  }
+
+  const validPassword = await bcrypt.compare(password, user.password);
+  if (!validPassword) {
+    return res.json("Invalid username or password");
+  }
+  res.json("Success!");
+});
+
 app.listen(PORT, () => console.log("Server running on port " + PORT));
