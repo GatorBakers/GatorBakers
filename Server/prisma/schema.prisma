@@ -5,7 +5,7 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../generated/prisma"
 }
 
@@ -85,9 +85,9 @@ model User {
   password  String  
   first_name  String
   last_name String
-  account_status Account_Status
+  account_status Account_Status?
   verified_account Boolean @default(false)
-  photo_url String
+  photo_url String?
   created_at DateTime @default(now())
   current_location  Coords?
   search_location Location?
