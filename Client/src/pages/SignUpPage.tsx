@@ -3,6 +3,7 @@ import AuthCard from '../components/AuthCard';
 import AuthInput from '../components/AuthInput';
 import AuthButton from '../components/AuthButton';
 import AuthFooter from '../components/AuthFooter';
+import { registerUser } from '../services/authService';
 
 const SignUpPage = () => {
     const [firstName, setFirstName] = useState('');
@@ -11,9 +12,13 @@ const SignUpPage = () => {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
 
-    const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSignUp = async (e: React.SyntheticEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log({firstName, lastName, email, password, confirmPassword});
+        if (password !== confirmPassword) {
+            return;
+        }
+        const data = await registerUser(email, password, firstName, lastName);
+        console.log(data);
     };
 
     return (
