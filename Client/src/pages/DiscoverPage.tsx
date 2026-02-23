@@ -1,5 +1,6 @@
 import ProductCard from '../components/ProductCard';
-
+import MobileDiscoverPage from './mobile/MobileDiscoverPage';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 /* Placeholder products for the discover page */
 const placeholderProducts = [
@@ -12,6 +13,12 @@ const placeholderProducts = [
 ];
 
 const DiscoverPage = () => {
+    const isMobile = useIsMobile();
+
+    if (isMobile) {
+        return <MobileDiscoverPage products={placeholderProducts} />;
+    }
+
     return (
         <div className="discover-page">
             <div className="headline-container">
