@@ -25,7 +25,7 @@ enum Listing_Status {
   SOLD
 }
 
-enum USState {
+enum US_State {
   AL
   AK
   AZ
@@ -91,14 +91,24 @@ model User {
   created_at DateTime @default(now())
   current_location  Coords?
   search_location Location?
+  token Token[]
   listings Listing?
   orders Order?
 }
 
+model Token {
+  token_id  Int       @id @default(autoincrement())
+  user_id    Int
+  user      User   @relation(fields: [user_id], references: [id])
+  token     String
+  created_at DateTime  @default(now())
+  expired_at DateTime?
+}
+
 model Listing {
   id  Int @id @default(autoincrement())
-  userId Int @unique
-  user   User @relation(fields: [userId], references: [id])
+  user_id Int @unique
+  user   User @relation(fields: [user_id], references: [id])
   title String
   description String
   price Decimal @db.Decimal(10, 2)
@@ -111,28 +121,28 @@ model Listing {
 
 model Coords {
   id  Int @id @default(autoincrement())
-  userId Int  @unique
-  user   User @relation(fields: [userId], references: [id])
+  user_id Int  @unique
+  user   User @relation(fields: [user_id], references: [id])
   latitude Float
   longitude Float
 }
 
 model Location {
   id Int @id @default(autoincrement())
-  userId    Int?     @unique
-  user      User?    @relation(fields: [userId], references: [id])
-  listingId Int?     @unique
-  listing   Listing? @relation(fields: [listingId], references: [id])
+  user_id    Int?     @unique
+  user      User?    @relation(fields: [user_id], references: [id])
+  listing_id Int?     @unique
+  listing   Listing? @relation(fields: [listing_id], references: [id])
   city      String
-  state     USState
+  state     US_State
 }
 
 
 model Order {
   id  Int @id @default(autoincrement())
   created_at DateTime @default(now())
-  userId Int  @unique
-  user   User @relation(fields: [userId], references: [id])
+  user_id Int  @unique
+  user   User @relation(fields: [user_id], references: [id])
   listing_id Int
   status  Listing_Status
 }
