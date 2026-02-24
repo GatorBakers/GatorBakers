@@ -11,14 +11,27 @@ const SignUpPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const handleSignUp = async (e: React.SyntheticEvent<HTMLFormElement>) => {
         e.preventDefault();
+        setError('');
+
         if (password !== confirmPassword) {
+            setError('Passwords do not match.');
             return;
         }
-        const data = await registerUser(email, password, firstName, lastName);
-        console.log(data);
+
+        setLoading(true);
+        try {
+            const data = await registerUser(email, password, firstName, lastName);
+            console.log(data);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'An unexpected error occurred.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -53,7 +66,8 @@ const SignUpPage = () => {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
             />
-            <AuthButton label="Sign Up" />
+            {error && <p className="auth-error">{error}</p>}
+            <AuthButton label={loading ? 'Signing Up...' : 'Sign Up'} disabled={loading} />
             <AuthFooter
                 message="Already have an account?"
                 linkText="Log In"
