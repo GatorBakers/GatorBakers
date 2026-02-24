@@ -7,6 +7,7 @@ import LoginPage from './pages/LogInPage';
 import SignUpPage from './pages/SignUpPage';
 import DiscoverPage from './pages/DiscoverPage';
 import YourOrdersPage from './pages/YourOrderPage';
+import SearchPage from './pages/SearchPage';
 
 function App() {
 
@@ -17,7 +18,7 @@ function App() {
         <Route element={<MainLayout />}>
           <Route path="/" element={<Navigate to="/login" replace/>} />
           <Route path="/discover" element={<DiscoverPage />} />
-          <Route path="/search" element={<></>} /> {/* TODO: Add Search Page */}
+          <Route path="/search" element={<SearchPage />} />
           <Route path="/orders" element={<YourOrdersPage />} />
           <Route path="/messages" element={<></>} /> {/* TODO: Add Messages Page */}
           <Route path="/profile" element={<></>} /> {/* TODO: Add Profile Page */}
