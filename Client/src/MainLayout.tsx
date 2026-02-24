@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import MobileNavbar from './components/mobile/MobileNavbar';
+import MobileTopBar from './components/mobile/MobileTopBar';
 import { useIsMobile } from './hooks/useIsMobile';
 
 const MainLayout = () => {
@@ -8,7 +9,14 @@ const MainLayout = () => {
 
     return (
         <div className={isMobile ? 'mobile-layout' : 'desktop-layout'}>
-            {isMobile ? <MobileNavbar /> : <Navbar />}
+            {isMobile ? (
+                <>
+                    <MobileTopBar />
+                    <MobileNavbar />
+                </>
+            ) : (
+                <Navbar />
+            )}
             <Outlet />
         </div>
     );
