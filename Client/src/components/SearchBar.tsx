@@ -26,7 +26,7 @@ const SearchBar = ({ onSearch, onCategoryChange }: SearchBarProps) => {
         onCategoryChange?.(category);
     };
 
-    // TODO: Handle search and category changes
+    // TODO: Debounce search API call — trigger the search API request 2 seconds after the user stops typing
 
     return (
         <div className="search-bar-wrapper">
