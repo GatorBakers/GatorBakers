@@ -18,6 +18,10 @@ const SignUpPage = () => {
         e.preventDefault();
         setError('');
 
+        if (!firstName.trim() || !lastName.trim() || !email.trim() || !password.trim()) {
+            setError('All fields are required.');
+            return;
+        }
         if (password !== confirmPassword) {
             setError('Passwords do not match.');
             return;
@@ -66,7 +70,7 @@ const SignUpPage = () => {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
             />
-            {error && <p className="auth-error">{error}</p>}
+            {error && <p className="auth-error" role="alert" aria-live="polite">{error}</p>}
             <AuthButton label={loading ? 'Signing Up...' : 'Sign Up'} disabled={loading} />
             <AuthFooter
                 message="Already have an account?"
