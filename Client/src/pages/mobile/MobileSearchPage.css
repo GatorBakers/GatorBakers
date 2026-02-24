@@ -1,0 +1,19 @@
+.m-search-page {
+    padding: 72px 16px 80px;
+}
+
+.m-search-results {
+    margin-top: 24px;
+}
+
+.m-search-results-count {
+    font-size: 0.85rem;
+    color: #7a6a60;
+    margin: 0 0 12px;
+}
+
+.m-search-results-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
