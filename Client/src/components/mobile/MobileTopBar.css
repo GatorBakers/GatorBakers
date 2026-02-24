@@ -6,6 +6,7 @@
     z-index: 100;
     display: flex;
     align-items: center;
+    justify-content: space-between;
     height: 52px;
     background-color: #fff;
     border-bottom: 1px solid #e8e0da;
@@ -19,4 +20,17 @@
     font-weight: 700;
     color: #8b6b52;
     text-decoration: none;
+}
+
+.mobile-top-bar-create {
+    display: flex;
+    align-items: center;
+    padding: 6px 14px;
+    border-radius: 20px;
+    background-color: #8b6b52;
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
 }

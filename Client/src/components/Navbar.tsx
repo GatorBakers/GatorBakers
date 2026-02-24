@@ -31,6 +31,9 @@ const Navbar = () => {
                 <NavLink to="/messages" className="navbar-messages">
                     <img src={MessagesIcon} alt="Messages" className="navbar-icon" />
                 </NavLink>
+                <NavLink to="/create-listing" className="navbar-create-listing">
+                    + Create Listing
+                </NavLink>
                 <NavLink to="/profile" className="navbar-avatar">
                     P
                 </NavLink>
