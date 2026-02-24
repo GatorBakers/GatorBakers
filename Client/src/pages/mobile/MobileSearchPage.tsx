@@ -1,8 +1,6 @@
-import SearchBar from '../components/SearchBar';
-import ProductCard from '../components/ProductCard';
-import MobileSearchPage from './mobile/MobileSearchPage';
-import { useIsMobile } from '../hooks/useIsMobile';
-import './SearchPage.css';
+import SearchBar from '../../components/SearchBar';
+import MobileProductCard from '../../components/mobile/MobileProductCard';
+import './MobileSearchPage.css';
 
 const placeholderResults = [
     { id: 1, title: 'Product Title', bakerName: 'Baker Name', price: 0 },
@@ -13,24 +11,18 @@ const placeholderResults = [
     { id: 6, title: 'Product Title', bakerName: 'Baker Name', price: 0 },
 ];
 
-const SearchPage = () => {
-    const isMobile = useIsMobile();
-
-    if (isMobile) {
-        return <MobileSearchPage />;
-    }
-
+const MobileSearchPage = () => {
     return (
-        <div className="search-page">
+        <div className="m-search-page">
             <SearchBar />
-            <div className="search-results">
-                <p className="search-results-count">{placeholderResults.length} results</p>
+            <div className="m-search-results">
+                <p className="m-search-results-count">{placeholderResults.length} results</p>
                 
                 {/* TODO: To be changed with actual search results */}
                 
-                <div className="search-results-grid">
+                <div className="m-search-results-list">
                     {placeholderResults.map((product) => (
-                        <ProductCard
+                        <MobileProductCard
                             key={product.id}
                             title={product.title}
                             bakerName={product.bakerName}
@@ -43,4 +35,4 @@ const SearchPage = () => {
     );
 };
 
-export default SearchPage;
+export default MobileSearchPage;

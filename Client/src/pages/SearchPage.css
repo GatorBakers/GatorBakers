@@ -1,5 +1,21 @@
 .search-page {
-    max-width: 720px;
+    max-width: 960px;
     margin: 32px auto 0;
-    padding: 0 24px;
+    padding: 0 24px 48px;
+}
+
+.search-results {
+    margin-top: 32px;
+}
+
+.search-results-count {
+    font-size: 0.9rem;
+    color: #7a6a60;
+    margin: 0 0 16px;
+}
+
+.search-results-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
 }
