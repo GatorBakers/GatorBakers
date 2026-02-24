@@ -7,6 +7,9 @@ const MobileTopBar = () => {
             <NavLink to="/discover" className="mobile-top-bar-logo">
                 Bake
             </NavLink>
+            <NavLink to="/create-listing" className="mobile-top-bar-create">
+                + Create Listing
+            </NavLink>
         </header>
     );
 };
