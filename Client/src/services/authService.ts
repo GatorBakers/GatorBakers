@@ -5,7 +5,7 @@ export async function registerUser(email: string, password: string, firstName: s
     const response = await fetch(`${API_URL}/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, firstName, lastName }),
+        body: JSON.stringify({ email, password, first_name: firstName, last_name: lastName }),
     });
     if (!response.ok) {
         const errorData = await response.json().catch(() => null);
