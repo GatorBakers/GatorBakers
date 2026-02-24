@@ -1,0 +1,22 @@
+.mobile-top-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    height: 52px;
+    background-color: #fff;
+    border-bottom: 1px solid #e8e0da;
+    padding: env(safe-area-inset-top, 0) 20px 0;
+}
+
+.mobile-top-bar-logo {
+    font-family: 'Georgia', serif;
+    font-style: italic;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #8b6b52;
+    text-decoration: none;
+}
