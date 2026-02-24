@@ -1,0 +1,78 @@
+.m-listing-card {
+    background-color: #fff;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e8ddd6;
+    padding: 10px 10px 0;
+}
+
+.m-listing-card-image {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    background-color: #f0d9c8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 10px;
+}
+
+.m-listing-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.m-listing-card-placeholder {
+    color: #a08070;
+    font-size: 0.82rem;
+    font-weight: 500;
+    text-align: center;
+    padding: 8px;
+}
+
+.m-listing-card-info {
+    padding: 10px 4px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.m-listing-card-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #3b2f2f;
+    margin: 0;
+}
+
+.m-listing-card-baker {
+    font-size: 0.78rem;
+    color: #7a6a60;
+    margin: 0;
+}
+
+.m-listing-card-price {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #8b6b52;
+    margin: 3px 0 8px;
+}
+
+.m-listing-card-edit-btn {
+    width: 100%;
+    padding: 9px 0;
+    background-color: #c4835a;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.m-listing-card-edit-btn:active {
+    background-color: #b0724d;
+}
