@@ -81,6 +81,15 @@
   background-color: #a67a5f;
 }
 
+.auth-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.auth-button:disabled:hover {
+  background-color: #b8896e;
+}
+
 .auth-button:focus {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
@@ -116,6 +125,14 @@
   width: 100%;
   font-size: 0.85rem;
   color: #d9534f;
+  text-align: center;
+  margin: 0 0 12px;
+}
+
+.auth-success {
+  width: 100%;
+  font-size: 0.85rem;
+  color: #5cb85c;
   text-align: center;
   margin: 0 0 12px;
 }

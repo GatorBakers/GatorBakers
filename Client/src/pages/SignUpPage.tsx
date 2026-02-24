@@ -1,11 +1,14 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import AuthCard from '../components/AuthCard';
 import AuthInput from '../components/AuthInput';
 import AuthButton from '../components/AuthButton';
 import AuthFooter from '../components/AuthFooter';
 import { registerUser } from '../services/authService';
+import { isValidEmail } from '../utils/validation';
 
 const SignUpPage = () => {
+    const navigate = useNavigate();
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
@@ -18,8 +21,12 @@ const SignUpPage = () => {
         e.preventDefault();
         setError('');
 
-        if (!firstName.trim() || !lastName.trim() || !email.trim() || !password.trim()) {
+        if (!firstName.trim() || !lastName.trim() || !email.trim() || !password || !confirmPassword) {
             setError('All fields are required.');
+            return;
+        }
+        if (!isValidEmail(email.trim())) {
+            setError('Please enter a valid email address.');
             return;
         }
         if (password !== confirmPassword) {
@@ -29,8 +36,8 @@ const SignUpPage = () => {
 
         setLoading(true);
         try {
-            const data = await registerUser(email, password, firstName, lastName);
-            console.log(data);
+            await registerUser(email.trim(), password, firstName.trim(), lastName.trim());
+            navigate('/login', { state: { success: 'Account created successfully. Please log in.' } });
         } catch (err) {
             setError(err instanceof Error ? err.message : 'An unexpected error occurred.');
         } finally {
