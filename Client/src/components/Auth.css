@@ -111,3 +111,11 @@
   margin: -10px 0 16px;
   padding-left: 4px;
 }
+
+.auth-error {
+  width: 100%;
+  font-size: 0.85rem;
+  color: #d9534f;
+  text-align: center;
+  margin: 0 0 12px;
+}
