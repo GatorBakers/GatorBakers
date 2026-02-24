@@ -1,10 +1,11 @@
 interface AuthButtonProps {
   label: string;
+  disabled?: boolean;
 }
 
-const AuthButton = ({ label }: AuthButtonProps) => {
+const AuthButton = ({ label, disabled = false }: AuthButtonProps) => {
   return (
-    <button type="submit" className="auth-button">
+    <button type="submit" className="auth-button" disabled={disabled}>
       {label}
     </button>
   );
