@@ -8,8 +8,17 @@ export async function registerUser(email: string, password: string, firstName: s
         body: JSON.stringify({ email, password, first_name: firstName, last_name: lastName }),
     });
     if (!response.ok) {
-        const errorData = await response.json().catch(() => null);
-        throw new Error(errorData?.message || "Registration failed");
+        let errorMessage = `Registration failed (${response.status})`;
+        try {
+            const errorData = await response.json();
+            if (errorData?.message) {
+                errorMessage = errorData.message;
+            }
+        } catch {
+            const text = await response.text().catch(() => '');
+            console.error(`Server error ${response.status}:`, text || response.statusText);
+        }
+        throw new Error(errorMessage);
     }
     return response.json();
 }
