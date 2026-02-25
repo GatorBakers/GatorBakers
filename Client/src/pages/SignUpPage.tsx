@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthCard from '../components/AuthCard';
 import AuthInput from '../components/AuthInput';
@@ -9,6 +9,7 @@ import { isValidEmail, validatePassword } from '../utils/validation';
 
 const SignUpPage = () => {
     const navigate = useNavigate();
+    const isSubmitting = useRef(false);
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
@@ -19,6 +20,7 @@ const SignUpPage = () => {
 
     const handleSignUp = async (e: React.SyntheticEvent<HTMLFormElement>) => {
         e.preventDefault();
+        if (isSubmitting.current) return;
         setError('');
 
         if (!firstName.trim() || !lastName.trim() || !email.trim() || !password || !confirmPassword) {
@@ -40,6 +42,7 @@ const SignUpPage = () => {
         }
 
         setLoading(true);
+        isSubmitting.current = true;
         try {
             await registerUser(email.trim(), password, firstName.trim(), lastName.trim());
             navigate('/login', { state: { success: 'Account created successfully. Please log in.' } });
@@ -47,6 +50,7 @@ const SignUpPage = () => {
             setError(err instanceof Error ? err.message : 'An unexpected error occurred.');
         } finally {
             setLoading(false);
+            isSubmitting.current = false;
         }
     };
 
