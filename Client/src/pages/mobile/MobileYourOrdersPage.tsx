@@ -20,16 +20,30 @@ interface Listing {
 }
 
 interface MobileYourOrdersPageProps {
+    // TODO: Once API calls are added in YourOrderPage.tsx, these props will carry real data.
+    //       Consider passing loading/error states here as well so the mobile view can show
+    //       skeleton loaders or error messages.
     orders: Order[];
     listings: Listing[];
 }
 
 const MobileYourOrdersPage = ({ orders, listings }: MobileYourOrdersPageProps) => {
+    // TODO: Auth context is resolved in the parent (YourOrderPage.tsx) — no userId needed here directly,
+    //       but ensure the parent is not rendering this component before auth is confirmed.
+
+    // TODO: Wire up onViewDetails on each MobileOrderCard to navigate to the order detail page.
+    //       e.g. navigate(`/orders/${order.id}`) — GET /api/orders/{orderId}.
+
+    // TODO: Wire up onViewEdit on each MobileListingCard to navigate to the listing edit page.
+    //       e.g. navigate(`/listings/${listing.id}/edit`) — GET/PATCH /api/listings/{listingId}.
+
     return (
         <div className="m-your-orders-page">
             <section className="m-your-orders-section">
                 <h2 className="m-your-orders-heading">Your Orders</h2>
                 <div className="m-your-orders-list">
+                    {/* TODO: If orders is empty, render an empty state here instead of nothing.
+                              e.g. <p>You have no active orders.</p> */}
                     {orders.map((order) => (
                         <MobileOrderCard
                             key={order.id}
@@ -46,6 +60,8 @@ const MobileYourOrdersPage = ({ orders, listings }: MobileYourOrdersPageProps) =
             <section className="m-your-listings-section">
                 <h2 className="m-your-orders-heading">Your Listings</h2>
                 <div className="m-your-listings-grid">
+                    {/* TODO: If listings is empty, render an empty state here instead of nothing.
+                              e.g. <p>You haven't created any listings yet.</p> */}
                     {listings.map((listing) => (
                         <MobileListingCard
                             key={listing.id}

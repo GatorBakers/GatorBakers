@@ -21,6 +21,9 @@ interface Listing {
     price: number;
 }
 
+// TODO: Replace with useState + useEffect fetching the authenticated user's orders from the API.
+//       GET /api/orders?userId={userId} — should return Order[] for the current user.
+//       Handle loading and error states.
 const placeholderOrders: Order[] = [
     { id: 1, itemName: 'Item Name', bakerName: 'Baker Name', status: 'ready_for_pickup', pickupTime: 'Pickup by 6:30 pm', pickupAddress: '123 Main Street' },
     { id: 2, itemName: 'Item Name', bakerName: 'Baker Name', status: 'pending', pickupTime: 'Pickup by 6:30 pm', pickupAddress: '123 Main Street' },
@@ -28,6 +31,9 @@ const placeholderOrders: Order[] = [
     { id: 4, itemName: 'Item Name', bakerName: 'Baker Name', status: 'cancelled', pickupTime: 'Pickup by 6:30 pm', pickupAddress: '123 Main Street' },
 ];
 
+// TODO: Replace with useState + useEffect fetching the authenticated user's listings from the API.
+//       GET /api/listings?userId={userId} — should return Listing[] owned by the current user.
+//       Handle loading and error states.
 const placeholderListings: Listing[] = [
     { id: 1, title: 'Product Title', bakerName: 'Baker Name', price: 0 },
     { id: 2, title: 'Product Title', bakerName: 'Baker Name', price: 0 },
@@ -37,6 +43,15 @@ const placeholderListings: Listing[] = [
 
 const YourOrdersPage = () => {
     const isMobile = useIsMobile();
+
+    // TODO: Pull the current user's ID from the auth context once authentication is implemented.
+    //       e.g. const { userId } = useAuth(); — pass userId into the fetch calls for orders and listings.
+
+    // TODO: Wire up onViewDetails for each OrderCard to navigate to an order detail page.
+    //       e.g. navigate(`/orders/${order.id}`) — GET /api/orders/{orderId} for full details.
+
+    // TODO: Wire up onViewEdit for each ListingCard to navigate to the listing edit page.
+    //       e.g. navigate(`/listings/${listing.id}/edit`) — GET/PATCH /api/listings/{listingId}.
 
     if (isMobile) {
         return (
@@ -52,6 +67,8 @@ const YourOrdersPage = () => {
             <div className="your-orders-col">
                 <h2 className="your-orders-heading">Your Orders</h2>
                 <div className="your-orders-list">
+                    {/* TODO: If orders is empty, render an empty state here instead of nothing.
+                              e.g. <p>You have no active orders.</p> */}
                     {placeholderOrders.map((order) => (
                         <OrderCard
                             key={order.id}
@@ -68,6 +85,8 @@ const YourOrdersPage = () => {
             <div className="your-listings-col">
                 <h2 className="your-orders-heading">Your Listings</h2>
                 <div className="your-listings-grid">
+                    {/* TODO: If listings is empty, render an empty state here instead of nothing.
+                              e.g. <p>You haven't created any listings yet.</p> */}
                     {placeholderListings.map((listing) => (
                         <ListingCard
                             key={listing.id}
