@@ -42,34 +42,44 @@ const MobileYourOrdersPage = ({ orders, listings }: MobileYourOrdersPageProps) =
             <section className="m-your-orders-section">
                 <h2 className="m-your-orders-heading">Your Orders</h2>
                 <div className="m-your-orders-list">
-                    {/* TODO: If orders is empty, render an empty state here instead of nothing.
-                              e.g. <p>You have no active orders.</p> */}
-                    {orders.map((order) => (
-                        <MobileOrderCard
-                            key={order.id}
-                            itemName={order.itemName}
-                            bakerName={order.bakerName}
-                            status={order.status}
-                            pickupTime={order.pickupTime}
-                            pickupAddress={order.pickupAddress}
-                        />
-                    ))}
+                    {orders.length === 0 ? (
+                        <div className="m-your-orders-empty">
+                            <p className="m-your-orders-empty-title">No active orders</p>
+                            <p className="m-your-orders-empty-sub">Your orders will appear here once you place one.</p>
+                        </div>
+                    ) : (
+                        orders.map((order) => (
+                            <MobileOrderCard
+                                key={order.id}
+                                itemName={order.itemName}
+                                bakerName={order.bakerName}
+                                status={order.status}
+                                pickupTime={order.pickupTime}
+                                pickupAddress={order.pickupAddress}
+                            />
+                        ))
+                    )}
                 </div>
             </section>
 
             <section className="m-your-listings-section">
                 <h2 className="m-your-orders-heading">Your Listings</h2>
                 <div className="m-your-listings-grid">
-                    {/* TODO: If listings is empty, render an empty state here instead of nothing.
-                              e.g. <p>You haven't created any listings yet.</p> */}
-                    {listings.map((listing) => (
-                        <MobileListingCard
-                            key={listing.id}
-                            title={listing.title}
-                            bakerName={listing.bakerName}
-                            price={listing.price}
-                        />
-                    ))}
+                    {listings.length === 0 ? (
+                        <div className="m-your-orders-empty m-your-listings-empty">
+                            <p className="m-your-orders-empty-title">No listings yet</p>
+                            <p className="m-your-orders-empty-sub">Listings you create will appear here.</p>
+                        </div>
+                    ) : (
+                        listings.map((listing) => (
+                            <MobileListingCard
+                                key={listing.id}
+                                title={listing.title}
+                                bakerName={listing.bakerName}
+                                price={listing.price}
+                            />
+                        ))
+                    )}
                 </div>
             </section>
         </div>
