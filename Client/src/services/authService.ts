@@ -16,7 +16,9 @@ export async function registerUser(email: string, password: string, firstName: s
                 errorMessage = errorData.message;
             }
         } catch {
-            console.error(`Server error ${response.status}:`, text || response.statusText);
+            if (import.meta.env.DEV) {
+                console.error(`Server error ${response.status}:`, text || response.statusText);
+            }
         }
         throw new Error(errorMessage);
     }
