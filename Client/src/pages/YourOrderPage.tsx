@@ -1,6 +1,7 @@
 import OrderCard from '../components/OrderCard';
-import type { OrderStatus } from '../components/OrderCard';
-import ListingCard from '../components/ListingCard';
+import type { OrderStatus } from '../components/StatusBadge';
+import ProductCard from '../components/ProductCard';
+import EmptyState from '../components/EmptyState';
 import MobileYourOrdersPage from './mobile/MobileYourOrdersPage';
 import { useIsMobile } from '../hooks/useIsMobile';
 import './YourOrdersPage.css';
@@ -50,7 +51,7 @@ const YourOrdersPage = () => {
     // TODO: Wire up onViewDetails for each OrderCard to navigate to an order detail page.
     //       e.g. navigate(`/orders/${order.id}`) — GET /api/orders/{orderId} for full details.
 
-    // TODO: Wire up onViewEdit for each ListingCard to navigate to the listing edit page.
+    // TODO: Wire up onAction for each listing ProductCard to navigate to the listing edit page.
     //       e.g. navigate(`/listings/${listing.id}/edit`) — GET/PATCH /api/listings/{listingId}.
 
     if (isMobile) {
@@ -68,10 +69,10 @@ const YourOrdersPage = () => {
                 <h2 className="your-orders-heading">Your Orders</h2>
                 <div className="your-orders-list">
                     {placeholderOrders.length === 0 ? (
-                        <div className="your-orders-empty">
-                            <p className="your-orders-empty-title">No active orders</p>
-                            <p className="your-orders-empty-sub">Your orders will appear here once you place one.</p>
-                        </div>
+                        <EmptyState
+                            title="No active orders"
+                            subtitle="Your orders will appear here once you place one."
+                        />
                     ) : (
                         placeholderOrders.map((order) => (
                             <OrderCard
@@ -90,19 +91,20 @@ const YourOrdersPage = () => {
             <div className="your-listings-col">
                 <h2 className="your-orders-heading">Your Listings</h2>
                 <div className="your-listings-grid">
-
                     {placeholderListings.length === 0 ? (
-                        <div className="your-listings-empty">
-                            <p className="your-listings-empty-title">No listings</p>
-                            <p className="your-listings-empty-sub">Your listings will appear here once you create one.</p>
-                        </div>
+                        <EmptyState
+                            title="No listings yet"
+                            subtitle="Listings you create will appear here."
+                            className="your-listings-empty-span"
+                        />
                     ) : (
                         placeholderListings.map((listing) => (
-                            <ListingCard
+                            <ProductCard
                                 key={listing.id}
                                 title={listing.title}
                                 bakerName={listing.bakerName}
                                 price={listing.price}
+                                buttonLabel="View/Edit Listing"
                             />
                         ))
                     )}

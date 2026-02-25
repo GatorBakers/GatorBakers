@@ -1,6 +1,9 @@
+import StatusBadge from '../StatusBadge';
+import type { OrderStatus } from '../StatusBadge';
+import CardImage from '../CardImage';
 import './MobileOrderCard.css';
 
-export type OrderStatus = 'ready_for_pickup' | 'pending' | 'completed' | 'cancelled';
+export type { OrderStatus };
 
 interface MobileOrderCardProps {
     itemName: string;
@@ -11,13 +14,6 @@ interface MobileOrderCardProps {
     imageUrl?: string;
     onViewDetails?: () => void;
 }
-
-const statusLabels: Record<OrderStatus, string> = {
-    ready_for_pickup: 'Ready for pickup',
-    pending: 'Pending',
-    completed: 'Completed',
-    cancelled: 'Cancelled',
-};
 
 const MobileOrderCard = ({
     itemName,
@@ -30,13 +26,12 @@ const MobileOrderCard = ({
 }: MobileOrderCardProps) => {
     return (
         <div className="m-order-card">
-            <div className="m-order-card-image">
-                {imageUrl ? (
-                    <img src={imageUrl} alt={itemName} />
-                ) : (
-                    <span className="m-order-card-image-placeholder">Temp</span>
-                )}
-            </div>
+            <CardImage
+                imageUrl={imageUrl}
+                alt={itemName}
+                placeholderText="Temp"
+                className="m-order-card-image"
+            />
 
             <div className="m-order-card-body">
                 <div className="m-order-card-top-row">
@@ -44,9 +39,7 @@ const MobileOrderCard = ({
                         <p className="m-order-card-item-name">{itemName}</p>
                         <p className="m-order-card-baker-name">{bakerName}</p>
                     </div>
-                    <span className={`m-order-card-badge m-order-card-badge--${status}`}>
-                        {statusLabels[status]}
-                    </span>
+                    <StatusBadge status={status} />
                 </div>
 
                 <div className="m-order-card-bottom-row">

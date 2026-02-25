@@ -1,6 +1,7 @@
 import MobileOrderCard from '../../components/mobile/MobileOrderCard';
-import type { OrderStatus } from '../../components/mobile/MobileOrderCard';
-import MobileListingCard from '../../components/mobile/MobileListingCard';
+import type { OrderStatus } from '../../components/StatusBadge';
+import ProductCard from '../../components/ProductCard';
+import EmptyState from '../../components/EmptyState';
 import './MobileYourOrdersPage.css';
 
 interface Order {
@@ -34,7 +35,7 @@ const MobileYourOrdersPage = ({ orders, listings }: MobileYourOrdersPageProps) =
     // TODO: Wire up onViewDetails on each MobileOrderCard to navigate to the order detail page.
     //       e.g. navigate(`/orders/${order.id}`) — GET /api/orders/{orderId}.
 
-    // TODO: Wire up onViewEdit on each MobileListingCard to navigate to the listing edit page.
+    // TODO: Wire up onAction on each listing ProductCard to navigate to the listing edit page.
     //       e.g. navigate(`/listings/${listing.id}/edit`) — GET/PATCH /api/listings/{listingId}.
 
     return (
@@ -43,10 +44,10 @@ const MobileYourOrdersPage = ({ orders, listings }: MobileYourOrdersPageProps) =
                 <h2 className="m-your-orders-heading">Your Orders</h2>
                 <div className="m-your-orders-list">
                     {orders.length === 0 ? (
-                        <div className="m-your-orders-empty">
-                            <p className="m-your-orders-empty-title">No active orders</p>
-                            <p className="m-your-orders-empty-sub">Your orders will appear here once you place one.</p>
-                        </div>
+                        <EmptyState
+                            title="No active orders"
+                            subtitle="Your orders will appear here once you place one."
+                        />
                     ) : (
                         orders.map((order) => (
                             <MobileOrderCard
@@ -66,17 +67,19 @@ const MobileYourOrdersPage = ({ orders, listings }: MobileYourOrdersPageProps) =
                 <h2 className="m-your-orders-heading">Your Listings</h2>
                 <div className="m-your-listings-grid">
                     {listings.length === 0 ? (
-                        <div className="m-your-orders-empty m-your-listings-empty">
-                            <p className="m-your-orders-empty-title">No listings yet</p>
-                            <p className="m-your-orders-empty-sub">Listings you create will appear here.</p>
-                        </div>
+                        <EmptyState
+                            title="No listings yet"
+                            subtitle="Listings you create will appear here."
+                            className="m-your-listings-empty-span"
+                        />
                     ) : (
                         listings.map((listing) => (
-                            <MobileListingCard
+                            <ProductCard
                                 key={listing.id}
                                 title={listing.title}
                                 bakerName={listing.bakerName}
                                 price={listing.price}
+                                buttonLabel="View/Edit Listing"
                             />
                         ))
                     )}

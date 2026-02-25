@@ -35,32 +35,6 @@
     gap: 14px;
 }
 
-.m-your-orders-empty {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-    padding: 32px 16px;
-    background-color: #faf8f5;
-    border: 1px dashed #d9cec4;
-    border-radius: 14px;
-    text-align: center;
-}
-
-.m-your-listings-empty {
+.m-your-listings-empty-span {
     grid-column: 1 / -1;
-}
-
-.m-your-orders-empty-title {
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: #3b2f2f;
-    margin: 0;
-}
-
-.m-your-orders-empty-sub {
-    font-size: 0.82rem;
-    color: #7a6a60;
-    margin: 0;
 }

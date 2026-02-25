@@ -12,25 +12,6 @@
     width: 120px;
     min-height: 120px;
     flex-shrink: 0;
-    background-color: #f0d9c8;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-}
-
-.m-product-card-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.m-product-card-placeholder {
-    color: #a08070;
-    font-size: 0.8rem;
-    font-weight: 500;
-    text-align: center;
-    padding: 8px;
 }
 
 .m-product-card-info {

@@ -1,6 +1,9 @@
+import StatusBadge from './StatusBadge';
+import type { OrderStatus } from './StatusBadge';
+import CardImage from './CardImage';
 import './OrderCard.css';
 
-export type OrderStatus = 'ready_for_pickup' | 'pending' | 'completed' | 'cancelled';
+export type { OrderStatus };
 
 interface OrderCardProps {
     itemName: string;
@@ -11,13 +14,6 @@ interface OrderCardProps {
     imageUrl?: string;
     onViewDetails?: () => void;
 }
-
-const statusLabels: Record<OrderStatus, string> = {
-    ready_for_pickup: 'Ready for pickup',
-    pending: 'Pending',
-    completed: 'Completed',
-    cancelled: 'Cancelled',
-};
 
 const OrderCard = ({
     itemName,
@@ -30,13 +26,12 @@ const OrderCard = ({
 }: OrderCardProps) => {
     return (
         <div className="order-card">
-            <div className="order-card-image">
-                {imageUrl ? (
-                    <img src={imageUrl} alt={itemName} />
-                ) : (
-                    <span className="order-card-image-placeholder">Temp</span>
-                )}
-            </div>
+            <CardImage
+                imageUrl={imageUrl}
+                alt={itemName}
+                placeholderText="Temp"
+                className="order-card-image"
+            />
 
             <div className="order-card-info">
                 <p className="order-card-item-name">{itemName}</p>
@@ -44,9 +39,7 @@ const OrderCard = ({
             </div>
 
             <div className="order-card-status-block">
-                <span className={`order-card-badge order-card-badge--${status}`}>
-                    {statusLabels[status]}
-                </span>
+                <StatusBadge status={status} />
                 <p className="order-card-pickup-time">{pickupTime}</p>
                 <p className="order-card-pickup-address">{pickupAddress}</p>
             </div>

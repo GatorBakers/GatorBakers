@@ -13,22 +13,6 @@
     width: 72px;
     flex-shrink: 0;
     background-color: #e8dcc8;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-}
-
-.m-order-card-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.m-order-card-image-placeholder {
-    font-size: 0.72rem;
-    font-weight: 600;
-    color: #8b6b52;
 }
 
 .m-order-card-body {
@@ -63,36 +47,6 @@
     font-size: 0.78rem;
     color: #7a6a60;
     margin: 0;
-}
-
-.m-order-card-badge {
-    display: inline-block;
-    padding: 3px 10px;
-    border-radius: 20px;
-    font-size: 0.72rem;
-    font-weight: 700;
-    white-space: nowrap;
-    flex-shrink: 0;
-}
-
-.m-order-card-badge--ready_for_pickup {
-    background-color: #d4f0d8;
-    color: #2e7d45;
-}
-
-.m-order-card-badge--pending {
-    background-color: #fdecd2;
-    color: #a05a1a;
-}
-
-.m-order-card-badge--completed {
-    background-color: #e8e8e8;
-    color: #555;
-}
-
-.m-order-card-badge--cancelled {
-    background-color: #fde8e8;
-    color: #c0392b;
 }
 
 .m-order-card-bottom-row {
@@ -136,4 +90,10 @@
 
 .m-order-card-details-btn:active {
     color: #5c3d22;
+}
+
+/* Mobile StatusBadge size override */
+.m-order-card .status-badge {
+    padding: 3px 10px;
+    font-size: 0.72rem;
 }
