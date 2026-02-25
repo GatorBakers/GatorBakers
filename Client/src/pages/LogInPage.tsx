@@ -18,7 +18,7 @@ const LoginPage = () => {
     
     return (
       <AuthCard subtitle="Welcome Back" onSubmit={handleLogin}>
-        {successMessage && <p className="auth-success" role="alert">{successMessage}</p>}
+        {successMessage && <p className="auth-success" role="alert" aria-live="polite">{successMessage}</p>}
         <AuthInput
           type="email"
           placeholder="Email"

@@ -84,10 +84,7 @@
 .auth-button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-}
-
-.auth-button:disabled:hover {
-  background-color: #b8896e;
+  background-color: #99908A;
 }
 
 .auth-button:focus {
