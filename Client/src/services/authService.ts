@@ -12,7 +12,9 @@ export async function registerUser(email: string, password: string, firstName: s
         const text = await response.text().catch(() => '');
         try {
             const errorData = JSON.parse(text);
-            if (errorData?.message) {
+            if (typeof errorData === 'string') {
+                errorMessage = errorData;
+            } else if (errorData?.message) {
                 errorMessage = errorData.message;
             }
         } catch {

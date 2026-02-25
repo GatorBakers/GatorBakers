@@ -124,7 +124,7 @@
 .auth-error {
   width: 100%;
   font-size: 0.85rem;
-  color: #d9534f;
+  color: #D4403A;
   text-align: center;
   margin: 0 0 12px;
 }
@@ -132,7 +132,7 @@
 .auth-success {
   width: 100%;
   font-size: 0.85rem;
-  color: #5cb85c;
+  color: #3E843E;
   text-align: center;
   margin: 0 0 12px;
 }
