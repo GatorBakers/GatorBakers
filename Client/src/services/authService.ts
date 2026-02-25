@@ -9,13 +9,13 @@ export async function registerUser(email: string, password: string, firstName: s
     });
     if (!response.ok) {
         let errorMessage = `Registration failed (${response.status})`;
+        const text = await response.text().catch(() => '');
         try {
-            const errorData = await response.json();
+            const errorData = JSON.parse(text);
             if (errorData?.message) {
                 errorMessage = errorData.message;
             }
         } catch {
-            const text = await response.text().catch(() => '');
             console.error(`Server error ${response.status}:`, text || response.statusText);
         }
         throw new Error(errorMessage);
