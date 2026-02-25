@@ -4,6 +4,7 @@ import express, { Request, Response } from "express";
 import { PrismaPg } from "@prisma/adapter-pg";
 import cors from "cors";
 import bcrypt from "bcrypt";
+import { validateRegInput } from "./src/utils/validation";
 
 const saltRounds = 10;
 const adapter = new PrismaPg({
@@ -24,18 +25,32 @@ app.use(
 );
 
 app.post("/register", async (req: Request, res: Response) => {
-  const { email, password, first_name, last_name } = req.body;
+  const result = validateRegInput(req.body);
+
+  if ("error" in result) {
+    return res.status(400).json({ message: result.error });
+  }
+
+  const { email, password, first_name, last_name } = result.sanitized;
+
+  const existingUser = await prisma.user.findUnique({ where: { email } });
+  if (existingUser) {
+    return res.status(409).json({ message: "An account with this email already exists." });
+  }
+
   const hashedPassword = await bcrypt.hash(password, saltRounds);
   const user = await prisma.user.create({
     data: {
-      email: email,
+      email,
       password: hashedPassword,
       account_status: "USER",
-      first_name: first_name,
-      last_name: last_name,
+      first_name,
+      last_name,
     },
   });
-  res.json(user);
+
+  const { password: _, ...safeUser } = user;
+  res.status(201).json(safeUser);
 });
 
 app.post("/login", async (req: Request, res: Response) => {
