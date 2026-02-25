@@ -25,9 +25,9 @@ interface Listing {
 //       GET /api/orders?userId={userId} — should return Order[] for the current user.
 //       Handle loading and error states.
 const placeholderOrders: Order[] = [
-    { id: 1, itemName: 'Item Name', bakerName: 'Baker Name', status: 'ready_for_pickup', pickupTime: 'Pickup by 6:30 pm', pickupAddress: '123 Main Street' },
-    { id: 2, itemName: 'Item Name', bakerName: 'Baker Name', status: 'pending', pickupTime: 'Pickup by 6:30 pm', pickupAddress: '123 Main Street' },
-    { id: 3, itemName: 'Item Name', bakerName: 'Baker Name', status: 'completed', pickupTime: 'Pickup by 6:30 pm', pickupAddress: '123 Main Street' },
+    // { id: 1, itemName: 'Item Name', bakerName: 'Baker Name', status: 'ready_for_pickup', pickupTime: 'Pickup by 6:30 pm', pickupAddress: '123 Main Street' },
+    // { id: 2, itemName: 'Item Name', bakerName: 'Baker Name', status: 'pending', pickupTime: 'Pickup by 6:30 pm', pickupAddress: '123 Main Street' },
+    // { id: 3, itemName: 'Item Name', bakerName: 'Baker Name', status: 'completed', pickupTime: 'Pickup by 6:30 pm', pickupAddress: '123 Main Street' },
     { id: 4, itemName: 'Item Name', bakerName: 'Baker Name', status: 'cancelled', pickupTime: 'Pickup by 6:30 pm', pickupAddress: '123 Main Street' },
 ];
 
@@ -67,34 +67,45 @@ const YourOrdersPage = () => {
             <div className="your-orders-col">
                 <h2 className="your-orders-heading">Your Orders</h2>
                 <div className="your-orders-list">
-                    {/* TODO: If orders is empty, render an empty state here instead of nothing.
-                              e.g. <p>You have no active orders.</p> */}
-                    {placeholderOrders.map((order) => (
-                        <OrderCard
-                            key={order.id}
-                            itemName={order.itemName}
-                            bakerName={order.bakerName}
-                            status={order.status}
-                            pickupTime={order.pickupTime}
-                            pickupAddress={order.pickupAddress}
-                        />
-                    ))}
+                    {placeholderOrders.length === 0 ? (
+                        <div className="your-orders-empty">
+                            <p className="your-orders-empty-title">No active orders</p>
+                            <p className="your-orders-empty-sub">Your orders will appear here once you place one.</p>
+                        </div>
+                    ) : (
+                        placeholderOrders.map((order) => (
+                            <OrderCard
+                                key={order.id}
+                                itemName={order.itemName}
+                                bakerName={order.bakerName}
+                                status={order.status}
+                                pickupTime={order.pickupTime}
+                                pickupAddress={order.pickupAddress}
+                            />
+                        ))
+                    )}
                 </div>
             </div>
 
             <div className="your-listings-col">
                 <h2 className="your-orders-heading">Your Listings</h2>
                 <div className="your-listings-grid">
-                    {/* TODO: If listings is empty, render an empty state here instead of nothing.
-                              e.g. <p>You haven't created any listings yet.</p> */}
-                    {placeholderListings.map((listing) => (
-                        <ListingCard
-                            key={listing.id}
-                            title={listing.title}
-                            bakerName={listing.bakerName}
-                            price={listing.price}
-                        />
-                    ))}
+
+                    {placeholderListings.length === 0 ? (
+                        <div className="your-listings-empty">
+                            <p className="your-listings-empty-title">No listings</p>
+                            <p className="your-listings-empty-sub">Your listings will appear here once you create one.</p>
+                        </div>
+                    ) : (
+                        placeholderListings.map((listing) => (
+                            <ListingCard
+                                key={listing.id}
+                                title={listing.title}
+                                bakerName={listing.bakerName}
+                                price={listing.price}
+                            />
+                        ))
+                    )}
                 </div>
             </div>
         </div>
