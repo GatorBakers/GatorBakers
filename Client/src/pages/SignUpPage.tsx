@@ -21,28 +21,33 @@ const SignUpPage = () => {
     const handleSignUp = async (e: React.SyntheticEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (isSubmitting.current) return;
+        isSubmitting.current = true;
         setError('');
 
         if (!firstName.trim() || !lastName.trim() || !email.trim() || !password || !confirmPassword) {
             setError('All fields are required.');
+            isSubmitting.current = false;
             return;
         }
         if (!isValidEmail(email.trim())) {
             setError('Please enter a valid email address.');
+            isSubmitting.current = false;
             return;
         }
         const passwordError = validatePassword(password);
         if (passwordError) {
             setError(passwordError);
+            isSubmitting.current = false;
             return;
         }
         if (password !== confirmPassword) {
             setError('Passwords do not match.');
+            isSubmitting.current = false;
             return;
         }
 
         setLoading(true);
-        isSubmitting.current = true;
+        
         try {
             await registerUser(email.trim(), password, firstName.trim(), lastName.trim());
             navigate('/login', { state: { success: 'Account created successfully. Please log in.' } });
