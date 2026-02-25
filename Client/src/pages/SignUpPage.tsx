@@ -5,7 +5,7 @@ import AuthInput from '../components/AuthInput';
 import AuthButton from '../components/AuthButton';
 import AuthFooter from '../components/AuthFooter';
 import { registerUser } from '../services/authService';
-import { isValidEmail } from '../utils/validation';
+import { isValidEmail, validatePassword } from '../utils/validation';
 
 const SignUpPage = () => {
     const navigate = useNavigate();
@@ -27,6 +27,11 @@ const SignUpPage = () => {
         }
         if (!isValidEmail(email.trim())) {
             setError('Please enter a valid email address.');
+            return;
+        }
+        const passwordError = validatePassword(password);
+        if (passwordError) {
+            setError(passwordError);
             return;
         }
         if (password !== confirmPassword) {
