@@ -25,20 +25,20 @@ interface Listing {
 //       GET /api/orders?userId={userId} — should return Order[] for the current user.
 //       Handle loading and error states.
 const placeholderOrders: Order[] = [
-    // { id: 1, itemName: 'Item Name', bakerName: 'Baker Name', status: 'ready_for_pickup', pickupTime: 'Pickup by 6:30 pm', pickupAddress: '123 Main Street' },
-    // { id: 2, itemName: 'Item Name', bakerName: 'Baker Name', status: 'pending', pickupTime: 'Pickup by 6:30 pm', pickupAddress: '123 Main Street' },
-    // { id: 3, itemName: 'Item Name', bakerName: 'Baker Name', status: 'completed', pickupTime: 'Pickup by 6:30 pm', pickupAddress: '123 Main Street' },
-    // { id: 4, itemName: 'Item Name', bakerName: 'Baker Name', status: 'cancelled', pickupTime: 'Pickup by 6:30 pm', pickupAddress: '123 Main Street' },
+    { id: 1, itemName: 'Item Name', bakerName: 'Baker Name', status: 'ready_for_pickup', pickupTime: 'Pickup by 6:30 pm', pickupAddress: '123 Main Street' },
+    { id: 2, itemName: 'Item Name', bakerName: 'Baker Name', status: 'pending', pickupTime: 'Pickup by 6:30 pm', pickupAddress: '123 Main Street' },
+    { id: 3, itemName: 'Item Name', bakerName: 'Baker Name', status: 'completed', pickupTime: 'Pickup by 6:30 pm', pickupAddress: '123 Main Street' },
+    { id: 4, itemName: 'Item Name', bakerName: 'Baker Name', status: 'cancelled', pickupTime: 'Pickup by 6:30 pm', pickupAddress: '123 Main Street' },
 ];
 
 // TODO: Replace with useState + useEffect fetching the authenticated user's listings from the API.
 //       GET /api/listings?userId={userId} — should return Listing[] owned by the current user.
 //       Handle loading and error states.
 const placeholderListings: Listing[] = [
-    // { id: 1, title: 'Product Title', bakerName: 'Baker Name', price: 0 },
-    // { id: 2, title: 'Product Title', bakerName: 'Baker Name', price: 0 },
-    // { id: 3, title: 'Product Title', bakerName: 'Baker Name', price: 0 },
-    // { id: 4, title: 'Product Title', bakerName: 'Baker Name', price: 0 },
+    { id: 1, title: 'Product Title', bakerName: 'Baker Name', price: 0 },
+    { id: 2, title: 'Product Title', bakerName: 'Baker Name', price: 0 },
+    { id: 3, title: 'Product Title', bakerName: 'Baker Name', price: 0 },
+    { id: 4, title: 'Product Title', bakerName: 'Baker Name', price: 0 },
 ];
 
 const YourOrdersPage = () => {
