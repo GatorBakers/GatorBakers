@@ -3,7 +3,7 @@ import './Auth.css';
 
 interface AuthCardProps {
   subtitle: string;
-  onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  onSubmit: (e: React.SyntheticEvent<HTMLFormElement>) => void;
   children: React.ReactNode;
 }
 
