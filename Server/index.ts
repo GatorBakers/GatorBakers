@@ -1,11 +1,13 @@
 import "dotenv/config";
 import { PrismaClient } from "./generated/prisma";
 import express, { Request, Response } from "express";
+import { TokenExpiredError } from "jsonwebtoken";
 import { PrismaPg } from "@prisma/adapter-pg";
 import cors from "cors";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dayjs from "dayjs";
+import cookieParser from "cookie-parser";
 
 const saltRounds = 10;
 const adapter = new PrismaPg({
@@ -15,13 +17,18 @@ const adapter = new PrismaPg({
 export const prisma = new PrismaClient({ adapter });
 const app = express();
 const PORT = 4000;
-const private_key = process.env.PRIVATE_KEY;
+const access_secret = process.env.access_secret;
+const refresh_secret = process.env.REFRESH_TOKEN_SECRET!;
 
-if (!private_key) {
-  throw new Error("PRIVATE_KEY is not defined ");
+if (!access_secret) {
+  throw new Error("access_secret is not defined ");
+}
+if (!refresh_secret) {
+  throw new Error("refresh_secret is not defined ");
 }
 
 app.use(express.json());
+app.use(cookieParser());
 app.use(
   cors({
     origin: "http://localhost:5173",
@@ -60,7 +67,7 @@ app.post("/login", async (req: Request, res: Response) => {
 
   const refresh_token = jwt.sign(
     { id: user.id, email: user.email },
-    private_key!,
+    refresh_secret!,
     { expiresIn: "2d" },
   );
   const expired_at = dayjs().add(2, "day").toDate();
@@ -73,11 +80,31 @@ app.post("/login", async (req: Request, res: Response) => {
 
   const access_token = jwt.sign(
     { id: user.id, email: user.email },
-    private_key!,
+    access_secret!,
     { expiresIn: "2h" },
   );
+
+  res.cookie("refresh_token", refresh_token, {
+    httpOnly: true,
+    secure: false,
+    sameSite: "strict",
+  });
+
   // TODO: Send access token as a HTTP cookie for more security
   res.json(access_token);
+});
+
+app.post("/auth", async (req: Request, res: Response) => {
+  const token = req.body;
+  try {
+    jwt.verify(token, access_secret);
+  } catch (e) {
+    if (e instanceof TokenExpiredError) {
+      console.log("Token expired");
+    } else {
+      console.log("Invalid token");
+    }
+  }
 });
 
 app.listen(PORT, () => console.log("Server running on port " + PORT));
