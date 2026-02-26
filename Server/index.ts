@@ -49,18 +49,17 @@ function authenticate(req: Request, res: Response, next: any) {
   if (parts.length !== 2 || parts[0] !== "Bearer") {
     return res.json({ message: "Invalid token format" });
   }
-
   const token = parts[1];
 
   try {
-    const payload = jwt.verify(token, access_secret);
-    (req as any).user = payload;
+    const data = jwt.verify(token, access_secret);
+    (req as any).user = data;
     next();
   } catch (err) {
     if (err instanceof TokenExpiredError) {
-      return res.status(401).json({ message: "Token expired" });
+      return res.json({ message: "Token expired" });
     }
-    return res.status(401).json({ message: "Invalid token" });
+    return res.json({ message: "Invalid token" });
   }
 }
 
@@ -120,7 +119,5 @@ app.post("/login", async (req: Request, res: Response) => {
   // TODO: Send access token as a HTTP cookie for more security
   res.json(access_token);
 });
-
-
 
 app.listen(PORT, () => console.log("Server running on port " + PORT));
