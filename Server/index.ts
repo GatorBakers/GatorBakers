@@ -7,7 +7,6 @@ import cors from "cors";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dayjs from "dayjs";
-import cookieParser from "cookie-parser";
 
 const saltRounds = 10;
 const adapter = new PrismaPg({
@@ -28,7 +27,6 @@ if (!refresh_secret) {
 }
 
 app.use(express.json());
-app.use(cookieParser());
 app.use(
   cors({
     origin: "http://localhost:5173",
@@ -109,14 +107,8 @@ app.post("/login", async (req: Request, res: Response) => {
     { expiresIn: "2h" },
   );
 
-  res.cookie("refresh_token", refresh_token, {
-    httpOnly: true,
-    secure: false,
-    sameSite: "strict",
-  });
-
   // TODO: Send access token as a HTTP cookie for more security
-  res.json(access_token);
+  res.json({ access_token, refresh_token });
 });
 
 app.listen(PORT, () => console.log("Server running on port " + PORT));
