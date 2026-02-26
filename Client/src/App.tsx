@@ -8,6 +8,7 @@ import SignUpPage from './pages/SignUpPage';
 import DiscoverPage from './pages/DiscoverPage';
 import YourOrdersPage from './pages/YourOrderPage';
 import SearchPage from './pages/SearchPage';
+import ProfilePage from './pages/ProfilePage';
 
 function App() {
 
@@ -22,7 +23,7 @@ function App() {
           <Route path="/orders" element={<YourOrdersPage />} />
           <Route path="/messages" element={<></>} /> {/* TODO: Add Messages Page */}
           <Route path="/create-listing" element={<></>} /> {/* TODO: Add Create Listing Page */}
-          <Route path="/profile" element={<></>} /> {/* TODO: Add Profile Page */}
+          <Route path="/profile" element={<ProfilePage/>} /> {/* TODO: Add Profile Page */}
         </Route>
 
         {/* Auth Layout */}
