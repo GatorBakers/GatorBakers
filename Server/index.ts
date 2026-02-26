@@ -37,6 +37,33 @@ app.use(
   }),
 );
 
+function authenticate(req: Request, res: Response, next: any) {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader) {
+    return res.json({ message: "No token provided" });
+  }
+  res.json(authHeader);
+  const parts = authHeader.split(" ");
+
+  if (parts.length !== 2 || parts[0] !== "Bearer") {
+    return res.json({ message: "Invalid token format" });
+  }
+
+  const token = parts[1];
+
+  try {
+    const payload = jwt.verify(token, access_secret);
+    (req as any).user = payload;
+    next();
+  } catch (err) {
+    if (err instanceof TokenExpiredError) {
+      return res.status(401).json({ message: "Token expired" });
+    }
+    return res.status(401).json({ message: "Invalid token" });
+  }
+}
+
 app.post("/register", async (req: Request, res: Response) => {
   const { email, password, first_name, last_name } = req.body;
   const hashedPassword = await bcrypt.hash(password, saltRounds);
@@ -94,17 +121,6 @@ app.post("/login", async (req: Request, res: Response) => {
   res.json(access_token);
 });
 
-app.post("/auth", async (req: Request, res: Response) => {
-  const token = req.body;
-  try {
-    jwt.verify(token, access_secret);
-  } catch (e) {
-    if (e instanceof TokenExpiredError) {
-      console.log("Token expired");
-    } else {
-      console.log("Invalid token");
-    }
-  }
-});
+
 
 app.listen(PORT, () => console.log("Server running on port " + PORT));
