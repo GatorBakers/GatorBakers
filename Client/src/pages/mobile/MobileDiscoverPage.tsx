@@ -27,6 +27,7 @@ const MobileDiscoverPage = ({ products }: MobileDiscoverPageProps) => {
                         title={product.title}
                         bakerName={product.bakerName}
                         price={product.price}
+                        buttonLabel="Order"
                     />
                 ))}
             </div>

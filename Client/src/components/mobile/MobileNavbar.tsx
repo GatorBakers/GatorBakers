@@ -18,7 +18,7 @@ const MobileNavbar = () => {
             </NavLink>
             <NavLink to="/orders" className="mobile-nav-tab">
                 <img src={HandbagIcon} alt="Orders" className="mobile-nav-icon" />
-                <span>Orders</span>
+                <span>Orders & Listings</span>
             </NavLink>
             <NavLink to="/messages" className="mobile-nav-tab">
                 <img src={MessagesIcon} alt="Messages" className="mobile-nav-icon" />
