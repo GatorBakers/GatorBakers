@@ -2,7 +2,9 @@ import './ProfilePage.css';
 import YourListingsColumn from '../components/YourListingsColumn';
 import type { Listing } from '../components/YourListingsColumn';
 
-// TODO: Add profile data from backend, this data is placeholder
+// TODO: Get listings from backend
+
+
 const name = "John Doe";
 const city = "New York";
 const state = "NY";
