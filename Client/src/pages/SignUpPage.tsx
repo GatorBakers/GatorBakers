@@ -1,19 +1,62 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import AuthCard from '../components/AuthCard';
 import AuthInput from '../components/AuthInput';
 import AuthButton from '../components/AuthButton';
 import AuthFooter from '../components/AuthFooter';
+import { registerUser } from '../services/authService';
+import { isValidEmail, validatePassword } from '../utils/validation';
 
 const SignUpPage = () => {
+    const navigate = useNavigate();
+    const isSubmitting = useRef(false);
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSignUp = async (e: React.SyntheticEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log({firstName, lastName, email, password, confirmPassword});
+        if (isSubmitting.current) return;
+        isSubmitting.current = true;
+        setError('');
+
+        if (!firstName.trim() || !lastName.trim() || !email.trim() || !password || !confirmPassword) {
+            setError('All fields are required.');
+            isSubmitting.current = false;
+            return;
+        }
+        if (!isValidEmail(email.trim())) {
+            setError('Please enter a valid email address.');
+            isSubmitting.current = false;
+            return;
+        }
+        const passwordError = validatePassword(password);
+        if (passwordError) {
+            setError(passwordError);
+            isSubmitting.current = false;
+            return;
+        }
+        if (password !== confirmPassword) {
+            setError('Passwords do not match.');
+            isSubmitting.current = false;
+            return;
+        }
+
+        setLoading(true);
+        
+        try {
+            await registerUser(email.trim(), password, firstName.trim(), lastName.trim());
+            navigate('/login', { state: { success: 'Account created successfully. Please log in.' } });
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'An unexpected error occurred.');
+        } finally {
+            setLoading(false);
+            isSubmitting.current = false;
+        }
     };
 
     return (
@@ -48,7 +91,8 @@ const SignUpPage = () => {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
             />
-            <AuthButton label="Sign Up" />
+            {error && <p className="auth-error" role="alert" aria-live="polite">{error}</p>}
+            <AuthButton label={loading ? 'Signing Up...' : 'Sign Up'} disabled={loading} />
             <AuthFooter
                 message="Already have an account?"
                 linkText="Log In"

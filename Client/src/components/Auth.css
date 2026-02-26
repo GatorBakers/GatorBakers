@@ -81,6 +81,12 @@
   background-color: #a67a5f;
 }
 
+.auth-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: #99908A;
+}
+
 .auth-button:focus {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
@@ -110,4 +116,20 @@
   color: var(--color-text-secondary);
   margin: -10px 0 16px;
   padding-left: 4px;
+}
+
+.auth-error {
+  width: 100%;
+  font-size: 0.85rem;
+  color: #D4403A;
+  text-align: center;
+  margin: 0 0 12px;
+}
+
+.auth-success {
+  width: 100%;
+  font-size: 0.85rem;
+  color: #3E843E;
+  text-align: center;
+  margin: 0 0 12px;
 }
