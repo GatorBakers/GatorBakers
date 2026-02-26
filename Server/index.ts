@@ -17,7 +17,7 @@ const adapter = new PrismaPg({
 export const prisma = new PrismaClient({ adapter });
 const app = express();
 const PORT = 4000;
-const access_secret = process.env.access_secret;
+const access_secret = process.env.ACCESS_TOKEN_SECRET!;
 const refresh_secret = process.env.REFRESH_TOKEN_SECRET!;
 
 if (!access_secret) {
