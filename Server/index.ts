@@ -43,7 +43,6 @@ function authenticate(req: Request, res: Response, next: any) {
   if (!authHeader) {
     return res.json({ message: "No token provided" });
   }
-  res.json(authHeader);
   const parts = authHeader.split(" ");
 
   if (parts.length !== 2 || parts[0] !== "Bearer") {
