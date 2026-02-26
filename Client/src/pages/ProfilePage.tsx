@@ -1,6 +1,6 @@
 import './ProfilePage.css';
-import EmptyState from '../components/EmptyState';
-import ProductCard from '../components/ProductCard';
+import YourListingsColumn from '../components/YourListingsColumn';
+import type { Listing } from '../components/YourListingsColumn';
 
 // TODO: Add profile data from backend, this data is placeholder
 const name = "John Doe";
@@ -9,13 +9,6 @@ const state = "NY";
 const favoriteBake = "Chocolate Cake";
 const photoUrl = "https://picsum.photos/150";
 // const photoUrl = false;
-
-interface Listing {
-    id: number;
-    title: string;
-    bakerName: string;
-    price: number;
-}
 
 const placeholderListings: Listing[] = [];
 
@@ -39,30 +32,7 @@ const ProfilePage = () => {
                 </div>
             </div>
 
-
-
-            <div className="your-listings-col">
-                <h2 className="profile-heading">Your Listings</h2>
-                <div className="your-listings-grid">
-                    {placeholderListings.length === 0 ? (
-                        <EmptyState
-                            title="No listings yet"
-                            subtitle="Listings you create will appear here."
-                            className="your-listings-empty-span"
-                        />
-                    ) : (
-                        placeholderListings.map((listing) => (
-                            <ProductCard 
-                                key={listing.id}
-                                title={listing.title}
-                                bakerName={listing.bakerName}
-                                price={listing.price}
-                                buttonLabel="View/Edit Listing"
-                            />
-                        ))
-                    )}
-                </div>
-            </div>
+            <YourListingsColumn listings={placeholderListings} />
         </div>
     );
 };
