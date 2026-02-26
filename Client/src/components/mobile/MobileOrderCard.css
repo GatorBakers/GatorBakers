@@ -1,0 +1,99 @@
+.m-order-card {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    background-color: #fff;
+    border-radius: 14px;
+    border: 1px solid #e8ddd6;
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.07);
+    overflow: hidden;
+}
+
+.m-order-card-image {
+    width: 72px;
+    flex-shrink: 0;
+    background-color: #e8dcc8;
+}
+
+.m-order-card-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 12px 14px;
+    gap: 8px;
+}
+
+.m-order-card-top-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.m-order-card-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.m-order-card-item-name {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #3b2f2f;
+    margin: 0;
+}
+
+.m-order-card-baker-name {
+    font-size: 0.78rem;
+    color: #7a6a60;
+    margin: 0;
+}
+
+.m-order-card-bottom-row {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.m-order-card-pickup {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.m-order-card-pickup-time {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #3b2f2f;
+    margin: 0;
+}
+
+.m-order-card-pickup-address {
+    font-size: 0.76rem;
+    color: #7a6a60;
+    margin: 0;
+}
+
+.m-order-card-details-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #8b6b52;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 0.2s ease;
+    flex-shrink: 0;
+}
+
+.m-order-card-details-btn:active {
+    color: #5c3d22;
+}
+
+/* Mobile StatusBadge size override */
+.m-order-card .status-badge {
+    padding: 3px 10px;
+    font-size: 0.72rem;
+}

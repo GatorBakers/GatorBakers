@@ -1,0 +1,25 @@
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 40px 24px;
+    background-color: #faf8f5;
+    border: 1px dashed #d9cec4;
+    border-radius: 14px;
+    text-align: center;
+}
+
+.empty-state-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #3b2f2f;
+    margin: 0;
+}
+
+.empty-state-sub {
+    font-size: 0.88rem;
+    color: #7a6a60;
+    margin: 0;
+}
