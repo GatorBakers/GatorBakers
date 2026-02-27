@@ -93,13 +93,32 @@ app.post("/refresh", async (req: Request, res: Response) => {
     return res.json({ message: "Refresh token expired" });
   }
 
+  const new_refresh_token = jwt.sign(
+    { id: data.id, email: data.email },
+    refresh_secret,
+    { expiresIn: "2d" },
+  );
+
   const access_token = jwt.sign(
     { id: data.id, email: data.email },
     access_secret!,
     { expiresIn: "2h" },
   );
 
-  res.json({ access_token });
+  const new_expired_at = dayjs().add(2, "day").toDate();
+
+  await prisma.token.update({
+    where: { user_id: data.id },
+    data: {
+      token: new_refresh_token,
+      expired_at: new_expired_at,
+    },
+  });
+
+  res.json({
+    access_token,
+    refresh_token: new_refresh_token,
+  });
 });
 
 app.post("/register", async (req: Request, res: Response) => {
