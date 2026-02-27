@@ -60,6 +60,67 @@ function authenticate(req: Request, res: Response, next: any) {
   }
 }
 
+interface tokenData {
+  id: number;
+  email: string;
+  iat?: number;
+  exp?: number;
+}
+
+app.post("/refresh", async (req: Request, res: Response) => {
+  const { refresh_token } = req.body;
+  if (!refresh_token) return res.json({ message: "No refresh token provided" });
+
+  let data: tokenData;
+  try {
+    data = jwt.verify(refresh_token, refresh_secret!) as tokenData;
+  } catch (err) {
+    return res.json({ message: "Invalid or expired refresh token" });
+  }
+
+  const db_token = await prisma.token.findUnique({
+    where: { user_id: data.id },
+  });
+
+  if (!db_token || db_token.token !== refresh_token) {
+    return res.status(401).json({ message: "Invalid refresh token" });
+  }
+
+  if (db_token.expired_at < new Date()) {
+    await prisma.token.delete({
+      where: { user_id: data.id },
+    });
+    return res.json({ message: "Refresh token expired" });
+  }
+
+  const new_refresh_token = jwt.sign(
+    { id: data.id, email: data.email },
+    refresh_secret,
+    { expiresIn: "2d" },
+  );
+
+  const access_token = jwt.sign(
+    { id: data.id, email: data.email },
+    access_secret!,
+    { expiresIn: "2h" },
+  );
+
+  const new_expired_at = dayjs().add(2, "day").toDate();
+
+  await prisma.token.update({
+    where: { user_id: data.id },
+    data: {
+      token: new_refresh_token,
+      expired_at: new_expired_at,
+    },
+  });
+
+  res.json({
+    access_token,
+    refresh_token: new_refresh_token,
+  });
+});
+
 app.post("/register", async (req: Request, res: Response) => {
   const { email, password, first_name, last_name } = req.body;
   const hashedPassword = await bcrypt.hash(password, saltRounds);

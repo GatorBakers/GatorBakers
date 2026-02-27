@@ -102,7 +102,7 @@ model Token {
   user      User   @relation(fields: [user_id], references: [id])
   token     String
   created_at DateTime  @default(now())
-  expired_at DateTime?
+  expired_at DateTime
 }
 
 model Listing {
