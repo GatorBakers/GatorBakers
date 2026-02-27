@@ -103,6 +103,23 @@
     text-decoration: none;
     white-space: nowrap;
     transition: background-color 0.2s ease;
+    position: relative;
+}
+
+.navbar-create-listing::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    border-radius: 2px;
+    background-color: transparent;
+    transition: background-color 0.2s ease;
+}
+
+.navbar-create-listing.active::after {
+    background-color: #8b6b52;
 }
 
 .navbar-create-listing:hover {
