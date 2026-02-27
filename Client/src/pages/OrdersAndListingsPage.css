@@ -28,21 +28,3 @@
     flex-direction: column;
     gap: 14px;
 }
-
-/* ── Listings column ── */
-.your-listings-col {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-}
-
-.your-listings-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-}
-
-.your-listings-empty-span {
-    grid-column: 1 / -1;
-}

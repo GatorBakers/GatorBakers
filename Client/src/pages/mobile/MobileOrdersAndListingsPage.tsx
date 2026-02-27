@@ -1,8 +1,9 @@
 import MobileOrderCard from '../../components/mobile/MobileOrderCard';
 import type { OrderStatus } from '../../components/StatusBadge';
-import ProductCard from '../../components/ProductCard';
+import UserListings from '../../components/UserListings';
+import type { Listing } from '../../components/UserListings';
 import EmptyState from '../../components/EmptyState';
-import './MobileYourOrdersPage.css';
+import './MobileOrdersAndListingsPage.css';
 
 interface Order {
     id: number;
@@ -11,13 +12,6 @@ interface Order {
     status: OrderStatus;
     pickupTime: string;
     pickupAddress: string;
-}
-
-interface Listing {
-    id: number;
-    title: string;
-    bakerName: string;
-    price: number;
 }
 
 interface MobileYourOrdersPageProps {
@@ -63,28 +57,7 @@ const MobileYourOrdersPage = ({ orders, listings }: MobileYourOrdersPageProps) =
                 </div>
             </section>
 
-            <section className="m-your-listings-section">
-                <h2 className="m-your-orders-heading">Your Listings</h2>
-                <div className="m-your-listings-grid">
-                    {listings.length === 0 ? (
-                        <EmptyState
-                            title="No listings yet"
-                            subtitle="Listings you create will appear here."
-                            className="m-your-listings-empty-span"
-                        />
-                    ) : (
-                        listings.map((listing) => (
-                            <ProductCard
-                                key={listing.id}
-                                title={listing.title}
-                                bakerName={listing.bakerName}
-                                price={listing.price}
-                                buttonLabel="View/Edit Listing"
-                            />
-                        ))
-                    )}
-                </div>
-            </section>
+            <UserListings listings={listings} />
         </div>
     );
 };

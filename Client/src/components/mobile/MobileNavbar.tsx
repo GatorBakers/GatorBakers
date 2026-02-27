@@ -16,7 +16,7 @@ const MobileNavbar = () => {
                 <img src={SearchIcon} alt="Search" className="mobile-nav-icon" />
                 <span>Search</span>
             </NavLink>
-            <NavLink to="/orders" className="mobile-nav-tab">
+            <NavLink to="/orders&listings" className="mobile-nav-tab">
                 <img src={HandbagIcon} alt="Orders" className="mobile-nav-icon" />
                 <span>Orders & Listings</span>
             </NavLink>

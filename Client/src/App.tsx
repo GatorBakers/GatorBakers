@@ -6,8 +6,9 @@ import AuthLayout from './AuthLayout';
 import LoginPage from './pages/LogInPage';
 import SignUpPage from './pages/SignUpPage';
 import DiscoverPage from './pages/DiscoverPage';
-import YourOrdersPage from './pages/YourOrderPage';
+import YourOrdersPage from './pages/OrdersAndListingsPage';
 import SearchPage from './pages/SearchPage';
+import ProfilePage from './pages/ProfilePage';
 
 function App() {
 
@@ -19,10 +20,10 @@ function App() {
           <Route path="/" element={<Navigate to="/login" replace/>} />
           <Route path="/discover" element={<DiscoverPage />} />
           <Route path="/search" element={<SearchPage />} />
-          <Route path="/orders" element={<YourOrdersPage />} />
+          <Route path="/orders&listings" element={<YourOrdersPage />} />
           <Route path="/messages" element={<></>} /> {/* TODO: Add Messages Page */}
           <Route path="/create-listing" element={<></>} /> {/* TODO: Add Create Listing Page */}
-          <Route path="/profile" element={<></>} /> {/* TODO: Add Profile Page */}
+          <Route path="/profile" element={<ProfilePage/>} /> {/* TODO: Add Profile Page */}
         </Route>
 
         {/* Auth Layout */}

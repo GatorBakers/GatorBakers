@@ -1,10 +1,11 @@
 import OrderCard from '../components/OrderCard';
 import type { OrderStatus } from '../components/StatusBadge';
-import ProductCard from '../components/ProductCard';
+import UserListings from '../components/UserListings';
+import type { Listing } from '../components/UserListings';
 import EmptyState from '../components/EmptyState';
-import MobileYourOrdersPage from './mobile/MobileYourOrdersPage';
+import MobileYourOrdersPage from './mobile/MobileOrdersAndListingsPage';
 import { useIsMobile } from '../hooks/useIsMobile';
-import './YourOrdersPage.css';
+import './OrdersAndListingsPage.css';
 
 interface Order {
     id: number;
@@ -13,13 +14,6 @@ interface Order {
     status: OrderStatus;
     pickupTime: string;
     pickupAddress: string;
-}
-
-interface Listing {
-    id: number;
-    title: string;
-    bakerName: string;
-    price: number;
 }
 
 // TODO: Replace with useState + useEffect fetching the authenticated user's orders from the API.
@@ -88,28 +82,7 @@ const YourOrdersPage = () => {
                 </div>
             </div>
 
-            <div className="your-listings-col">
-                <h2 className="your-orders-heading">Your Listings</h2>
-                <div className="your-listings-grid">
-                    {placeholderListings.length === 0 ? (
-                        <EmptyState
-                            title="No listings yet"
-                            subtitle="Listings you create will appear here."
-                            className="your-listings-empty-span"
-                        />
-                    ) : (
-                        placeholderListings.map((listing) => (
-                            <ProductCard
-                                key={listing.id}
-                                title={listing.title}
-                                bakerName={listing.bakerName}
-                                price={listing.price}
-                                buttonLabel="View/Edit Listing"
-                            />
-                        ))
-                    )}
-                </div>
-            </div>
+            <UserListings listings={placeholderListings} />
         </div>
     );
 };
