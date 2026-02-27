@@ -3,7 +3,7 @@ import type { OrderStatus } from '../../components/StatusBadge';
 import UserListings from '../../components/UserListings';
 import type { Listing } from '../../components/UserListings';
 import EmptyState from '../../components/EmptyState';
-import './MobileYourOrdersPage.css';
+import './MobileOrdersAndListingsPage.css';
 
 interface Order {
     id: number;

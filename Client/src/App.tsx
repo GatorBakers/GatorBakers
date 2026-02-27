@@ -6,7 +6,7 @@ import AuthLayout from './AuthLayout';
 import LoginPage from './pages/LogInPage';
 import SignUpPage from './pages/SignUpPage';
 import DiscoverPage from './pages/DiscoverPage';
-import YourOrdersPage from './pages/YourOrderPage';
+import YourOrdersPage from './pages/OrdersAndListingsPage';
 import SearchPage from './pages/SearchPage';
 import ProfilePage from './pages/ProfilePage';
 
