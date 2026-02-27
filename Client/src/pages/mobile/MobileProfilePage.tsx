@@ -1,16 +1,7 @@
 import UserListings from '../../components/UserListings';
 import type { Listing } from '../../components/UserListings';
+import type { UserProfile } from '../ProfilePage';
 import './MobileProfilePage.css';
-
-interface UserProfile {
-    name: string;
-    city: string;
-    state: string;
-    favoriteBake: string;
-    photoUrl: string;
-    ordersPlaced: number;
-    createdAt: string;
-}
 
 interface MobileProfilePageProps {
     userProfile: UserProfile;
