@@ -21,7 +21,7 @@ const Navbar = () => {
                     <img src={SearchIcon} alt="Search" className="navbar-icon" />
                     <span>Search</span>
                 </NavLink>
-                <NavLink to="/orders" className="navbar-link">
+                <NavLink to="/orders&listings" className="navbar-link">
                     <img src={HandbagIcon} alt="Your Orders" className="navbar-icon" />
                     <span>Orders & Listings</span>
                 </NavLink>
