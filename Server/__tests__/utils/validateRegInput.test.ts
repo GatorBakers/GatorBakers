@@ -60,6 +60,39 @@ describe("validateRegInput", () => {
     });
   });
 
+  // ── Non-string field types ──────────────────────────────────
+  describe("non-string field types", () => {
+    it("returns error when email is a number", () => {
+      expect(validateRegInput({ ...validInput, email: 123 as any })).toEqual({
+        error: "All fields are required.",
+      });
+    });
+
+    it("returns error when password is a number", () => {
+      expect(validateRegInput({ ...validInput, password: 456 as any })).toEqual({
+        error: "All fields are required.",
+      });
+    });
+
+    it("returns error when first_name is an array", () => {
+      expect(validateRegInput({ ...validInput, first_name: [] as any })).toEqual({
+        error: "All fields are required.",
+      });
+    });
+
+    it("returns error when last_name is an object", () => {
+      expect(validateRegInput({ ...validInput, last_name: {} as any })).toEqual({
+        error: "All fields are required.",
+      });
+    });
+
+    it("returns error when fields are booleans", () => {
+      expect(validateRegInput({ ...validInput, email: true as any, password: false as any })).toEqual({
+        error: "All fields are required.",
+      });
+    });
+  });
+
   // ── Whitespace-only fields ──────────────────────────────────
   describe("whitespace-only fields", () => {
     it("returns error when email is only whitespace", () => {

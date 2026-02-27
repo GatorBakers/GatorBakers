@@ -13,6 +13,15 @@ export function validateRegInput(input: {
 }): { error: string } | { sanitized: { email: string; password: string; first_name: string; last_name: string } } {
   const { email, password, first_name, last_name } = input;
 
+  if (
+    typeof email !== "string" ||
+    typeof password !== "string" ||
+    typeof first_name !== "string" ||
+    typeof last_name !== "string"
+  ) {
+    return { error: "All fields are required." };
+  }
+
   if (!email || !password || !first_name || !last_name) {
     return { error: "All fields are required." };
   }
