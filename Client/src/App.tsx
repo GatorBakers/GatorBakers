@@ -9,6 +9,7 @@ import DiscoverPage from './pages/DiscoverPage';
 import YourOrdersPage from './pages/OrdersAndListingsPage';
 import SearchPage from './pages/SearchPage';
 import ProfilePage from './pages/ProfilePage';
+import CreateListingPage from './pages/CreateListingPage';
 
 function App() {
 
@@ -22,8 +23,8 @@ function App() {
           <Route path="/search" element={<SearchPage />} />
           <Route path="/orders&listings" element={<YourOrdersPage />} />
           <Route path="/messages" element={<></>} /> {/* TODO: Add Messages Page */}
-          <Route path="/create-listing" element={<></>} /> {/* TODO: Add Create Listing Page */}
-          <Route path="/profile" element={<ProfilePage/>} /> {/* TODO: Add Profile Page */}
+          <Route path="/create-listing" element={<CreateListingPage />} />
+          <Route path="/profile" element={<ProfilePage/>} />
         </Route>
 
         {/* Auth Layout */}
