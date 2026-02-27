@@ -69,8 +69,7 @@ interface tokenData {
 
 app.post("/refresh", async (req: Request, res: Response) => {
   const { refresh_token } = req.body;
-  if (!refresh_token)
-    return res.status(401).json({ message: "No refresh token provided" });
+  if (!refresh_token) return res.json({ message: "No refresh token provided" });
 
   let data: tokenData;
   try {
@@ -87,15 +86,21 @@ app.post("/refresh", async (req: Request, res: Response) => {
     return res.status(401).json({ message: "Invalid refresh token" });
   }
 
+  if (db_token.expired_at < new Date()) {
+    await prisma.token.delete({
+      where: { user_id: data.id },
+    });
+    return res.json({ message: "Refresh token expired" });
+  }
+
   const access_token = jwt.sign(
     { id: data.id, email: data.email },
     access_secret!,
-    { expiresIn: "2h" }
+    { expiresIn: "2h" },
   );
 
   res.json({ access_token });
 });
-
 
 app.post("/register", async (req: Request, res: Response) => {
   const { email, password, first_name, last_name } = req.body;
