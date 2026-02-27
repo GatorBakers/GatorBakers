@@ -19,11 +19,11 @@ jobs:
           node-version: "22"
 
       - name: Install server dependencies
-        working-directory: server
+        working-directory: Server
         run: npm ci
 
       - name: Run server tests
-        working-directory: server
+        working-directory: Server
         run: npm test
 
   DeployDev:
