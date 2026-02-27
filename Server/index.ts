@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { PrismaClient } from "./generated/prisma";
 import express, { Request, Response } from "express";
+import { TokenExpiredError } from "jsonwebtoken";
 import { PrismaPg } from "@prisma/adapter-pg";
 import cors from "cors";
 import bcrypt from "bcrypt";
@@ -15,10 +16,14 @@ const adapter = new PrismaPg({
 export const prisma = new PrismaClient({ adapter });
 const app = express();
 const PORT = 4000;
-const private_key = process.env.PRIVATE_KEY;
+const access_secret = process.env.ACCESS_TOKEN_SECRET!;
+const refresh_secret = process.env.REFRESH_TOKEN_SECRET!;
 
-if (!private_key) {
-  throw new Error("PRIVATE_KEY is not defined ");
+if (!access_secret) {
+  throw new Error("access_secret is not defined ");
+}
+if (!refresh_secret) {
+  throw new Error("refresh_secret is not defined ");
 }
 
 app.use(express.json());
@@ -29,6 +34,31 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"],
   }),
 );
+
+function authenticate(req: Request, res: Response, next: any) {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader) {
+    return res.json({ message: "No token provided" });
+  }
+  const parts = authHeader.split(" ");
+
+  if (parts.length !== 2 || parts[0] !== "Bearer") {
+    return res.json({ message: "Invalid token format" });
+  }
+  const token = parts[1];
+
+  try {
+    const data = jwt.verify(token, access_secret);
+    (req as any).user = data;
+    next();
+  } catch (err) {
+    if (err instanceof TokenExpiredError) {
+      return res.json({ message: "Token expired" });
+    }
+    return res.json({ message: "Invalid token" });
+  }
+}
 
 app.post("/register", async (req: Request, res: Response) => {
   const { email, password, first_name, last_name } = req.body;
@@ -60,7 +90,7 @@ app.post("/login", async (req: Request, res: Response) => {
 
   const refresh_token = jwt.sign(
     { id: user.id, email: user.email },
-    private_key!,
+    refresh_secret!,
     { expiresIn: "2d" },
   );
   const expired_at = dayjs().add(2, "day").toDate();
@@ -73,11 +103,12 @@ app.post("/login", async (req: Request, res: Response) => {
 
   const access_token = jwt.sign(
     { id: user.id, email: user.email },
-    private_key!,
+    access_secret!,
     { expiresIn: "2h" },
   );
+
   // TODO: Send access token as a HTTP cookie for more security
-  res.json(access_token);
+  res.json({ access_token, refresh_token });
 });
 
 app.listen(PORT, () => console.log("Server running on port " + PORT));
