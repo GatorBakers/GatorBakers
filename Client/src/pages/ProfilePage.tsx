@@ -1,41 +1,61 @@
 import './ProfilePage.css';
 import UserListings from '../components/UserListings';
 import type { Listing } from '../components/UserListings';
+import { useIsMobile } from '../hooks/useIsMobile';
+import MobileProfilePage from './mobile/MobileProfilePage';
 
 // TODO: Get listings from backend
 
+interface UserProfile {
+    name: string;
+    city: string;
+    state: string;
+    favoriteBake: string;
+    photoUrl: string;
+    ordersPlaced: number;
+    createdAt: string;
+}
 
-const name: string = "John Doe";
-const city: string = "New York";
-const state: string = "NY";
-const favoriteBake: string = "Chocolate Cake";
-const photoUrl: string = "https://picsum.photos/150";
-const ordersPlaced: number = 10;
-const createdAt: string = new Date().toLocaleDateString();
-// const photoUrl = false;
+const userProfile: UserProfile = {
+    name: "John Doe",
+    city: "New York",
+    state: "NY",
+    favoriteBake: "Chocolate Cake",
+    photoUrl: "https://picsum.photos/150",
+    ordersPlaced: 10,
+    createdAt: new Date().toLocaleDateString(),
+};
 
 const placeholderListings: Listing[] = [];
 
 const ProfilePage = () => {
-    const initial = name.charAt(0).toUpperCase();
+    const isMobile = useIsMobile();
+
+    if (isMobile) {
+        return (
+            <MobileProfilePage userProfile={userProfile} listings={placeholderListings} />
+        )
+    }
+
+    const initial = userProfile.name.charAt(0).toUpperCase();
 
     return (
         <div className="profile-page">
             
             <div className="profile-col">
-                <h2 className="profile-heading">{name}'s Profile</h2>
+                <h2 className="profile-heading">{userProfile.name}'s Profile</h2>
                 <div className="profile-info">
-                    {photoUrl ? (
-                        <img className="profile-avatar-img" src={photoUrl} alt={`${name}'s profile`} />
+                    {userProfile.photoUrl ? (
+                        <img className="profile-avatar-img" src={userProfile.photoUrl} alt={`${userProfile.name}'s profile`} />
                     ) : (
                         <div className="profile-avatar-initial">{initial}</div>
                     )}
-                    <p className="profile-name">{name}</p>
-                    <p className="profile-location">{city}, {state}</p>
-                    <p className="profile-favorite-bake">Favorite Thing To Bake: {favoriteBake}</p>
+                    <p className="profile-name">{userProfile.name}</p>
+                    <p className="profile-location">{userProfile.city}, {userProfile.state}</p>
+                    <p className="profile-favorite-bake">Favorite Thing To Bake: {userProfile.favoriteBake}</p>
                     <p className="profile-active-listings">Active Listings: {placeholderListings.length}</p>
-                    <p className="profile-orders-places">Orders Placed: {ordersPlaced}</p>
-                    <p className="profile-created-at">Created At: {createdAt}</p>
+                    <p className="profile-orders-places">Orders Placed: {userProfile.ordersPlaced}</p>
+                    <p className="profile-created-at">Created At: {userProfile.createdAt}</p>
                 </div>
             </div>
 
