@@ -1,7 +1,7 @@
 import MobileOrderCard from '../../components/mobile/MobileOrderCard';
 import type { OrderStatus } from '../../components/StatusBadge';
-import YourListingsColumn from '../../components/YourListingsColumn';
-import type { Listing } from '../../components/YourListingsColumn';
+import UserListings from '../../components/UserListings';
+import type { Listing } from '../../components/UserListings';
 import EmptyState from '../../components/EmptyState';
 import './MobileYourOrdersPage.css';
 
@@ -57,7 +57,7 @@ const MobileYourOrdersPage = ({ orders, listings }: MobileYourOrdersPageProps) =
                 </div>
             </section>
 
-            <YourListingsColumn listings={listings} />
+            <UserListings listings={listings} />
         </div>
     );
 };

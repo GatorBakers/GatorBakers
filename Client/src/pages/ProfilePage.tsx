@@ -1,6 +1,6 @@
 import './ProfilePage.css';
-import YourListingsColumn from '../components/YourListingsColumn';
-import type { Listing } from '../components/YourListingsColumn';
+import UserListings from '../components/UserListings';
+import type { Listing } from '../components/UserListings';
 
 // TODO: Get listings from backend
 
@@ -39,7 +39,7 @@ const ProfilePage = () => {
                 </div>
             </div>
 
-            <YourListingsColumn listings={placeholderListings} />
+            <UserListings listings={placeholderListings} />
         </div>
     );
 };

@@ -1,6 +1,6 @@
 import ProductCard from './ProductCard';
 import EmptyState from './EmptyState';
-import './YourListingsColumn.css';
+import './UserListings.css';
 
 export interface Listing {
     id: number;
@@ -9,11 +9,11 @@ export interface Listing {
     price: number;
 }
 
-interface YourListingsColumnProps {
+interface UserListingsProps {
     listings: Listing[];
 }
 
-const YourListingsColumn = ({ listings }: YourListingsColumnProps) => {
+const UserListings = ({ listings }: UserListingsProps) => {
     return (
         <div className="your-listings-col">
             <h2 className="your-listings-heading">Your Listings</h2>
@@ -40,4 +40,4 @@ const YourListingsColumn = ({ listings }: YourListingsColumnProps) => {
     );
 };
 
-export default YourListingsColumn;
+export default UserListings;

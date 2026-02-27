@@ -1,7 +1,7 @@
 import OrderCard from '../components/OrderCard';
 import type { OrderStatus } from '../components/StatusBadge';
-import YourListingsColumn from '../components/YourListingsColumn';
-import type { Listing } from '../components/YourListingsColumn';
+import UserListings from '../components/UserListings';
+import type { Listing } from '../components/UserListings';
 import EmptyState from '../components/EmptyState';
 import MobileYourOrdersPage from './mobile/MobileYourOrdersPage';
 import { useIsMobile } from '../hooks/useIsMobile';
@@ -82,7 +82,7 @@ const YourOrdersPage = () => {
                 </div>
             </div>
 
-            <YourListingsColumn listings={placeholderListings} />
+            <UserListings listings={placeholderListings} />
         </div>
     );
 };
