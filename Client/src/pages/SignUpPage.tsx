@@ -31,10 +31,12 @@ const SignUpPage = () => {
         }
         if (!isValidName(firstName)) {
             setError('First name can only contain letters, hyphens, apostrophes, periods, and spaces.');
+            isSubmitting.current = false;
             return;
         }
         if (!isValidName(lastName)) {
             setError('Last name can only contain letters, hyphens, apostrophes, periods, and spaces.');
+            isSubmitting.current = false;
             return;
         }
         if (!isValidEmail(email.trim())) {
