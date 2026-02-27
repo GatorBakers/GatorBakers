@@ -12,9 +12,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Compile
-        run: echo Compiling build
-      # Here is where unit tests will be run, so the pipeline will stop if the build fails
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install server dependencies
+        working-directory: Server
+        run: npm ci
+
+      - name: Run server tests
+        working-directory: Server
+        run: npm test
 
   DeployDev:
     name: Deploying to Development

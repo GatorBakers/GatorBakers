@@ -24,5 +24,6 @@ export async function registerUser(email: string, password: string, firstName: s
         }
         throw new Error(errorMessage);
     }
-    return response.json();
+    
+    return;
 }

@@ -5,7 +5,7 @@ import AuthInput from '../components/AuthInput';
 import AuthButton from '../components/AuthButton';
 import AuthFooter from '../components/AuthFooter';
 import { registerUser } from '../services/authService';
-import { isValidEmail, validatePassword } from '../utils/validation';
+import { isValidEmail, isValidName, validatePassword } from '@shared/utils/validation';
 
 const SignUpPage = () => {
     const navigate = useNavigate();
@@ -26,6 +26,16 @@ const SignUpPage = () => {
 
         if (!firstName.trim() || !lastName.trim() || !email.trim() || !password || !confirmPassword) {
             setError('All fields are required.');
+            isSubmitting.current = false;
+            return;
+        }
+        if (!isValidName(firstName)) {
+            setError('First name can only contain letters, hyphens, apostrophes, periods, and spaces.');
+            isSubmitting.current = false;
+            return;
+        }
+        if (!isValidName(lastName)) {
+            setError('Last name can only contain letters, hyphens, apostrophes, periods, and spaces.');
             isSubmitting.current = false;
             return;
         }
