@@ -25,6 +25,7 @@ const INITIAL_LISTING: ListingForm = {
 
 const CreateListingPage = () => {
     const [listing, setListing] = useState<ListingForm>(INITIAL_LISTING);
+    const [uploadKey, setUploadKey] = useState(0);
 
     const handleChange = (field: keyof ListingForm, value: ListingForm[typeof field]) => {
         setListing(prev => ({ ...prev, [field]: value }));
@@ -34,6 +35,8 @@ const CreateListingPage = () => {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         console.log('Listing to submit:', listing);
+        setListing(INITIAL_LISTING);
+        setUploadKey(k => k + 1);
     };
 
     return (
@@ -44,7 +47,7 @@ const CreateListingPage = () => {
 
             <div className="create-listing-section">
                 <h3 className="create-listing-section-title">Item Photo</h3>
-                <ImageUpload onFileChange={(file) => handleChange('image', file)} />
+                <ImageUpload key={uploadKey} onFileChange={(file) => handleChange('image', file)} />
             </div>
 
             <hr className="create-listing-divider" />
