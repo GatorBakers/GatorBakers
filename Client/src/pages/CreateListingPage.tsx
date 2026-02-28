@@ -25,8 +25,10 @@ const INITIAL_LISTING: ListingForm = {
 
 const CreateListingPage = () => {
     const [listing, setListing] = useState<ListingForm>(INITIAL_LISTING);
+    // uploadKey is incremented on submit to force ImageUpload to remount and clear its preview
     const [uploadKey, setUploadKey] = useState(0);
 
+    // Generic field updater — pass the field name and new value to update a single listing property
     const handleChange = (field: keyof ListingForm, value: ListingForm[typeof field]) => {
         setListing(prev => ({ ...prev, [field]: value }));
     };
@@ -35,8 +37,8 @@ const CreateListingPage = () => {
     const handleSubmit = (e: SubmitEvent) => {
         e.preventDefault();
         console.log('Listing to submit:', listing);
-        setListing(INITIAL_LISTING);
-        setUploadKey(k => k + 1);
+        setListing(INITIAL_LISTING);       // reset form state
+        setUploadKey(k => k + 1);          // remount ImageUpload to clear the image preview
     };
 
     return (
