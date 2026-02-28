@@ -1,0 +1,88 @@
+.create-listing-page {
+    max-width: 680px;
+    margin: 40px auto;
+    padding: 0 32px 64px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.create-listing-heading {
+    font-family: 'Georgia', serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #8b5e3c;
+    margin: 0;
+}
+
+.create-listing-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.create-listing-section-title {
+    font-family: 'Georgia', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #5c3d1e;
+    margin: 0;
+}
+
+.create-listing-label {
+    font-family: 'Georgia', serif;
+    font-size: 0.95rem;
+    color: #5c3d1e;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.create-listing-input,
+.create-listing-textarea {
+    font-family: inherit;
+    font-size: 0.95rem;
+    color: #3b2a1a;
+    background: #fff;
+    border: 1.5px solid #d4b896;
+    border-radius: 8px;
+    padding: 10px 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.create-listing-input:focus,
+.create-listing-textarea:focus {
+    border-color: #8b5e3c;
+}
+
+.create-listing-textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.create-listing-divider {
+    border: none;
+    border-top: 1.5px solid #e8d5c0;
+    margin: 0;
+}
+
+.create-listing-submit {
+    align-self: flex-end;
+    font-family: 'Georgia', serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #fff;
+    background: #8b5e3c;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 28px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.create-listing-submit:hover {
+    background: #6f4a2d;
+}
