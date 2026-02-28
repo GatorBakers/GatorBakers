@@ -1,7 +1,7 @@
 // TODO: Ingredients Section (Type them in and press add)
 // TODO: Allergen Section (Present common allergens and allow users to add custom allergens)
 
-import { useState } from 'react';
+import { useState, type SubmitEvent } from 'react';
 import ImageUpload from '../components/ImageUpload';
 import './CreateListingPage.css';
 
@@ -32,7 +32,7 @@ const CreateListingPage = () => {
     };
 
     // TODO: Build FormData from `listing` and POST to /api/listings
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = (e: SubmitEvent) => {
         e.preventDefault();
         console.log('Listing to submit:', listing);
         setListing(INITIAL_LISTING);
