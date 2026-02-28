@@ -1,0 +1,68 @@
+.m-profile-page {
+    padding: 72px 16px 88px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.m-profile-section {
+    display: flex;
+    flex-direction: column;
+}
+
+.m-profile-heading {
+    font-family: 'Georgia', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #8b5e3c;
+    margin: 0 0 16px;
+}
+
+.m-profile-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.m-profile-info p {
+    margin: 0;
+    font-weight: bold;
+}
+
+.m-profile-avatar-img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 8px;
+}
+
+.m-profile-avatar-initial {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background-color: #8b6b52;
+    color: #fff;
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.m-profile-name {
+    font-size: 1.1rem;
+    color: #3d2b1f;
+}
+
+.m-profile-location {
+    font-size: 0.95rem;
+    color: #7a5c44;
+}
+
+.m-profile-detail {
+    font-size: 0.9rem;
+    color: #5a4030;
+}
