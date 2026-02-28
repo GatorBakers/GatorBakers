@@ -3,12 +3,15 @@ import UploadIcon from '../assets/ImageUpload.svg';
 import CloseIcon from '../assets/CloseIcon.svg';
 import './ImageUpload.css';
 
-const ImageUpload = () => {
+interface ImageUploadProps {
+    onFileChange?: (file: File | null) => void;
+}
+
+const ImageUpload = ({ onFileChange }: ImageUploadProps) => {
     const [imgSrc, setImgSrc] = useState<string | null>(null);
 
     const handleDragOver = (e: React.DragEvent<HTMLLabelElement>) => {
         e.preventDefault();
-        console.log('Drag over');
     }
 
     const handleDrop = (e: React.DragEvent<HTMLLabelElement>) => {
@@ -23,6 +26,7 @@ const ImageUpload = () => {
     const handleFiles = (files: FileList) => {
         if (!files) return;
         const file = files[0];
+        onFileChange?.(file);
         const reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = () => {
@@ -30,14 +34,21 @@ const ImageUpload = () => {
         }
     }
 
+    const handleClear = () => {
+        setImgSrc(null);
+        onFileChange?.(null);
+    }
+
     const uploadContent = (
-        <label 
-        onDragOver={handleDragOver}
-        onDrop={handleDrop}
-        className='img-upload' htmlFor='img-upload'>
+        <label
+            onDragOver={handleDragOver}
+            onDrop={handleDrop}
+            className='img-upload'
+            htmlFor='img-upload'
+        >
             <img src={UploadIcon} alt='Upload' />
             <span>Upload an Image</span>
-            <input onChange={handleImgInput} type='file' id='img-upload'/>
+            <input onChange={handleImgInput} type='file' id='img-upload' />
         </label>
     )
 
@@ -45,7 +56,7 @@ const ImageUpload = () => {
         <div className='img-preview'>
             <img src={imgSrc ?? undefined} alt='' />
             <div className='overlay'>
-                <button onClick={() => setImgSrc(null)} className='close-btn'>
+                <button onClick={handleClear} className='close-btn'>
                     <img src={CloseIcon} alt='Close' />
                 </button>
             </div>
