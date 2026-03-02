@@ -48,7 +48,7 @@ const ImageUpload = ({ onFileChange }: ImageUploadProps) => {
         >
             <img src={UploadIcon} alt='Upload' />
             <span>Upload an Image</span>
-            <input onChange={handleImgInput} type='file' id='img-upload' />
+            <input onChange={handleImgInput} type='file' id='img-upload' accept='image/*' />
         </label>
     )
 
