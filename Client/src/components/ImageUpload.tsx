@@ -26,6 +26,10 @@ const ImageUpload = ({ onFileChange }: ImageUploadProps) => {
     const handleFiles = (files: FileList) => {
         if (!files) return;
         const file = files[0];
+
+        if (!file.type.startsWith('image/')) return;
+        if (file.size > 5 * 1024 * 1024) return; // 5MB limit (Can be changed)
+
         onFileChange?.(file);
         const reader = new FileReader();
         reader.readAsDataURL(file);
