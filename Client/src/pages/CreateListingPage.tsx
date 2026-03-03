@@ -37,6 +37,20 @@ const CreateListingPage = () => {
     const handleSubmit = (e: SubmitEvent) => {
         e.preventDefault();
         console.log('Listing to submit:', listing);
+
+        const formData = new FormData();
+        formData.append('name', listing.name);
+        formData.append('description', listing.description);
+        formData.append('price', listing.price);
+        listing.ingredients.forEach(i => formData.append('ingredients[]', i));
+        listing.allergens.forEach(a => formData.append('allergens[]', a));
+        if (listing.image) formData.append('image', listing.image);
+
+        // display form data in the console
+        for (const [key, value] of formData.entries()) {
+            console.log(`${key}: ${value}`);
+        }
+
         setListing(INITIAL_LISTING);       // reset form state
         setUploadKey(k => k + 1);          // remount ImageUpload to clear the image preview
     };
