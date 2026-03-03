@@ -25,10 +25,8 @@ const INITIAL_LISTING: ListingForm = {
 
 const CreateListingPage = () => {
     const [listing, setListing] = useState<ListingForm>(INITIAL_LISTING);
-    // uploadKey is incremented on submit to force ImageUpload to remount and clear its preview
     const [uploadKey, setUploadKey] = useState(0);
 
-    // pass the field name and new value to update a single listing property
     const handleChange = (field: keyof ListingForm, value: ListingForm[typeof field]) => {
         setListing(prev => ({ ...prev, [field]: value }));
     };
@@ -39,20 +37,19 @@ const CreateListingPage = () => {
         console.log('Listing to submit:', listing);
 
         const formData = new FormData();
-        formData.append('name', listing.name);
-        formData.append('description', listing.description);
-        formData.append('price', listing.price);
+        formData.append('name', listing.name.trim());
+        formData.append('description', listing.description.trim());
+        formData.append('price', listing.price.trim());
         listing.ingredients.forEach(i => formData.append('ingredients[]', i));
         listing.allergens.forEach(a => formData.append('allergens[]', a));
         if (listing.image) formData.append('image', listing.image);
 
-        // display form data in the console
         for (const [key, value] of formData.entries()) {
             console.log(`${key}: ${value}`);
         }
 
-        setListing(INITIAL_LISTING);       // reset form state
-        setUploadKey(k => k + 1);          // remount ImageUpload to clear the image preview
+        setListing(INITIAL_LISTING);
+        setUploadKey(k => k + 1);
     };
 
     return (
@@ -98,7 +95,13 @@ const CreateListingPage = () => {
                         min="0"
                         step="0.01"
                         value={listing.price}
-                        onChange={(e) => handleChange('price', e.target.value)}
+                        onChange={(e) => {
+                            const val = e.target.value;
+                            if (/^\d*\.?\d{0,2}$/.test(val)) handleChange('price', val);
+                        }}
+                        onBlur={() => {
+                            if (listing.price) handleChange('price', parseFloat(listing.price).toFixed(2));
+                        }}
                     />
                 </label>
             </div>
