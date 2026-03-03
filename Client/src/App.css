@@ -12,12 +12,12 @@
 
 .headline-container h1 {
   font-family: 'Georgia', serif;
-  color: #8b5e3c;
+  color: var(--color-brand);
   margin: 0 0 6px;
 }
 
 .headline-container p {
-  color: #5c4a3a;
+  color: var(--color-brand-muted);
   font-size: 1.05rem;
   margin: 0;
 }

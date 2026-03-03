@@ -5,23 +5,91 @@
   --color-primary-dark: #6B4F0E;
   --color-primary-light: rgba(139, 105, 20, 0.1);
 
+  /* White */
+  --color-white: #ffffff;
+
   /* Backgrounds */
   --color-background: #ffffff;
   --color-background-warm: #faf8f5;
+  --color-background-subtle: #f9f9f9;
   --color-surface: #f5f0e8;
+  --color-surface-warm-light: #f0d9c8;
+  --color-surface-input: #f0e6dc;
+  --color-surface-card: #e8ddd6;
+  --color-surface-warm: #e8d5c0;
 
   /* Text */
   --color-text: #3d2e1a;
   --color-text-secondary: #7a6a55;
+  --color-text-dark: #3b2f2f;
+  --color-text-deep: #3d2b1f;
+  --color-text-muted: #7a6a60;
+  --color-text-brown: #3b2a1a;
+  --color-text-section: #5c3d1e;
+  --color-text-profile: #7a5c44;
+  --color-text-profile-detail: #5a4030;
 
   /* Borders */
   --color-border: #e5ddd1;
+  --color-border-warm: #e8e0da;
+  --color-border-neutral: #e8e8e8;
+  --color-border-muted: #d9cec4;
+  --color-border-input: #e0d5cc;
+  --color-border-hover: #e4d4c6;
+  --color-border-subtle: #ddd;
 
   /* Accent colors */
   --color-accent: #4a5568;
+  --color-accent-warm: #d4b896;
+  --color-blue-focus: #5a9ad6;
 
   /* Avatar */
   --color-avatar-bg: #e8dcc8;
+
+  /* Brand browns */
+  --color-brand: #8b5e3c;
+  --color-brand-medium: #8b6b52;
+  --color-brand-hover: #6c513d;
+  --color-brand-dark: #6f4a2d;
+  --color-brand-muted: #5c4a3a;
+
+  /* Category filter */
+  --color-category-text: #5c4a3e;
+
+  /* Link / button hover */
+  --color-link-hover: #5c3d22;
+
+  /* Muted / secondary tones */
+  --color-muted-warm: #cbb8a8;
+  --color-muted-brown: #a89585;
+  --color-icon-muted: #a08070;
+  --color-placeholder: #b0a090;
+  --color-placeholder-light: #aaa;
+  --color-gray-medium: #777;
+  --color-gray-dark: #555;
+  --color-disabled: #99908a;
+
+  /* CTA / action buttons */
+  --color-cta: #c4835a;
+  --color-cta-hover: #b0724d;
+  --color-cta-active: #b07a56;
+  --color-cta-active-hover: #9c6b4a;
+
+  /* Auth component */
+  --color-auth-btn: #b8896e;
+  --color-auth-btn-hover: #a67a5f;
+
+  /* Feedback */
+  --color-error: #d4403a;
+  --color-success: #3e843e;
+
+  /* Status badges */
+  --color-status-success-bg: #d4f0d8;
+  --color-status-success: #2e7d45;
+  --color-status-warning-bg: #fdecd2;
+  --color-status-warning: #a05a1a;
+  --color-status-error-bg: #fde8e8;
+  --color-status-error: #c0392b;
 
   /* Typography */
   font-family: "Inter", system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;

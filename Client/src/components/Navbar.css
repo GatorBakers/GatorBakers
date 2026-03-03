@@ -3,8 +3,8 @@
     align-items: center;
     justify-content: space-between;
     padding: 12px 32px;
-    border-bottom: 1px solid #e8e0da;
-    background-color: #fff;
+    border-bottom: 1px solid var(--color-border-warm);
+    background-color: var(--color-white);
     position: relative;
 }
 
@@ -13,7 +13,7 @@
     font-style: italic;
     font-size: 1.5rem;
     font-weight: 700;
-    color: #8b6b52;
+    color: var(--color-brand-medium);
     text-decoration: none;
 }
 
@@ -32,7 +32,7 @@
     align-items: center;
     gap: 4px;
     text-decoration: none;
-    color: #8b6b52;
+    color: var(--color-brand-medium);
     font-size: 0.85rem;
     font-weight: 500;
     position: relative;
@@ -50,7 +50,7 @@
 }
 
 .navbar-link.active::after {
-    background-color: #8b6b52;
+    background-color: var(--color-brand-medium);
 }
 
 .navbar-icon {
@@ -83,7 +83,7 @@
 }
 
 .navbar-messages.active::after {
-    background-color: #8b6b52;
+    background-color: var(--color-brand-medium);
 }
 
 .navbar-messages .navbar-icon {
@@ -96,8 +96,8 @@
     align-items: center;
     padding: 8px 16px;
     border-radius: 20px;
-    background-color: #8b6b52;
-    color: #fff;
+    background-color: var(--color-brand-medium);
+    color: var(--color-white);
     font-size: 0.85rem;
     font-weight: 600;
     text-decoration: none;
@@ -119,12 +119,12 @@
 }
 
 .navbar-create-listing.active::after {
-    background-color: #8b6b52;
+    background-color: var(--color-brand-medium);
 }
 
 .navbar-create-listing:hover {
-    background-color: #6c513d;
-    color: #fff;
+    background-color: var(--color-brand-hover);
+    color: var(--color-white);
 }
 
 .navbar-avatar {
@@ -134,8 +134,8 @@
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    background-color: #8b6b52;
-    color: #fff;
+    background-color: var(--color-brand-medium);
+    color: var(--color-white);
     font-size: 0.9rem;
     font-weight: 600;
     text-decoration: none;
@@ -155,10 +155,10 @@
 }
 
 .navbar-avatar.active::after {
-    background-color: #8b6b52;
+    background-color: var(--color-brand-medium);
 }
 
 .navbar-avatar:hover {
-    background-color: #6c513d;
-    color:#fff;
+    background-color: var(--color-brand-hover);
+    color: var(--color-white);
 }

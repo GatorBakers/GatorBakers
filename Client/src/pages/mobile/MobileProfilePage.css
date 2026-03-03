@@ -14,7 +14,7 @@
     font-family: 'Georgia', serif;
     font-size: 1.4rem;
     font-weight: 700;
-    color: #8b5e3c;
+    color: var(--color-brand);
     margin: 0 0 16px;
 }
 
@@ -45,8 +45,8 @@
     width: 120px;
     height: 120px;
     border-radius: 50%;
-    background-color: #8b6b52;
-    color: #fff;
+    background-color: var(--color-brand-medium);
+    color: var(--color-white);
     font-size: 2rem;
     font-weight: 600;
     margin-bottom: 8px;
@@ -54,15 +54,15 @@
 
 .m-profile-name {
     font-size: 1.1rem;
-    color: #3d2b1f;
+    color: var(--color-text-deep);
 }
 
 .m-profile-location {
     font-size: 0.95rem;
-    color: #7a5c44;
+    color: var(--color-text-profile);
 }
 
 .m-profile-detail {
     font-size: 0.9rem;
-    color: #5a4030;
+    color: var(--color-text-profile-detail);
 }
