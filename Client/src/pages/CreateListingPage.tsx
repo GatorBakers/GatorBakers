@@ -103,6 +103,7 @@ const CreateListingPage = () => {
                         onBlur={() => {
                             if (listing.price) handleChange('price', parseFloat(listing.price).toFixed(2));
                         }}
+                        onKeyDown={(e) => { if (e.key === 'Enter') e.preventDefault(); }}
                     />
                 </label>
             </div>
