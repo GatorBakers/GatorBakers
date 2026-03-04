@@ -3,6 +3,7 @@
 
 import { useState, type SubmitEvent } from 'react';
 import ImageUpload from '../components/ImageUpload';
+import ButtonAddOn from '../components/ButtonAddOn';
 import './CreateListingPage.css';
 
 interface ListingForm {
@@ -110,7 +111,11 @@ const CreateListingPage = () => {
 
             <div className="create-listing-section">
                 <h3 className="create-listing-section-title">Ingredients</h3>
-                {/* TODO: Ingredient input + add button — update listing.ingredients */}
+                <ButtonAddOn
+                    label="List every ingredient in your item. Press Enter or click Add."
+                    placeholder="e.g. Butter, Flour, Sugar..."
+                    onItemsChange={(items) => handleChange('ingredients', items)}
+                />
             </div>
 
             <hr className="create-listing-divider" />
@@ -118,6 +123,11 @@ const CreateListingPage = () => {
             <div className="create-listing-section">
                 <h3 className="create-listing-section-title">Allergens</h3>
                 {/* TODO: Common allergen checkboxes + custom allergen input — update listing.allergens */}
+                <ButtonAddOn
+                    label="List ALL APPLICABLE allergens. Press Enter or click Add."
+                    placeholder="e.g. Milk, Eggs, Gluten, Soy, Nuts, etc."
+                    onItemsChange={(items) => handleChange('allergens', items)}
+                />
             </div>
 
             <button className="create-listing-submit" type="submit">Create Listing</button>
