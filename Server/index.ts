@@ -133,7 +133,9 @@ app.post("/register", async (req: Request, res: Response) => {
 
   const existingUser = await prisma.user.findUnique({ where: { email } });
   if (existingUser) {
-    return res.status(409).json({ message: "An account with this email already exists." });
+    return res
+      .status(409)
+      .json({ message: "An account with this email already exists." });
   }
 
   const hashedPassword = await bcrypt.hash(password, saltRounds);
@@ -224,6 +226,42 @@ app.post("/listing", async (req: Request, res: Response) => {
   }
 });
 
+app.patch("/listing/:id", async (req: Request, res: Response) => {
+  // TODO: Add funcitonality for updating locations model
+  const id = Number(req.params.id);
+  const updateData: any = {};
+
+  if (req.body.title !== undefined) updateData.title = req.body.title;
+
+  if (req.body.description !== undefined)
+    updateData.description = req.body.description;
+
+  if (req.body.price !== undefined)
+    updateData.price = req.body.price.toString();
+
+  if (req.body.remaining_inventory !== undefined)
+    updateData.remaining_inventory = Number(req.body.remaining_inventory);
+
+  if (req.body.photo_url !== undefined)
+    updateData.photo_url = req.body.photo_url;
+
+  if (req.body.listing_status !== undefined)
+    updateData.listing_status = req.body.listing_status;
+
+  if (!id || isNaN(id)) {
+    return res.json({ message: "Invalid listing id" });
+  }
+  try {
+    const updated_listing = await prisma.listing.update({
+      where: { id },
+      data: updateData,
+    });
+    res.json(updated_listing);
+  } catch (error) {
+    res.json({ message: "Server error", error });
+  }
+});
+
 app.delete("/listing/:id", async (req: Request, res: Response) => {
   const id = Number(req.params.id);
   if (!id || isNaN(id)) {
@@ -243,7 +281,7 @@ app.delete("/listing/:id", async (req: Request, res: Response) => {
     await prisma.listing.delete({
       where: { id },
     });
-    res.json("Deleted!")
+    res.json("Deleted!");
   } catch {
     res.json("Server Error");
   }
