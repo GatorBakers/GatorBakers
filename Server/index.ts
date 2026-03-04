@@ -186,4 +186,67 @@ app.post("/login", async (req: Request, res: Response) => {
   res.json({ access_token, refresh_token });
 });
 
+app.post("/listing", async (req: Request, res: Response) => {
+  const {
+    user_id,
+    title,
+    description,
+    price,
+    remaining_inventory,
+    listing_status,
+    photo_url,
+    location,
+  } = req.body;
+  const user = await prisma.user.findUnique({
+    where: {
+      id: user_id,
+    },
+  });
+  if (!user) {
+    return res.json("User not found");
+  }
+
+  try {
+    const new_listing = await prisma.listing.create({
+      data: {
+        user_id,
+        title,
+        description,
+        price,
+        remaining_inventory,
+        listing_status,
+        photo_url,
+      },
+    });
+    res.json(new_listing);
+  } catch {
+    res.json("Server error");
+  }
+});
+
+app.delete("/listing/:id", async (req: Request, res: Response) => {
+  const id = Number(req.params.id);
+  if (!id || isNaN(id)) {
+    return res.json({ message: "Invalid listing id" });
+  }
+  try {
+    const listing = await prisma.listing.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!listing) {
+      return res.json({ message: "Listing not found" });
+    }
+
+    await prisma.listing.delete({
+      where: { id },
+    });
+    res.json("Deleted!")
+  } catch {
+    res.json("Server Error");
+  }
+});
+
 app.listen(PORT, () => console.log("Server running on port " + PORT));
