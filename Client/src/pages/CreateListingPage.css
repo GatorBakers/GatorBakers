@@ -11,7 +11,7 @@
     font-family: 'Georgia', serif;
     font-size: 1.6rem;
     font-weight: 700;
-    color: #8b5e3c;
+    color: var(--color-brand);
     margin: 0;
 }
 
@@ -25,14 +25,14 @@
     font-family: 'Georgia', serif;
     font-size: 1.1rem;
     font-weight: 700;
-    color: #5c3d1e;
+    color: var(--color-text-section);
     margin: 0;
 }
 
 .create-listing-label {
     font-family: 'Georgia', serif;
     font-size: 0.95rem;
-    color: #5c3d1e;
+    color: var(--color-text-section);
     display: flex;
     flex-direction: column;
     gap: 6px;
@@ -42,9 +42,9 @@
 .create-listing-textarea {
     font-family: inherit;
     font-size: 0.95rem;
-    color: #3b2a1a;
-    background: #fff;
-    border: 1.5px solid #d4b896;
+    color: var(--color-text-brown);
+    background: var(--color-white);
+    border: 1.5px solid var(--color-accent-warm);
     border-radius: 8px;
     padding: 10px 14px;
     outline: none;
@@ -55,7 +55,7 @@
 
 .create-listing-input:focus,
 .create-listing-textarea:focus {
-    border-color: #8b5e3c;
+    border-color: var(--color-brand);
 }
 
 .create-listing-textarea {
@@ -65,7 +65,7 @@
 
 .create-listing-divider {
     border: none;
-    border-top: 1.5px solid #e8d5c0;
+    border-top: 1.5px solid var(--color-surface-warm);
     margin: 0;
 }
 
@@ -74,8 +74,8 @@
     font-family: 'Georgia', serif;
     font-size: 1rem;
     font-weight: 700;
-    color: #fff;
-    background: #8b5e3c;
+    color: var(--color-white);
+    background: var(--color-brand);
     border: none;
     border-radius: 8px;
     padding: 12px 28px;
@@ -84,5 +84,5 @@
 }
 
 .create-listing-submit:hover {
-    background: #6f4a2d;
+    background: var(--color-brand-dark);
 }

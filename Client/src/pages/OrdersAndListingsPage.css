@@ -12,7 +12,7 @@
     font-family: 'Georgia', serif;
     font-size: 1.6rem;
     font-weight: 700;
-    color: #8b5e3c;
+    color: var(--color-brand);
     margin: 0 0 20px;
 }
 

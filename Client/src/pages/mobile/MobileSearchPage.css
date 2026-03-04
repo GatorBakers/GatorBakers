@@ -8,7 +8,7 @@
 
 .m-search-results-count {
     font-size: 0.85rem;
-    color: #7a6a60;
+    color: var(--color-text-muted);
     margin: 0 0 12px;
 }
 

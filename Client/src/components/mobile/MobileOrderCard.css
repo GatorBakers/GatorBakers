@@ -2,9 +2,9 @@
     display: flex;
     flex-direction: row;
     align-items: stretch;
-    background-color: #fff;
+    background-color: var(--color-white);
     border-radius: 14px;
-    border: 1px solid #e8ddd6;
+    border: 1px solid var(--color-surface-card);
     box-shadow: 0 1px 8px rgba(0, 0, 0, 0.07);
     overflow: hidden;
 }
@@ -12,7 +12,7 @@
 .m-order-card-image {
     width: 72px;
     flex-shrink: 0;
-    background-color: #e8dcc8;
+    background-color: var(--color-avatar-bg);
 }
 
 .m-order-card-body {
@@ -39,13 +39,13 @@
 .m-order-card-item-name {
     font-size: 0.92rem;
     font-weight: 700;
-    color: #3b2f2f;
+    color: var(--color-text-dark);
     margin: 0;
 }
 
 .m-order-card-baker-name {
     font-size: 0.78rem;
-    color: #7a6a60;
+    color: var(--color-text-muted);
     margin: 0;
 }
 
@@ -65,13 +65,13 @@
 .m-order-card-pickup-time {
     font-size: 0.82rem;
     font-weight: 700;
-    color: #3b2f2f;
+    color: var(--color-text-dark);
     margin: 0;
 }
 
 .m-order-card-pickup-address {
     font-size: 0.76rem;
-    color: #7a6a60;
+    color: var(--color-text-muted);
     margin: 0;
 }
 
@@ -81,7 +81,7 @@
     padding: 0;
     font-size: 0.85rem;
     font-weight: 600;
-    color: #8b6b52;
+    color: var(--color-brand-medium);
     cursor: pointer;
     white-space: nowrap;
     transition: color 0.2s ease;
@@ -89,7 +89,7 @@
 }
 
 .m-order-card-details-btn:active {
-    color: #5c3d22;
+    color: var(--color-link-hover);
 }
 
 /* Mobile StatusBadge size override */
