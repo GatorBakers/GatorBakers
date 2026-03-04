@@ -26,7 +26,7 @@ const INITIAL_LISTING: ListingForm = {
 
 const CreateListingPage = () => {
     const [listing, setListing] = useState<ListingForm>(INITIAL_LISTING);
-    const [uploadKey, setUploadKey] = useState(0);
+    const [resetKey, setResetKey] = useState(0);
 
     const handleChange = (field: keyof ListingForm, value: ListingForm[typeof field]) => {
         setListing(prev => ({ ...prev, [field]: value }));
@@ -50,7 +50,7 @@ const CreateListingPage = () => {
         }
 
         setListing(INITIAL_LISTING);
-        setUploadKey(k => k + 1);
+        setResetKey(k => k + 1);
     };
 
     return (
@@ -61,7 +61,7 @@ const CreateListingPage = () => {
 
             <div className="create-listing-section">
                 <h3 className="create-listing-section-title">Item Photo</h3>
-                <ImageUpload key={uploadKey} onFileChange={(file) => handleChange('image', file)} />
+                <ImageUpload key={resetKey} onFileChange={(file) => handleChange('image', file)} />
             </div>
 
             <hr className="create-listing-divider" />
@@ -113,6 +113,7 @@ const CreateListingPage = () => {
             <div className="create-listing-section">
                 <h3 className="create-listing-section-title">Ingredients</h3>
                 <ButtonAddOn
+                    key={resetKey}
                     label="List every ingredient in your item. Press Enter or click Add."
                     placeholder="e.g. Butter, Flour, Sugar..."
                     onItemsChange={(items) => handleChange('ingredients', items)}
@@ -125,6 +126,7 @@ const CreateListingPage = () => {
                 <h3 className="create-listing-section-title">Allergens</h3>
                 {/* TODO: Common allergen checkboxes + custom allergen input — update listing.allergens */}
                 <ButtonAddOn
+                    key={resetKey + 1}
                     label="List ALL APPLICABLE allergens. Press Enter or click Add."
                     placeholder="e.g. Milk, Eggs, Gluten, Soy, Nuts, etc."
                     onItemsChange={(items) => handleChange('allergens', items)}
