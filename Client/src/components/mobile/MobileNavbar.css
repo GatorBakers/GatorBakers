@@ -8,8 +8,8 @@
     align-items: center;
     justify-content: space-around;
     height: 64px;
-    background-color: #fff;
-    border-top: 1px solid #e8e0da;
+    background-color: var(--color-white);
+    border-top: 1px solid var(--color-border-warm);
     padding: 4px 0 env(safe-area-inset-bottom, 0);
 }
 
@@ -19,7 +19,7 @@
     align-items: center;
     gap: 2px;
     text-decoration: none;
-    color: #a89585;
+    color: var(--color-muted-brown);
     font-size: 0.68rem;
     font-weight: 500;
     padding: 6px 12px 2px;
@@ -28,8 +28,8 @@
 }
 
 .mobile-nav-tab.active {
-    color: #8b6b52;
-    border-top-color: #8b6b52;
+    color: var(--color-brand-medium);
+    border-top-color: var(--color-brand-medium);
 }
 
 .mobile-nav-icon {
@@ -50,13 +50,13 @@
     width: 24px;
     height: 24px;
     border-radius: 50%;
-    background-color: #cbb8a8;
-    color: #fff;
+    background-color: var(--color-muted-warm);
+    color: var(--color-white);
     font-size: 0.7rem;
     font-weight: 600;
     transition: background-color 0.2s ease;
 }
 
 .mobile-nav-tab.active .mobile-nav-avatar {
-    background-color: #8b6b52;
+    background-color: var(--color-brand-medium);
 }

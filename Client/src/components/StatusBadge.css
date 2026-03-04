@@ -8,21 +8,21 @@
 }
 
 .status-badge--ready_for_pickup {
-    background-color: #d4f0d8;
-    color: #2e7d45;
+    background-color: var(--color-status-success-bg);
+    color: var(--color-status-success);
 }
 
 .status-badge--pending {
-    background-color: #fdecd2;
-    color: #a05a1a;
+    background-color: var(--color-status-warning-bg);
+    color: var(--color-status-warning);
 }
 
 .status-badge--completed {
-    background-color: #e8e8e8;
-    color: #555;
+    background-color: var(--color-border-neutral);
+    color: var(--color-gray-dark);
 }
 
 .status-badge--cancelled {
-    background-color: #fde8e8;
-    color: #c0392b;
+    background-color: var(--color-status-error-bg);
+    color: var(--color-status-error);
 }

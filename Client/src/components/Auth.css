@@ -27,7 +27,7 @@
   font-style: italic;
   font-weight: 700;
   font-size: 2.4rem;
-  color: #b8896e;
+  color: var(--color-auth-btn);
   margin: 0 0 4px;
   letter-spacing: 0.5px;
 }
@@ -69,8 +69,8 @@
   font-size: 1rem;
   font-weight: 600;
   font-family: inherit;
-  color: #ffffff;
-  background-color: #b8896e;
+  color: var(--color-white);
+  background-color: var(--color-auth-btn);
   cursor: pointer;
   transition: background-color 0.2s ease, opacity 0.2s ease;
   margin-top: 8px;
@@ -78,13 +78,13 @@
 }
 
 .auth-button:hover {
-  background-color: #a67a5f;
+  background-color: var(--color-auth-btn-hover);
 }
 
 .auth-button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-  background-color: #99908A;
+  background-color: var(--color-disabled);
 }
 
 .auth-button:focus {
@@ -121,7 +121,7 @@
 .auth-error {
   width: 100%;
   font-size: 0.85rem;
-  color: #D4403A;
+  color: var(--color-error);
   text-align: center;
   margin: 0 0 12px;
 }
@@ -129,7 +129,7 @@
 .auth-success {
   width: 100%;
   font-size: 0.85rem;
-  color: #3E843E;
+  color: var(--color-success);
   text-align: center;
   margin: 0 0 12px;
 }
