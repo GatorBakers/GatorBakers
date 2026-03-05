@@ -133,7 +133,9 @@ app.post("/register", async (req: Request, res: Response) => {
 
   const existingUser = await prisma.user.findUnique({ where: { email } });
   if (existingUser) {
-    return res.status(409).json({ message: "An account with this email already exists." });
+    return res
+      .status(409)
+      .json({ message: "An account with this email already exists." });
   }
 
   const hashedPassword = await bcrypt.hash(password, saltRounds);
@@ -184,6 +186,35 @@ app.post("/login", async (req: Request, res: Response) => {
 
   // TODO: Send access token as a HTTP cookie for more security
   res.json({ access_token, refresh_token });
+});
+
+app.get("/listing/:id", async (req: Request, res: Response) => {
+  const id = Number(req.params.id);
+  if (!id || isNaN(id)) {
+    return res.json({ message: "Invalid listing id" });
+  }
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        id,
+      },
+    });
+    if (!user) {
+      return res.json({ message: "User not found" });
+    }
+    const listings = await prisma.listing.findMany({
+      where: {
+        user_id: id,
+      },
+    });
+    if (listings.length === 0) {
+      return res.json({ message: "No listings exist" });
+    }
+    res.json(listings);
+  } catch (error) {
+    console.error(error);
+    res.json("Database Error");
+  }
 });
 
 app.post("/listing", async (req: Request, res: Response) => {
@@ -243,7 +274,7 @@ app.delete("/listing/:id", async (req: Request, res: Response) => {
     await prisma.listing.delete({
       where: { id },
     });
-    res.json("Deleted!")
+    res.json("Deleted!");
   } catch {
     res.json("Server Error");
   }
