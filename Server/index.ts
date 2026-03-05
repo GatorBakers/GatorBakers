@@ -188,32 +188,21 @@ app.post("/login", async (req: Request, res: Response) => {
   res.json({ access_token, refresh_token });
 });
 
-app.get("/listing/:id", async (req: Request, res: Response) => {
+app.get("/user/:id/listings", async (req: Request, res: Response) => {
   const id = Number(req.params.id);
   if (!id || isNaN(id)) {
-    return res.json({ message: "Invalid listing id" });
+    return res.status(400).json({ message: "Invalid listing id" });
   }
   try {
-    const user = await prisma.user.findUnique({
-      where: {
-        id,
-      },
-    });
-    if (!user) {
-      return res.json({ message: "User not found" });
-    }
     const listings = await prisma.listing.findMany({
       where: {
         user_id: id,
       },
     });
-    if (listings.length === 0) {
-      return res.json({ message: "No listings exist" });
-    }
-    res.json(listings);
+    return res.status(200).json(listings);
   } catch (error) {
     console.error(error);
-    res.json("Database Error");
+    return res.status(500).json({ message: "Database error" });
   }
 });
 
