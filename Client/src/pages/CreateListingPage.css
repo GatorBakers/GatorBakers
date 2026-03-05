@@ -38,6 +38,15 @@
     margin: 0;
 }
 
+.create-listing-row {
+    display: flex;
+    gap: 16px;
+}
+
+.create-listing-row .create-listing-label {
+    flex: 1;
+}
+
 .create-listing-label {
     font-family: 'Georgia', serif;
     font-size: 0.95rem;

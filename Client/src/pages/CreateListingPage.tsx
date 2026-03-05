@@ -8,6 +8,8 @@ import './CreateListingPage.css';
 
 interface ListingForm {
     name: string;
+    city: string;
+    state: string;
     description: string;
     price: string;
     ingredients: string[];
@@ -17,6 +19,8 @@ interface ListingForm {
 
 const INITIAL_LISTING: ListingForm = {
     name: '',
+    city: '',
+    state: '',
     description: '',
     price: '',
     ingredients: [],
@@ -39,6 +43,8 @@ const CreateListingPage = () => {
 
         const formData = new FormData();
         formData.append('name', listing.name.trim());
+        formData.append('city', listing.city.trim());
+        formData.append('state', listing.state.trim());
         formData.append('description', listing.description.trim());
         formData.append('price', listing.price.trim());
         listing.ingredients.forEach(i => formData.append('ingredients[]', i));
@@ -78,6 +84,28 @@ const CreateListingPage = () => {
                         onChange={(e) => handleChange('name', e.target.value)}
                     />
                 </label>
+                <div className="create-listing-row">
+                    <label className="create-listing-label">
+                        City
+                        <input
+                            className="create-listing-input"
+                            type="text"
+                            placeholder="e.g. Gainesville"
+                            value={listing.city}
+                            onChange={(e) => handleChange('city', e.target.value)}
+                        />
+                    </label>
+                    <label className="create-listing-label">
+                        State
+                        <input
+                            className="create-listing-input"
+                            type="text"
+                            placeholder="e.g. FL"
+                            value={listing.state}
+                            onChange={(e) => handleChange('state', e.target.value)}
+                        />
+                    </label>
+                </div>
                 <label className="create-listing-label">
                     Description
                     <textarea
