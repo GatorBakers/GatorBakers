@@ -7,6 +7,15 @@
     gap: 32px;
 }
 
+@media (max-width: 1024px) {
+    .create-listing-page {
+        margin-top: 0;
+        padding-top: 72px;
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+}
+
 .create-listing-heading {
     font-family: 'Georgia', serif;
     font-size: 1.6rem;
