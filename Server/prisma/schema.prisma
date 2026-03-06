@@ -1,3 +1,70 @@
+
+enum Account_Status {
+  USER
+  VENDOR
+  ADMIN
+}
+
+enum Listing_Status {
+  AVAILABLE
+  PENDING
+  SOLD
+}
+
+enum US_State {
+  AL
+  AK
+  AZ
+  AR
+  CA
+  CO
+  CT
+  DE
+  FL
+  GA
+  HI
+  ID
+  IL
+  IN
+  IA
+  KS
+  KY
+  LA
+  ME
+  MD
+  MA
+  MI
+  MN
+  MS
+  MO
+  MT
+  NE
+  NV
+  NH
+  NJ
+  NM
+  NY
+  NC
+  ND
+  OH
+  OK
+  OR
+  PA
+  RI
+  SC
+  SD
+  TN
+  TX
+  UT
+  VT
+  VA
+  WA
+  WV
+  WI
+  WY
+  DC
+}
+
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
@@ -72,70 +139,4 @@ model Order {
   status     Listing_Status
   user_id    Int            @unique
   user       User           @relation(fields: [user_id], references: [id])
-}
-
-enum Account_Status {
-  USER
-  VENDOR
-  ADMIN
-}
-
-enum Listing_Status {
-  AVAILABLE
-  PENDING
-  SOLD
-}
-
-enum US_State {
-  AL
-  AK
-  AZ
-  AR
-  CA
-  CO
-  CT
-  DE
-  FL
-  GA
-  HI
-  ID
-  IL
-  IN
-  IA
-  KS
-  KY
-  LA
-  ME
-  MD
-  MA
-  MI
-  MN
-  MS
-  MO
-  MT
-  NE
-  NV
-  NH
-  NJ
-  NM
-  NY
-  NC
-  ND
-  OH
-  OK
-  OR
-  PA
-  RI
-  SC
-  SD
-  TN
-  TX
-  UT
-  VT
-  VA
-  WA
-  WV
-  WI
-  WY
-  DC
 }
