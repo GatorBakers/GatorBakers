@@ -79,15 +79,6 @@ enum US_State {
   DC
 }
 
-generator client {
-  provider = "prisma-client-js"
-  output   = "../generated/prisma"
-}
-
-datasource db {
-  provider = "postgresql"
-}
-
 model User {
   id               Int             @id @default(autoincrement())
   email            String          @unique
