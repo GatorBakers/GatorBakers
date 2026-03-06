@@ -191,13 +191,14 @@ app.post("/login", async (req: Request, res: Response) => {
 app.post("/listing", async (req: Request, res: Response) => {
   const {
     user_id,
+    city,
+    state,
     title,
     description,
     price,
     remaining_inventory,
     listing_status,
     photo_url,
-    location,
   } = req.body;
   const user = await prisma.user.findUnique({
     where: {
@@ -218,10 +219,18 @@ app.post("/listing", async (req: Request, res: Response) => {
         remaining_inventory,
         listing_status,
         photo_url,
+        location: {
+          create: {
+            city,
+            state,
+          },
+        },
       },
     });
+
     res.json(new_listing);
-  } catch {
+  } catch (error) {
+    console.error(error);
     res.json("Server error");
   }
 });
