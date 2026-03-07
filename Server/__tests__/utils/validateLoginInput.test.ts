@@ -23,9 +23,30 @@ describe("validateLoginInput", () => {
     expect("sanitized" in result && result.sanitized.email).toBe("test@example.com");
   });
 
-  it("does not trim the password", () => {
+  it("trims leading/trailing whitespace from the password", () => {
     const result = validateLoginInput({ ...validInput, password: "  Password1!  " });
-    expect("sanitized" in result && result.sanitized.password).toBe("  Password1!  ");
+    expect("sanitized" in result && result.sanitized.password).toBe("Password1!");
+  });
+
+  // ── Password whitespace ────────────────────────────────────
+  describe("password whitespace", () => {
+    it("returns error when password contains internal whitespace", () => {
+      expect(validateLoginInput({ ...validInput, password: "Pass word1!" })).toEqual({
+        error: "Password must not contain spaces or whitespace.",
+      });
+    });
+
+    it("returns error when password is whitespace-only", () => {
+      expect(validateLoginInput({ ...validInput, password: "   " })).toEqual({
+        error: "Email and password are required.",
+      });
+    });
+
+    it("returns error when password contains a tab", () => {
+      expect(validateLoginInput({ ...validInput, password: "Pass\tword1!" })).toEqual({
+        error: "Password must not contain spaces or whitespace.",
+      });
+    });
   });
 
   // ── Missing fields ─────────────────────────────────────────

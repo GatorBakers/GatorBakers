@@ -72,9 +72,14 @@ export function validateLoginInput(input: {
   }
 
   const trimmedEmail = email.trim().toLowerCase();
+  const trimmedPassword = password.trim();
 
-  if (!trimmedEmail || !password) {
+  if (!trimmedEmail || !trimmedPassword) {
     return { error: "Email and password are required." };
+  }
+
+  if (/\s/.test(trimmedPassword)) {
+    return { error: "Password must not contain spaces or whitespace." };
   }
 
   if (!isValidEmail(trimmedEmail)) {
@@ -84,7 +89,7 @@ export function validateLoginInput(input: {
   return {
     sanitized: {
       email: trimmedEmail,
-      password,
+      password: trimmedPassword,
     },
   };
 }

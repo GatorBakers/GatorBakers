@@ -1,6 +1,6 @@
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
-// Parse error response and throw with a meaningful message
+// Parse error response and throw with a message
 async function throwApiError(response: Response, fallbackLabel: string): Promise<never> {
     let errorMessage = `${fallbackLabel} (${response.status})`;
     const text = await response.text().catch(() => '');
@@ -45,7 +45,11 @@ export async function loginUser(email: string, password: string) {
     if (!response.ok) {
         await throwApiError(response, "Login failed");
     }
-    return response.json() as Promise<{ access_token: string }>;
+    const data = await response.json();
+    if (typeof data?.access_token !== "string" || !data.access_token) {
+        throw new Error("Invalid token response from server.");
+    }
+    return data as { access_token: string };
 }
 
 // Refresh the access token using the refresh token cookie
@@ -57,7 +61,11 @@ export async function refreshAccessToken() {
     if (!response.ok) {
         throw new Error("Session expired. Please log in again.");
     }
-    return response.json() as Promise<{ access_token: string }>;
+    const data = await response.json();
+    if (typeof data?.access_token !== "string" || !data.access_token) {
+        throw new Error("Invalid token response from server.");
+    }
+    return data as { access_token: string };
 }
 
 // Log out the user by clearing the refresh token cookie
