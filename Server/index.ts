@@ -188,6 +188,24 @@ app.post("/login", async (req: Request, res: Response) => {
   res.json({ access_token, refresh_token });
 });
 
+app.get("/user/:id/listings", async (req: Request, res: Response) => {
+  const id = Number(req.params.id);
+  if (!id || isNaN(id)) {
+    return res.status(400).json({ message: "Invalid listing id" });
+  }
+  try {
+    const listings = await prisma.listing.findMany({
+      where: {
+        user_id: id,
+      },
+    });
+    return res.status(200).json(listings);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Database error" });
+  }
+});
+
 app.post("/listing", async (req: Request, res: Response) => {
   const {
     user_id,
