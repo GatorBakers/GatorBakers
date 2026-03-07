@@ -35,11 +35,9 @@ export async function loginUser(email: string, password: string) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
     });
-
-    const text = await response.text().catch(() => '');
-
     if (!response.ok) {
         let errorMessage = `Login failed (${response.status})`;
+        const text = await response.text().catch(() => '');
         try {
             const errorData = JSON.parse(text);
             if (typeof errorData === 'string') {
@@ -54,16 +52,5 @@ export async function loginUser(email: string, password: string) {
         }
         throw new Error(errorMessage);
     }
-
-    // Server returns 200 with a plain string for invalid credentials
-    try {
-        const data = JSON.parse(text);
-        if (typeof data === 'string') {
-            throw new Error(data);
-        }
-        return data as { access_token: string; refresh_token: string };
-    } catch (err) {
-        if (err instanceof Error) throw err;
-        throw new Error('Unexpected response from server.');
-    }
+    return response.json() as Promise<{ access_token: string; refresh_token: string }>;
 }

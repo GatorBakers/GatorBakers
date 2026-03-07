@@ -157,12 +157,12 @@ app.post("/login", async (req: Request, res: Response) => {
   const { email, password } = req.body;
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) {
-    return res.json("Invalid username or password");
+    return res.status(401).json({ message: "Invalid email or password" });
   }
 
   const validPassword = await bcrypt.compare(password, user.password);
   if (!validPassword) {
-    return res.json("Invalid username or password");
+    return res.status(401).json({ message: "Invalid email or password" });
   }
 
   const refresh_token = jwt.sign(
