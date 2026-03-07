@@ -2,6 +2,7 @@ import './App.css'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import MainLayout from './MainLayout';
 import AuthLayout from './AuthLayout';
+import { AuthProvider } from './context/AuthContext';
 
 import LoginPage from './pages/LogInPage';
 import SignUpPage from './pages/SignUpPage';
@@ -14,6 +15,7 @@ import CreateListingPage from './pages/CreateListingPage';
 function App() {
 
   return (
+    <AuthProvider>
     <BrowserRouter>
       <Routes>
         {/* Main Layout */}
@@ -34,6 +36,7 @@ function App() {
         </Route>
       </Routes>
     </BrowserRouter>
+    </AuthProvider>
   )
 }
 

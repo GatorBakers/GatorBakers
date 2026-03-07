@@ -5,10 +5,12 @@ import AuthInput from '../components/AuthInput';
 import AuthButton from '../components/AuthButton';
 import AuthFooter from '../components/AuthFooter';
 import { loginUser } from '../services/authService';
+import { useAuth } from '../context/AuthContext';
 
 const LoginPage = () => {
     const location = useLocation();
     const navigate = useNavigate();
+    const { setAccessToken } = useAuth();
     const isSubmitting = useRef(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -30,9 +32,8 @@ const LoginPage = () => {
 
         setLoading(true);
         try {
-            const { access_token, refresh_token } = await loginUser(email.trim(), password);
-            localStorage.setItem('access_token', access_token);
-            localStorage.setItem('refresh_token', refresh_token);
+            const { access_token } = await loginUser(email.trim(), password);
+            setAccessToken(access_token);
             navigate('/discover');
         } catch (err) {
             setError(err instanceof Error ? err.message : 'An unexpected error occurred.');
