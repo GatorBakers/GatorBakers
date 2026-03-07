@@ -7,7 +7,7 @@ import cors from "cors";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dayjs from "dayjs";
-import { validateRegInput } from "./src/utils/validation";
+import { validateRegInput, validateLoginInput } from "./src/utils/validation";
 
 const saltRounds = 10;
 const adapter = new PrismaPg({
@@ -154,7 +154,11 @@ app.post("/register", async (req: Request, res: Response) => {
 });
 
 app.post("/login", async (req: Request, res: Response) => {
-  const { email, password } = req.body;
+  const result = validateLoginInput(req.body);
+  if ("error" in result) {
+    return res.status(400).json({ message: result.error });
+  }
+  const { email, password } = result.sanitized;
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) {
     return res.status(401).json({ message: "Invalid email or password" });
