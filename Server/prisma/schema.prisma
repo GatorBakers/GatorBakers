@@ -80,20 +80,22 @@ enum US_State {
 }
 
 model User {
-  id               Int             @id @default(autoincrement())
-  email            String          @unique
+  id               Int       @id @default(autoincrement())
+  email            String    @unique
   password         String
   first_name       String
   last_name        String
-  photo_url        String?
-  created_at       DateTime        @default(now())
-  verified_account Boolean         @default(false)
   account_status   Account_Status?
-  Coords           Coords?
-  listings         Listing?
-  Location         Location?
-  orders           Order?
-  token            Token?
+  verified_account Boolean   @default(false)
+  photo_url        String?
+  created_at       DateTime  @default(now())
+
+  current_location Coords?   @relation("CurrentLocation")
+  search_location  Location? @relation("SearchLocation")
+
+  token    Token[]
+  listings Listing[]
+  orders   Order[]
 }
 
 model Token {
@@ -107,6 +109,7 @@ model Token {
 
 model Listing {
   id                  Int            @id @default(autoincrement())
+  user_id             Int
   title               String
   description         String
   price               Decimal        @db.Decimal(10, 2)
@@ -114,27 +117,32 @@ model Listing {
   listing_status      Listing_Status
   photo_url           String
   created_at          DateTime       @default(now())
-  user_id             Int            @unique
-  user                User           @relation(fields: [user_id], references: [id])
-  location            Location?
+
+  user     User      @relation(fields: [user_id], references: [id])
+  location Location?
+  orders   Order[]
 }
 
 model Coords {
-  id        Int   @id @default(autoincrement())
-  latitude  Float
-  longitude Float
-  user_id   Int   @unique
-  User      User  @relation(fields: [user_id], references: [id])
+  id              Int   @id @default(autoincrement())
+  latitude        Float
+  longitude       Float
+  user_current_id Int?  @unique
+  user_search_id  Int?  @unique
+
+  current_user User? @relation("CurrentLocation", fields: [user_current_id], references: [id])
+  search_user  User? @relation("SearchLocation", fields: [user_search_id], references: [id])
 }
 
 model Location {
   id         Int      @id @default(autoincrement())
   city       String
+  state      US_State
   listing_id Int?     @unique
   user_id    Int?     @unique
-  state      US_State
-  listing    Listing? @relation(fields: [listing_id], references: [id])
-  User       User?    @relation(fields: [user_id], references: [id])
+
+  listing Listing? @relation(fields: [listing_id], references: [id])
+  user    User?    @relation(fields: [user_id], references: [id])
 }
 
 model Order {
@@ -142,6 +150,8 @@ model Order {
   created_at DateTime       @default(now())
   listing_id Int
   status     Listing_Status
-  user_id    Int            @unique
-  user       User           @relation(fields: [user_id], references: [id])
+  user_id    Int
+
+  user    User    @relation(fields: [user_id], references: [id])
+  listing Listing @relation(fields: [listing_id], references: [id])
 }
