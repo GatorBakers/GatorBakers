@@ -93,7 +93,7 @@ model User {
   search_location Location?
   token Token[]
   listings Listing?
-  orders Order?
+  orders Order[]
 }
 
 model Token {
@@ -145,4 +145,4 @@ model Order {
   user   User @relation(fields: [user_id], references: [id])
   listing_id Int
   status  Listing_Status
-}
+} 

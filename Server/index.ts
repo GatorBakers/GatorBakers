@@ -305,4 +305,59 @@ app.delete("/listing/:id", async (req: Request, res: Response) => {
   }
 });
 
+app.post("/listing/:id/order", async (req: Request, res: Response) => {
+  const listing_id = Number(req.params.id);
+  const { user_id } = req.body;
+
+  if (!listing_id || isNaN(listing_id)) {
+    return res.status(400).json({ message: "Invalid listing id" });
+  }
+
+  try {
+    const listing = await prisma.listing.findUnique({
+      where: { id: listing_id },
+    });
+
+    if (!listing) {
+      return res.status(404).json({ message: "Listing does not exist" });
+    }
+
+    if (listing.user_id == user_id) {
+      return res.status(404).json({ message: "User is the owner of the listing!" });
+    }
+
+    if (listing.remaining_inventory < 1) {
+      await prisma.listing.update({
+        where: { id: listing_id },
+        data: {
+          remaining_inventory: 0,
+          listing_status: "SOLD",
+        },
+      });
+
+      return res.status(410).json({ message: "Pastry is sold out!" });
+    }
+
+    await prisma.listing.update({
+      where: { id: listing_id },
+      data: {
+        remaining_inventory: listing.remaining_inventory - 1,
+      },
+    });
+
+    const order = await prisma.order.create({
+      data: {
+        user_id,
+        listing_id,
+        status: "PENDING",
+      },
+    });
+
+    return res.status(201).json(order);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
 app.listen(PORT, () => console.log("Server running on port " + PORT));
