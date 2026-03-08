@@ -30,10 +30,10 @@ const placeholderOrders: Order[] = [
 //       GET /api/listings?userId={userId} — should return Listing[] owned by the current user.
 //       Handle loading and error states.
 const placeholderListings: Listing[] = [
-    { id: 1, title: 'Product Title', bakerName: 'Baker Name', price: 0 },
-    { id: 2, title: 'Product Title', bakerName: 'Baker Name', price: 0 },
-    { id: 3, title: 'Product Title', bakerName: 'Baker Name', price: 0 },
-    { id: 4, title: 'Product Title', bakerName: 'Baker Name', price: 0 },
+    { id: 1, title: 'Product Title', bakerName: 'Baker Name', price: 0, itemDescription: 'Item Description', ingredients: ['Ingredient 1', 'Ingredient 2', 'Ingredient 3'], allergens: ['Allergen 1', 'Allergen 2', 'Allergen 3'] },
+    { id: 2, title: 'Product Title', bakerName: 'Baker Name', price: 0, itemDescription: 'Item Description', ingredients: ['Ingredient 1', 'Ingredient 2', 'Ingredient 3'], allergens: ['Allergen 1', 'Allergen 2', 'Allergen 3'] },
+    { id: 3, title: 'Product Title', bakerName: 'Baker Name', price: 0, itemDescription: 'Item Description', ingredients: ['Ingredient 1', 'Ingredient 2', 'Ingredient 3'], allergens: ['Allergen 1', 'Allergen 2', 'Allergen 3'] },
+    { id: 4, title: 'Product Title', bakerName: 'Baker Name', price: 0, itemDescription: 'Item Description', ingredients: ['Ingredient 1', 'Ingredient 2', 'Ingredient 3'], allergens: ['Allergen 1', 'Allergen 2', 'Allergen 3'] },
 ];
 
 const YourOrdersPage = () => {

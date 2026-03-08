@@ -7,6 +7,9 @@ export interface Listing {
     title: string;
     bakerName: string;
     price: number;
+    itemDescription: string;
+    ingredients: string[];
+    allergens: string[];
 }
 
 interface UserListingsProps {
@@ -32,6 +35,9 @@ const UserListings = ({ listings }: UserListingsProps) => {
                             bakerName={listing.bakerName}
                             price={listing.price}
                             buttonLabel="View/Edit Listing"
+                            itemDescription={listing.itemDescription}
+                            ingredients={listing.ingredients}
+                            allergens={listing.allergens}
                         />
                     ))
                 )}
