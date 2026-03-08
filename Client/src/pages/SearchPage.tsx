@@ -5,19 +5,19 @@ import { useIsMobile } from '../hooks/useIsMobile';
 import './SearchPage.css';
 
 const placeholderResults = [
-    { id: 1, title: 'Product Title', bakerName: 'Baker Name', price: 0 },
-    { id: 2, title: 'Product Title', bakerName: 'Baker Name', price: 0 },
-    { id: 3, title: 'Product Title', bakerName: 'Baker Name', price: 0 },
-    { id: 4, title: 'Product Title', bakerName: 'Baker Name', price: 0 },
-    { id: 5, title: 'Product Title', bakerName: 'Baker Name', price: 0 },
-    { id: 6, title: 'Product Title', bakerName: 'Baker Name', price: 0 },
+    { id: 1, title: 'Product Title', bakerName: 'Baker Name', price: 0, itemDescription: 'Item Description 1'},
+    { id: 2, title: 'Product Title', bakerName: 'Baker Name', price: 0, itemDescription: 'Item Description 2'},
+    { id: 3, title: 'Product Title', bakerName: 'Baker Name', price: 0, itemDescription: 'Item Description 3'},
+    { id: 4, title: 'Product Title', bakerName: 'Baker Name', price: 0, itemDescription: 'Item Description 4'},
+    { id: 5, title: 'Product Title', bakerName: 'Baker Name', price: 0, itemDescription: 'Item Description 5'},
+    { id: 6, title: 'Product Title', bakerName: 'Baker Name', price: 0, itemDescription: 'Item Description 6'},
 ];
 
 const SearchPage = () => {
     const isMobile = useIsMobile();
 
     if (isMobile) {
-        return <MobileSearchPage />;
+        return <MobileSearchPage/>;
     }
 
     return (
@@ -36,6 +36,7 @@ const SearchPage = () => {
                             bakerName={product.bakerName}
                             price={product.price}
                             buttonLabel="Order"
+                            itemDescription={product.itemDescription}
                         />
                     ))}
                 </div>
