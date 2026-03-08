@@ -114,6 +114,22 @@
     margin: 4px 0 8px;
 }
 
+.product-card-ingredients,
+.product-card-allergens {
+    font-size: 0.85rem;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.product-card-ingredients {
+    color: var(--color-text-muted);
+}
+
+.product-card-allergens {
+    color: var(--color-cta);
+    font-weight: 600;
+}
+
 .product-card-modal-close {
     position: absolute;
     top: 14px;

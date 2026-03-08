@@ -9,10 +9,12 @@ interface ProductCardProps {
     imageUrl?: string;
     buttonLabel: string;
     itemDescription: string;
+    ingredients: string[];
+    allergens: string[];
     // onAction?: () => void;
 }
 
-const ProductCard = ({ title, bakerName, price, imageUrl, buttonLabel, itemDescription }: ProductCardProps) => {
+const ProductCard = ({ title, bakerName, price, imageUrl, buttonLabel, itemDescription, ingredients, allergens }: ProductCardProps) => {
     const [openModal, setOpenModal] = useState<boolean>(false);
     
     return (
@@ -47,6 +49,8 @@ const ProductCard = ({ title, bakerName, price, imageUrl, buttonLabel, itemDescr
                             <p className="product-card-baker">by {bakerName}</p>
                             <p className="product-card-price">${price.toFixed(2)}</p>
                             <p className="product-card-description">{itemDescription}</p>
+                            <p className="product-card-ingredients">Ingredients: {ingredients.join(', ')}</p>
+                            <p className="product-card-allergens">Allergens: {allergens.join(', ')}</p>
                             <button className="product-card-action">
                                 Purchase Now
                             </button>
