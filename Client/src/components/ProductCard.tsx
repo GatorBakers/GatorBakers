@@ -34,7 +34,7 @@ const ProductCard = ({ title, bakerName, price, imageUrl, buttonLabel, itemDescr
                 </button>
             </div>
 
-            { openModal && (buttonLabel === 'Order' || buttonLabel === 'View/Edit Listing') && (
+            { openModal && (buttonLabel === 'Order' || buttonLabel === 'View Listing') && (
                 <div className="product-card-modal-overlay" onClick={() => setOpenModal(false)}>
                     <div className="product-card-modal-content" onClick={(e) => e.stopPropagation()}>
                         <button className="product-card-modal-close" onClick={() => setOpenModal(false)}>✕</button>
@@ -56,7 +56,7 @@ const ProductCard = ({ title, bakerName, price, imageUrl, buttonLabel, itemDescr
                                     Purchase Now
                                 </button>
                             )}
-                            {buttonLabel === 'View/Edit Listing' && (
+                            {buttonLabel === 'View Listing' && (
                                 <button className="product-card-action" onClick={() => setOpenModal(false)}>
                                     Close
                                 </button>
