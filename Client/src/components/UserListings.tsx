@@ -19,7 +19,7 @@ interface UserListingsProps {
 const UserListings = ({ listings }: UserListingsProps) => {
     return (
         <div className="your-listings-col">
-            <h2 className="your-listings-heading">Your Listings</h2>
+            <h2 className="your-listings-heading">User Listings</h2>
             <div className="your-listings-grid">
                 {listings.length === 0 ? (
                     <EmptyState
