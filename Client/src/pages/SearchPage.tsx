@@ -35,7 +35,7 @@ const SearchPage = () => {
                             title={product.title}
                             bakerName={product.bakerName}
                             price={product.price}
-                            buttonLabel="Order"
+                            variant="to_order"
                             itemDescription={product.itemDescription}
                             ingredients={product.ingredients}
                             allergens={product.allergens}

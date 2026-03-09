@@ -34,7 +34,7 @@ const UserListings = ({ listings }: UserListingsProps) => {
                             title={listing.title}
                             bakerName={listing.bakerName}
                             price={listing.price}
-                            buttonLabel="View Listing"
+                            variant="listing"
                             itemDescription={listing.itemDescription}
                             ingredients={listing.ingredients}
                             allergens={listing.allergens}
