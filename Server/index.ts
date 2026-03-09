@@ -307,7 +307,7 @@ app.delete("/listing/:id", async (req: Request, res: Response) => {
 
 app.post("/listing/:id/order", async (req: Request, res: Response) => {
   const listing_id = Number(req.params.id);
-  const { user_id } = req.body;
+  const user_id = Number(req.body.user_id);
 
   if (!listing_id || isNaN(listing_id)) {
     return res.status(400).json({ message: "Invalid listing id" });
@@ -323,7 +323,9 @@ app.post("/listing/:id/order", async (req: Request, res: Response) => {
     }
 
     if (listing.user_id == user_id) {
-      return res.status(404).json({ message: "User is the owner of the listing" });
+      return res
+        .status(404)
+        .json({ message: "User is the owner of the listing" });
     }
 
     if (listing.remaining_inventory < 1) {
