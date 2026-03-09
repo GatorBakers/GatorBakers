@@ -323,7 +323,7 @@ app.post("/listing/:id/order", async (req: Request, res: Response) => {
     }
 
     if (listing.user_id == user_id) {
-      return res.status(404).json({ message: "User is the owner of the listing!" });
+      return res.status(404).json({ message: "User is the owner of the listing" });
     }
 
     if (listing.remaining_inventory < 1) {
