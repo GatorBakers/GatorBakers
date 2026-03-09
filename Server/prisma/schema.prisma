@@ -92,7 +92,7 @@ model User {
   current_location  Coords?
   search_location Location?
   token Token[]
-  listings Listing?
+  listings Listing[]
   orders Order[]
 }
 
