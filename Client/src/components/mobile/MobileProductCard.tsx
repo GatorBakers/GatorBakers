@@ -1,5 +1,6 @@
 import CardImage from '../CardImage';
 import './MobileProductCard.css';
+import { useState } from 'react';
 
 type MobileProductCardVariant = 'to_order' | 'listing';
 
@@ -14,10 +15,14 @@ interface MobileProductCardProps {
     price: number;
     imageUrl?: string;
     variant: MobileProductCardVariant;
-    onAction?: () => void;
+    itemDescription: string;
+    ingredients: string[];
+    allergens: string[];
 }
 
-const MobileProductCard = ({ title, bakerName, price, imageUrl, variant, onAction }: MobileProductCardProps) => {
+const MobileProductCard = ({ title, bakerName, price, imageUrl, variant, itemDescription, ingredients, allergens }: MobileProductCardProps) => {
+    const [openModal, setOpenModal] = useState<boolean>(false);
+
     return (
         <div className="m-product-card">
             <CardImage
@@ -31,11 +36,43 @@ const MobileProductCard = ({ title, bakerName, price, imageUrl, variant, onActio
                 <p className="m-product-card-baker">by {bakerName}</p>
                 <div className="m-product-card-bottom">
                     <p className="m-product-card-price">${price.toFixed(2)}</p>
-                    <button className="m-product-card-order" onClick={onAction}>
+                    <button className="m-product-card-order" onClick={() => setOpenModal(true)}>
                         {VARIANT_LABEL[variant]}
                     </button>
                 </div>
             </div>
+
+            {openModal && (
+                <div className="m-product-card-modal-overlay" onClick={() => setOpenModal(false)}>
+                    <div className="m-product-card-modal-content" onClick={(e) => e.stopPropagation()}>
+                        <button className="m-product-card-modal-close" onClick={() => setOpenModal(false)}>✕</button>
+                        <CardImage
+                            imageUrl={imageUrl}
+                            alt={title}
+                            placeholderText="Product Image"
+                            className="m-product-card-modal-image"
+                        />
+                        <div className="m-product-card-modal-info">
+                            <h2 className="m-product-card-title">{title}</h2>
+                            <p className="m-product-card-baker">by {bakerName}</p>
+                            <p className="m-product-card-price">${price.toFixed(2)}</p>
+                            <p className="m-product-card-description">{itemDescription}</p>
+                            <p className="m-product-card-ingredients">Ingredients: {ingredients.join(', ')}</p>
+                            <p className="m-product-card-allergens">Allergens: {allergens.join(', ')}</p>
+                            {variant === 'to_order' && (
+                                <button className="m-product-card-order">
+                                    Purchase Now
+                                </button>
+                            )}
+                            {variant === 'listing' && (
+                                <button className="m-product-card-order" onClick={() => setOpenModal(false)}>
+                                    Close
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

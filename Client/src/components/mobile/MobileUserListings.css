@@ -1,11 +1,9 @@
-.m-your-orders-page {
-    padding: 72px 16px 88px;
+.m-your-listings-section {
     display: flex;
     flex-direction: column;
-    gap: 32px;
 }
 
-.m-your-orders-heading {
+.m-your-listings-heading {
     font-family: 'Georgia', serif;
     font-size: 1.4rem;
     font-weight: 700;
@@ -13,14 +11,8 @@
     margin: 0 0 16px;
 }
 
-.m-your-orders-section {
-    display: flex;
-    flex-direction: column;
-}
-
-.m-your-orders-list {
+.m-your-listings-list {
     display: flex;
     flex-direction: column;
     gap: 12px;
 }
-

@@ -6,6 +6,9 @@ interface Product {
     title: string;
     bakerName: string;
     price: number;
+    itemDescription: string;
+    ingredients: string[];
+    allergens: string[];
 }
 
 interface MobileDiscoverPageProps {
@@ -28,6 +31,9 @@ const MobileDiscoverPage = ({ products }: MobileDiscoverPageProps) => {
                         bakerName={product.bakerName}
                         price={product.price}
                         variant="to_order"
+                        itemDescription={product.itemDescription}
+                        ingredients={product.ingredients}
+                        allergens={product.allergens}
                     />
                 ))}
             </div>
