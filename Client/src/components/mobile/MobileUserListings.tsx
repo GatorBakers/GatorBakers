@@ -1,35 +1,25 @@
-import ProductCard from './ProductCard';
-import EmptyState from './EmptyState';
-import './UserListings.css';
+import MobileProductCard from './MobileProductCard';
+import EmptyState from '../EmptyState';
+import type { Listing } from '../UserListings';
+import './MobileUserListings.css';
 
-export interface Listing {
-    id: number;
-    title: string;
-    bakerName: string;
-    price: number;
-    itemDescription: string;
-    ingredients: string[];
-    allergens: string[];
-}
-
-interface UserListingsProps {
+interface MobileUserListingsProps {
     listings: Listing[];
 }
 
-const UserListings = ({ listings }: UserListingsProps) => {
+const MobileUserListings = ({ listings }: MobileUserListingsProps) => {
     return (
-        <div className="your-listings-col">
-            <h2 className="your-listings-heading">Your Listings</h2>
-            <div className="your-listings-grid">
+        <section className="m-your-listings-section">
+            <h2 className="m-your-listings-heading">Your Listings</h2>
+            <div className="m-your-listings-list">
                 {listings.length === 0 ? (
                     <EmptyState
                         title="No listings yet"
                         subtitle="Listings you create will appear here."
-                        className="your-listings-empty-span"
                     />
                 ) : (
                     listings.map((listing) => (
-                        <ProductCard
+                        <MobileProductCard
                             key={listing.id}
                             title={listing.title}
                             bakerName={listing.bakerName}
@@ -42,8 +32,8 @@ const UserListings = ({ listings }: UserListingsProps) => {
                     ))
                 )}
             </div>
-        </div>
+        </section>
     );
 };
 
-export default UserListings;
+export default MobileUserListings;

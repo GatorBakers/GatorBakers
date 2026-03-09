@@ -65,3 +65,98 @@
 .m-product-card-order:active {
     background-color: var(--color-cta-hover);
 }
+
+/* Modal */
+
+.m-product-card-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.m-product-card-modal-content {
+    background-color: var(--color-white);
+    border-radius: 20px 20px 0 0;
+    box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    padding: 20px 20px 36px;
+    position: relative;
+    max-height: 85vh;
+    overflow-y: auto;
+}
+
+.m-product-card-modal-image {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    border-radius: 12px;
+    flex-shrink: 0;
+}
+
+.m-product-card-modal-info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.m-product-card-modal-info .m-product-card-title {
+    font-size: 1.2rem;
+}
+
+.m-product-card-modal-info .m-product-card-price {
+    font-size: 1rem;
+}
+
+.m-product-card-description {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+    margin: 4px 0 4px;
+}
+
+.m-product-card-ingredients,
+.m-product-card-allergens {
+    font-size: 0.85rem;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.m-product-card-ingredients {
+    color: var(--color-text-muted);
+}
+
+.m-product-card-allergens {
+    color: var(--color-cta);
+    font-weight: 600;
+}
+
+.m-product-card-modal-info .m-product-card-order {
+    width: 100%;
+    margin-top: 8px;
+}
+
+.m-product-card-modal-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    background: none;
+    border: none;
+    font-size: 1.4rem;
+    line-height: 1;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.m-product-card-modal-close:active {
+    background-color: var(--color-surface-card);
+    color: var(--color-text-dark);
+}

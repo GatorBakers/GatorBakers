@@ -1,6 +1,6 @@
 import MobileOrderCard from '../../components/mobile/MobileOrderCard';
 import type { OrderStatus } from '../../components/StatusBadge';
-import UserListings from '../../components/UserListings';
+import MobileUserListings from '../../components/mobile/MobileUserListings';
 import type { Listing } from '../../components/UserListings';
 import EmptyState from '../../components/EmptyState';
 import './MobileOrdersAndListingsPage.css';
@@ -57,7 +57,7 @@ const MobileYourOrdersPage = ({ orders, listings }: MobileYourOrdersPageProps) =
                 </div>
             </section>
 
-            <UserListings listings={listings} />
+            <MobileUserListings listings={listings} />
         </div>
     );
 };
