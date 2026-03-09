@@ -73,9 +73,7 @@ const OrderSummaryModal = ({ isOpen, onClose, onBack, title, bakerName, price, i
                 <hr className="order-summary-divider" />
 
                 {/* Pickup details */}
-                {/* TODO (Backend): Populate pickup location and time from the baker's listing.
-                        GET /api/listings/{listingId} should return pickupAddress and available pickup windows.
-                        Render them here so the buyer can confirm before placing the order. */}
+                {/* TODO: This area is subject to change. And could be based off of baker availability. */}
                 <div className="order-summary-pickup">
                     <p className="order-summary-pickup-label">Pickup details</p>
                     <p className="order-summary-pickup-placeholder">
@@ -85,7 +83,7 @@ const OrderSummaryModal = ({ isOpen, onClose, onBack, title, bakerName, price, i
 
                 <hr className="order-summary-divider" />
 
-                {/* Actions */}
+                {/* Buttons */}
                 <div className="order-summary-actions">
                     <button className="order-summary-btn-back" onClick={onBack}>
                         Back
