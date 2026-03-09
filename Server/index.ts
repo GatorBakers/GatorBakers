@@ -4,10 +4,11 @@ import express, { Request, Response } from "express";
 import { TokenExpiredError } from "jsonwebtoken";
 import { PrismaPg } from "@prisma/adapter-pg";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dayjs from "dayjs";
-import { validateRegInput } from "./src/utils/validation";
+import { validateRegInput, validateLoginInput } from "./src/utils/validation";
 
 const saltRounds = 10;
 const adapter = new PrismaPg({
@@ -28,9 +29,11 @@ if (!refresh_secret) {
 }
 
 app.use(express.json());
+app.use(cookieParser());
 app.use(
   cors({
     origin: "http://localhost:5173",
+    credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   }),
@@ -69,8 +72,8 @@ interface tokenData {
 }
 
 app.post("/refresh", async (req: Request, res: Response) => {
-  const { refresh_token } = req.body;
-  if (!refresh_token) return res.json({ message: "No refresh token provided" });
+  const refresh_token = req.cookies?.refresh_token;
+  if (!refresh_token) return res.status(401).json({ message: "No refresh token provided" });
 
   let data: tokenData;
   try {
@@ -116,10 +119,34 @@ app.post("/refresh", async (req: Request, res: Response) => {
     },
   });
 
+  res.cookie("refresh_token", new_refresh_token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    maxAge: 2 * 24 * 60 * 60 * 1000, // 2 days
+  });
+
   res.json({
     access_token,
-    refresh_token: new_refresh_token,
   });
+});
+
+app.post("/logout", async (req: Request, res: Response) => {
+  const refresh_token = req.cookies?.refresh_token;
+  if (refresh_token) {
+    try {
+      const data = jwt.verify(refresh_token, refresh_secret!) as tokenData;
+      await prisma.token.delete({ where: { user_id: data.id } }).catch(() => {});
+    } catch {
+      // Token invalid/expired, still clear cookie
+    }
+  }
+  res.clearCookie("refresh_token", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+  });
+  res.json({ message: "Logged out" });
 });
 
 app.post("/register", async (req: Request, res: Response) => {
@@ -154,15 +181,19 @@ app.post("/register", async (req: Request, res: Response) => {
 });
 
 app.post("/login", async (req: Request, res: Response) => {
-  const { email, password } = req.body;
+  const result = validateLoginInput(req.body);
+  if ("error" in result) {
+    return res.status(400).json({ message: result.error });
+  }
+  const { email, password } = result.sanitized;
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) {
-    return res.json("Invalid username or password");
+    return res.status(401).json({ message: "Invalid email or password" });
   }
 
   const validPassword = await bcrypt.compare(password, user.password);
   if (!validPassword) {
-    return res.json("Invalid username or password");
+    return res.status(401).json({ message: "Invalid email or password" });
   }
 
   const refresh_token = jwt.sign(
@@ -184,8 +215,15 @@ app.post("/login", async (req: Request, res: Response) => {
     { expiresIn: "2h" },
   );
 
-  // TODO: Send access token as a HTTP cookie for more security
-  res.json({ access_token, refresh_token });
+  // Set refresh token as httpOnly cookie
+  res.cookie("refresh_token", refresh_token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    maxAge: 2 * 24 * 60 * 60 * 1000, // 2 days
+  });
+
+  res.json({ access_token });
 });
 
 app.get("/user/:id/listings", async (req: Request, res: Response) => {

@@ -59,3 +59,37 @@ export function validateRegInput(input: {
     },
   };
 }
+
+// Validates and sanitizes login input
+export function validateLoginInput(input: {
+  email?: string;
+  password?: string;
+}): { error: string } | { sanitized: { email: string; password: string } } {
+  const { email, password } = input;
+
+  if (typeof email !== "string" || typeof password !== "string") {
+    return { error: "Email and password are required." };
+  }
+
+  const trimmedEmail = email.trim().toLowerCase();
+  const trimmedPassword = password.trim();
+
+  if (!trimmedEmail || !trimmedPassword) {
+    return { error: "Email and password are required." };
+  }
+
+  if (/\s/.test(trimmedPassword)) {
+    return { error: "Password must not contain spaces or whitespace." };
+  }
+
+  if (!isValidEmail(trimmedEmail)) {
+    return { error: "Please enter a valid email address." };
+  }
+
+  return {
+    sanitized: {
+      email: trimmedEmail,
+      password: trimmedPassword,
+    },
+  };
+}
