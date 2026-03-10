@@ -1,76 +1,20 @@
-import { useEffect, useState } from 'react';
 import './ProfilePage.css';
 import UserListings from '../components/UserListings';
 import type { Listing } from '../components/UserListings';
 import { useIsMobile } from '../hooks/useIsMobile';
 import MobileProfilePage from './mobile/MobileProfilePage';
-import { useAuth } from '../context/AuthContext';
-import { fetchProfile, type ProfileData } from '../services/profileService';
+import { useProfile } from '../hooks/useProfile';
 
-export interface UserProfile {
-    name: string;
-    city: string | null;
-    state: string | null;
-    favoriteBake: string | null;
-    photoUrl: string | null;
-    listingCount: number;
-    orderCount: number;
-    createdAt: string;
-}
-
-function toUserProfile(data: ProfileData): UserProfile {
-    return {
-        name: `${data.first_name} ${data.last_name}`,
-        city: data.city,
-        state: data.state,
-        favoriteBake: data.favorite_bake,
-        photoUrl: data.photo_url,
-        listingCount: data.listing_count,
-        orderCount: data.order_count,
-        createdAt: new Date(data.created_at).toLocaleDateString(),
-    };
-}
+export type { UserProfile } from '../hooks/useProfile';
 
 const ProfilePage = () => {
     const isMobile = useIsMobile();
-    const { accessToken } = useAuth();
-    const [profile, setProfile] = useState<UserProfile | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
+    const { profile, isLoading, error } = useProfile();
 
     // TODO: fetch user listings from backend
     const listings: Listing[] = [];
 
-    useEffect(() => {
-        if (!accessToken) {
-            setError('You must be logged in to view your profile.');
-            setProfile(null);
-            setLoading(false);
-            return;
-        }
-
-        setError('');
-        setLoading(true);
-
-        let cancelled = false;
-        fetchProfile(accessToken)
-            .then((data) => {
-                if (!cancelled) {
-                    setProfile(toUserProfile(data));
-                    setError('');
-                }
-            })
-            .catch((err) => {
-                if (!cancelled) setError(err instanceof Error ? err.message : 'Failed to load profile');
-            })
-            .finally(() => {
-                if (!cancelled) setLoading(false);
-            });
-
-        return () => { cancelled = true; };
-    }, [accessToken]);
-
-    if (loading) {
+    if (isLoading) {
         return <div className="profile-page"><p>Loading profile…</p></div>;
     }
 
