@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect, useRef, type ReactNode } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { logoutUser, refreshAccessToken } from '../services/authService';
 
@@ -15,8 +15,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [accessToken, setAccessToken] = useState<string | null>(null);
     const [isAuthLoading, setIsAuthLoading] = useState(true);
     const queryClient = useQueryClient();
+    const refreshCalled = useRef(false);
     
     useEffect(() => {
+        if (refreshCalled.current) return;
+        refreshCalled.current = true;
+
         refreshAccessToken()
             .then(({ access_token }) => setAccessToken(access_token))
             .catch(() => {})
