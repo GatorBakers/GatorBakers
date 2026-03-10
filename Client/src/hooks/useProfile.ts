@@ -27,7 +27,7 @@ function toUserProfile(data: ProfileData): UserProfile {
 }
 
 export function useProfile() {
-    const { accessToken } = useAuth();
+    const { accessToken, isAuthLoading } = useAuth();
 
     const { data: profile, isLoading, error } = useQuery<UserProfile, Error>({
         queryKey: ['profile', accessToken],
@@ -40,13 +40,13 @@ export function useProfile() {
         retry: false,
     });
 
-    const authError = !accessToken
+    const authError = !isAuthLoading && !accessToken
         ? 'You must be logged in to view your profile.'
         : null;
 
     return {
         profile: profile ?? null,
-        isLoading: !!accessToken && isLoading,
+        isLoading: isAuthLoading || (!!accessToken && isLoading),
         error: authError ?? (error?.message || null),
     };
 }

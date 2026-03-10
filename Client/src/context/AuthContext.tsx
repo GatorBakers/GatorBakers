@@ -1,9 +1,10 @@
-import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { logoutUser } from '../services/authService';
+import { logoutUser, refreshAccessToken } from '../services/authService';
 
 interface AuthContextType {
     accessToken: string | null;
+    isAuthLoading: boolean;
     setAccessToken: (token: string | null) => void;
     logout: () => Promise<void>;
 }
@@ -12,7 +13,15 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [accessToken, setAccessToken] = useState<string | null>(null);
+    const [isAuthLoading, setIsAuthLoading] = useState(true);
     const queryClient = useQueryClient();
+    
+    useEffect(() => {
+        refreshAccessToken()
+            .then(({ access_token }) => setAccessToken(access_token))
+            .catch(() => {})
+            .finally(() => setIsAuthLoading(false));
+    }, []);
 
     const logout = useCallback(async () => {
         setAccessToken(null);
@@ -21,7 +30,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, [queryClient]);
 
     return (
-        <AuthContext.Provider value={{ accessToken, setAccessToken, logout }}>
+        <AuthContext.Provider value={{ accessToken, isAuthLoading, setAccessToken, logout }}>
             {children}
         </AuthContext.Provider>
     );
