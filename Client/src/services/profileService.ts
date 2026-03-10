@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
+import { API_URL, throwApiError } from './api';
 
 export interface ProfileData {
     id: number;
@@ -22,15 +22,7 @@ export async function fetchProfile(accessToken: string): Promise<ProfileData> {
     });
 
     if (!response.ok) {
-        const text = await response.text().catch(() => "");
-        let message = `Failed to load profile (${response.status})`;
-        try {
-            const data = JSON.parse(text);
-            if (data?.message) message = data.message;
-        } catch {
-            // non-JSON body, use default message
-        }
-        throw new Error(message);
+        await throwApiError(response, "Failed to load profile");
     }
 
     return response.json() as Promise<ProfileData>;

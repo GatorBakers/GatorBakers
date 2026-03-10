@@ -155,8 +155,18 @@ app.get("/profile", authenticate, async (req: Request, res: Response) => {
   try {
     const user = await prisma.user.findUnique({
       where: { id },
-      include: {
-        search_location: true,
+      select: {
+        id: true,
+        email: true,
+        first_name: true,
+        last_name: true,
+        account_status: true,
+        photo_url: true,
+        favorite_bake: true,
+        created_at: true,
+        search_location: {
+          select: { city: true, state: true },
+        },
         _count: {
           select: { listings: true, orders: true },
         },
@@ -167,21 +177,19 @@ app.get("/profile", authenticate, async (req: Request, res: Response) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const { password: _, token: _t, ...safeUser } = user as any;
-
     res.json({
-      id: safeUser.id,
-      email: safeUser.email,
-      first_name: safeUser.first_name,
-      last_name: safeUser.last_name,
-      account_status: safeUser.account_status,
-      photo_url: safeUser.photo_url,
-      favorite_bake: safeUser.favorite_bake ?? null,
-      created_at: safeUser.created_at,
-      city: safeUser.search_location?.city ?? null,
-      state: safeUser.search_location?.state ?? null,
-      listing_count: safeUser._count.listings,
-      order_count: safeUser._count.orders,
+      id: user.id,
+      email: user.email,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      account_status: user.account_status,
+      photo_url: user.photo_url,
+      favorite_bake: user.favorite_bake ?? null,
+      created_at: user.created_at,
+      city: user.search_location?.city ?? null,
+      state: user.search_location?.state ?? null,
+      listing_count: user._count.listings,
+      order_count: user._count.orders,
     });
   } catch (error) {
     console.error(error);

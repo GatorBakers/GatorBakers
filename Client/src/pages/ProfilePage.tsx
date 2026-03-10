@@ -44,14 +44,21 @@ const ProfilePage = () => {
     useEffect(() => {
         if (!accessToken) {
             setError('You must be logged in to view your profile.');
+            setProfile(null);
             setLoading(false);
             return;
         }
 
+        setError('');
+        setLoading(true);
+
         let cancelled = false;
         fetchProfile(accessToken)
             .then((data) => {
-                if (!cancelled) setProfile(toUserProfile(data));
+                if (!cancelled) {
+                    setProfile(toUserProfile(data));
+                    setError('');
+                }
             })
             .catch((err) => {
                 if (!cancelled) setError(err instanceof Error ? err.message : 'Failed to load profile');

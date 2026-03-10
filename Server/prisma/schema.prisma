@@ -108,7 +108,7 @@ model Token {
 
 model Listing {
   id  Int @id @default(autoincrement())
-  user_id Int @unique
+  user_id Int
   user   User @relation(fields: [user_id], references: [id])
   title String
   description String
@@ -142,7 +142,7 @@ model Location {
 model Order {
   id  Int @id @default(autoincrement())
   created_at DateTime @default(now())
-  user_id Int  @unique
+  user_id Int
   user   User @relation(fields: [user_id], references: [id])
   listing_id Int
   status  Listing_Status
