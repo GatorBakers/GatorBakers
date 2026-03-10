@@ -118,6 +118,8 @@ model Listing {
   photo_url String
   created_at DateTime @default(now())
   location Location?
+
+  @@index([user_id])
 }
 
 model Coords {
@@ -146,4 +148,6 @@ model Order {
   user   User @relation(fields: [user_id], references: [id])
   listing_id Int
   status  Listing_Status
+
+  @@index([user_id])
 } 
