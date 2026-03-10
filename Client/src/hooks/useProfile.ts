@@ -30,13 +30,14 @@ export function useProfile() {
     const { accessToken } = useAuth();
 
     const { data: profile, isLoading, error } = useQuery<UserProfile, Error>({
-        queryKey: ['profile'],
+        queryKey: ['profile', accessToken],
         queryFn: async () => {
             const data = await fetchProfile(accessToken!);
             return toUserProfile(data);
         },
         enabled: !!accessToken,
         staleTime: 5 * 60 * 1000, // 5 minutes
+        retry: false,
     });
 
     const authError = !accessToken
