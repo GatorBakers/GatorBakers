@@ -10,6 +10,9 @@ interface MobileProfilePageProps {
 
 const MobileProfilePage = ({ userProfile, listings }: MobileProfilePageProps) => {
     const initial = userProfile.name.charAt(0).toUpperCase();
+    const locationText = userProfile.city && userProfile.state
+        ? `${userProfile.city}, ${userProfile.state}`
+        : null;
 
     return (
         <div className="m-profile-page">
@@ -26,11 +29,11 @@ const MobileProfilePage = ({ userProfile, listings }: MobileProfilePageProps) =>
                         <div className="m-profile-avatar-initial">{initial}</div>
                     )}
                     <p className="m-profile-name">{userProfile.name}</p>
-                    <p className="m-profile-location">{userProfile.city}, {userProfile.state}</p>
-                    <p className="m-profile-detail">Favorite Thing To Bake: {userProfile.favoriteBake}</p>
-                    <p className="m-profile-detail">Active Listings: {listings.length}</p>
-                    <p className="m-profile-detail">Orders Placed: {userProfile.ordersPlaced}</p>
-                    <p className="m-profile-detail">Created At: {userProfile.createdAt}</p>
+                    {locationText && <p className="m-profile-location">{locationText}</p>}
+                    {userProfile.favoriteBake && <p className="m-profile-detail">Favorite Thing To Bake: {userProfile.favoriteBake}</p>}
+                    <p className="m-profile-detail">Active Listings: {userProfile.listingCount}</p>
+                    <p className="m-profile-detail">Orders Placed: {userProfile.orderCount}</p>
+                    <p className="m-profile-detail">Member Since: {userProfile.createdAt}</p>
                 </div>
             </section>
 

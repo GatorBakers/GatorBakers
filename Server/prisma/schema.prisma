@@ -88,6 +88,7 @@ model User {
   account_status Account_Status?
   verified_account Boolean @default(false)
   photo_url String?
+  favorite_bake String?
   created_at DateTime @default(now())
   current_location  Coords?
   search_location Location?

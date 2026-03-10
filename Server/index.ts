@@ -43,12 +43,12 @@ function authenticate(req: Request, res: Response, next: any) {
   const authHeader = req.headers.authorization;
 
   if (!authHeader) {
-    return res.json({ message: "No token provided" });
+    return res.status(401).json({ message: "No token provided" });
   }
   const parts = authHeader.split(" ");
 
   if (parts.length !== 2 || parts[0] !== "Bearer") {
-    return res.json({ message: "Invalid token format" });
+    return res.status(401).json({ message: "Invalid token format" });
   }
   const token = parts[1];
 
@@ -58,9 +58,9 @@ function authenticate(req: Request, res: Response, next: any) {
     next();
   } catch (err) {
     if (err instanceof TokenExpiredError) {
-      return res.json({ message: "Token expired" });
+      return res.status(401).json({ message: "Token expired" });
     }
-    return res.json({ message: "Invalid token" });
+    return res.status(401).json({ message: "Invalid token" });
   }
 }
 
@@ -147,6 +147,46 @@ app.post("/logout", async (req: Request, res: Response) => {
     sameSite: "strict",
   });
   res.json({ message: "Logged out" });
+});
+
+app.get("/profile", authenticate, async (req: Request, res: Response) => {
+  const { id } = (req as any).user;
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id },
+      include: {
+        search_location: true,
+        _count: {
+          select: { listings: true, orders: true },
+        },
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const { password: _, token: _t, ...safeUser } = user as any;
+
+    res.json({
+      id: safeUser.id,
+      email: safeUser.email,
+      first_name: safeUser.first_name,
+      last_name: safeUser.last_name,
+      account_status: safeUser.account_status,
+      photo_url: safeUser.photo_url,
+      favorite_bake: safeUser.favorite_bake ?? null,
+      created_at: safeUser.created_at,
+      city: safeUser.search_location?.city ?? null,
+      state: safeUser.search_location?.state ?? null,
+      listing_count: safeUser._count.listings,
+      order_count: safeUser._count.orders,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Failed to fetch profile" });
+  }
 });
 
 app.post("/register", async (req: Request, res: Response) => {
