@@ -43,12 +43,12 @@ function authenticate(req: Request, res: Response, next: any) {
   const authHeader = req.headers.authorization;
 
   if (!authHeader) {
-    return res.json({ message: "No token provided" });
+    return res.status(401).json({ message: "No token provided" });
   }
   const parts = authHeader.split(" ");
 
   if (parts.length !== 2 || parts[0] !== "Bearer") {
-    return res.json({ message: "Invalid token format" });
+    return res.status(401).json({ message: "Invalid token format" });
   }
   const token = parts[1];
 
@@ -58,9 +58,9 @@ function authenticate(req: Request, res: Response, next: any) {
     next();
   } catch (err) {
     if (err instanceof TokenExpiredError) {
-      return res.json({ message: "Token expired" });
+      return res.status(401).json({ message: "Token expired" });
     }
-    return res.json({ message: "Invalid token" });
+    return res.status(401).json({ message: "Invalid token" });
   }
 }
 
@@ -147,6 +147,54 @@ app.post("/logout", async (req: Request, res: Response) => {
     sameSite: "strict",
   });
   res.json({ message: "Logged out" });
+});
+
+app.get("/profile", authenticate, async (req: Request, res: Response) => {
+  const { id } = (req as any).user;
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        email: true,
+        first_name: true,
+        last_name: true,
+        account_status: true,
+        photo_url: true,
+        favorite_bake: true,
+        created_at: true,
+        search_location: {
+          select: { city: true, state: true },
+        },
+        _count: {
+          select: { listings: true, orders: true },
+        },
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({
+      id: user.id,
+      email: user.email,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      account_status: user.account_status,
+      photo_url: user.photo_url,
+      favorite_bake: user.favorite_bake ?? null,
+      created_at: user.created_at,
+      city: user.search_location?.city ?? null,
+      state: user.search_location?.state ?? null,
+      listing_count: user._count.listings,
+      order_count: user._count.orders,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Failed to fetch profile" });
+  }
 });
 
 app.post("/register", async (req: Request, res: Response) => {
