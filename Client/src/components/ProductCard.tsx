@@ -1,6 +1,7 @@
 import CardImage from './CardImage';
 import './ProductCard.css';
 import { useState } from 'react';
+import OrderSummaryModal from './OrderSummaryModal';
 
 type ProductCardVariant = 'to_order' | 'listing';
 
@@ -23,7 +24,8 @@ interface ProductCardProps {
 
 const ProductCard = ({ title, bakerName, price, imageUrl, variant, itemDescription, ingredients, allergens }: ProductCardProps) => {
     const [openModal, setOpenModal] = useState<boolean>(false);
-    
+    const [openOrderSummary, setOpenOrderSummary] = useState<boolean>(false);
+
     return (
         <div className="product-card">
             <CardImage
@@ -59,7 +61,7 @@ const ProductCard = ({ title, bakerName, price, imageUrl, variant, itemDescripti
                             <p className="product-card-ingredients">Ingredients: {ingredients.join(', ')}</p>
                             <p className="product-card-allergens">Allergens: {allergens.join(', ')}</p>
                             {variant === 'to_order' && (
-                                <button className="product-card-action">
+                                <button className="product-card-action" onClick={() => setOpenOrderSummary(true)}>
                                     Purchase Now
                                 </button>
                             )}
@@ -72,6 +74,16 @@ const ProductCard = ({ title, bakerName, price, imageUrl, variant, itemDescripti
                     </div>
                 </div>
             )}
+
+        <OrderSummaryModal
+            isOpen={openOrderSummary}
+            onClose={() => { setOpenOrderSummary(false); setOpenModal(false); }}
+            onBack={() => setOpenOrderSummary(false)}
+            title={title}
+            bakerName={bakerName}
+            price={price}
+            imageUrl={imageUrl}
+        />
 
         </div>
     );
