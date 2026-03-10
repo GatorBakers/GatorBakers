@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { logoutUser } from '../services/authService';
 
 interface AuthContextType {
@@ -11,11 +12,13 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [accessToken, setAccessToken] = useState<string | null>(null);
+    const queryClient = useQueryClient();
 
     const logout = useCallback(async () => {
         setAccessToken(null);
+        queryClient.removeQueries();
         await logoutUser().catch(() => {});
-    }, []);
+    }, [queryClient]);
 
     return (
         <AuthContext.Provider value={{ accessToken, setAccessToken, logout }}>
