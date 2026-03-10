@@ -1,16 +1,9 @@
 import ProductCard from './ProductCard';
 import EmptyState from './EmptyState';
+import type { Listing } from '../hooks/useUserListings';
 import './UserListings.css';
 
-export interface Listing {
-    id: number;
-    title: string;
-    bakerName: string;
-    price: number;
-    itemDescription: string;
-    ingredients: string[];
-    allergens: string[];
-}
+export type { Listing };
 
 interface UserListingsProps {
     listings: Listing[];
@@ -34,6 +27,7 @@ const UserListings = ({ listings }: UserListingsProps) => {
                             title={listing.title}
                             bakerName={listing.bakerName}
                             price={listing.price}
+                            imageUrl={listing.imageUrl}
                             variant="listing"
                             itemDescription={listing.itemDescription}
                             ingredients={listing.ingredients}

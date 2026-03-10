@@ -116,6 +116,8 @@ model Listing {
   remaining_inventory Int
   listing_status Listing_Status
   photo_url String
+  ingredients String[]
+  allergens String[]
   created_at DateTime @default(now())
   location Location?
 

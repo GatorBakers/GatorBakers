@@ -24,6 +24,7 @@ const MobileUserListings = ({ listings }: MobileUserListingsProps) => {
                             title={listing.title}
                             bakerName={listing.bakerName}
                             price={listing.price}
+                            imageUrl={listing.imageUrl}
                             variant="listing"
                             itemDescription={listing.itemDescription}
                             ingredients={listing.ingredients}

@@ -1,16 +1,14 @@
 import './ProfilePage.css';
 import UserListings from '../components/UserListings';
-import type { Listing } from '../components/UserListings';
 import { useIsMobile } from '../hooks/useIsMobile';
 import MobileProfilePage from './mobile/MobileProfilePage';
 import { useProfile } from '../hooks/useProfile';
+import { useUserListings } from '../hooks/useUserListings';
 
 const ProfilePage = () => {
     const isMobile = useIsMobile();
     const { profile, isLoading, error } = useProfile();
-
-    // TODO: fetch user listings from backend
-    const listings: Listing[] = [];
+    const { listings } = useUserListings();
 
     if (isLoading) {
         return <div className="profile-page"><p>Loading profile…</p></div>;
