@@ -5,8 +5,6 @@ import { useIsMobile } from '../hooks/useIsMobile';
 import MobileProfilePage from './mobile/MobileProfilePage';
 import { useProfile } from '../hooks/useProfile';
 
-export type { UserProfile } from '../hooks/useProfile';
-
 const ProfilePage = () => {
     const isMobile = useIsMobile();
     const { profile, isLoading, error } = useProfile();
