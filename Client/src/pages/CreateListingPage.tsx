@@ -2,18 +2,10 @@
 // TODO: Allergen Section (Present common allergens and allow users to add custom allergens)
 
 import { useState, type SubmitEvent } from 'react';
+import type { ListingForm } from '../types';
 import ImageUpload from '../components/ImageUpload';
 import ButtonAddOn from '../components/ButtonAddOn';
 import './CreateListingPage.css';
-
-interface ListingForm {
-    name: string;
-    description: string;
-    price: string;
-    ingredients: string[];
-    allergens: string[];
-    image: File | null;
-}
 
 const INITIAL_LISTING: ListingForm = {
     name: '',

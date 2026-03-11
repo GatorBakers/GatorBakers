@@ -1,20 +1,10 @@
+import type { Order, Listing } from '../types';
 import OrderCard from '../components/OrderCard';
-import type { OrderStatus } from '../components/StatusBadge';
 import UserListings from '../components/UserListings';
-import type { Listing } from '../components/UserListings';
 import EmptyState from '../components/EmptyState';
 import MobileYourOrdersPage from './mobile/MobileOrdersAndListingsPage';
 import { useIsMobile } from '../hooks/useIsMobile';
 import './OrdersAndListingsPage.css';
-
-interface Order {
-    id: number;
-    itemName: string;
-    bakerName: string;
-    status: OrderStatus;
-    pickupTime: string;
-    pickupAddress: string;
-}
 
 // TODO: Replace with useState + useEffect fetching the authenticated user's orders from the API.
 //       GET /api/orders?userId={userId} — should return Order[] for the current user.

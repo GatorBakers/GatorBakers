@@ -1,16 +1,7 @@
+import type { Listing } from '../types';
 import ProductCard from './ProductCard';
 import EmptyState from './EmptyState';
 import './UserListings.css';
-
-export interface Listing {
-    id: number;
-    title: string;
-    bakerName: string;
-    price: number;
-    itemDescription: string;
-    ingredients: string[];
-    allergens: string[];
-}
 
 interface UserListingsProps {
     listings: Listing[];

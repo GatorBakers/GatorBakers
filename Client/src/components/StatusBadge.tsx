@@ -1,6 +1,5 @@
+import type { OrderStatus } from '../types';
 import './StatusBadge.css';
-
-export type OrderStatus = 'ready_for_pickup' | 'pending' | 'completed' | 'cancelled';
 
 interface StatusBadgeProps {
     status: OrderStatus;

@@ -1,18 +1,9 @@
+import type { Listing } from '../../types';
 import MobileProductCard from '../../components/mobile/MobileProductCard';
 import './MobileDiscoverPage.css';
 
-interface Product {
-    id: number;
-    title: string;
-    bakerName: string;
-    price: number;
-    itemDescription: string;
-    ingredients: string[];
-    allergens: string[];
-}
-
 interface MobileDiscoverPageProps {
-    products: Product[];
+    products: Listing[];
 }
 
 const MobileDiscoverPage = ({ products }: MobileDiscoverPageProps) => {

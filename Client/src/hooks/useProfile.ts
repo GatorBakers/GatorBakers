@@ -1,17 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '../context/AuthContext';
-import { fetchProfile, type ProfileData } from '../services/profileService';
-
-export interface UserProfile {
-    name: string;
-    city: string | null;
-    state: string | null;
-    favoriteBake: string | null;
-    photoUrl: string | null;
-    listingCount: number;
-    orderCount: number;
-    createdAt: string;
-}
+import { fetchProfile } from '../services/profileService';
+import type { UserProfile, ProfileData } from '../types';
 
 function toUserProfile(data: ProfileData): UserProfile {
     return {

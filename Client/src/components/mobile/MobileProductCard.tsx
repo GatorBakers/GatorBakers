@@ -1,10 +1,9 @@
+import type { ProductCardVariant } from '../../types';
 import CardImage from '../CardImage';
 import './MobileProductCard.css';
 import { useState } from 'react';
 
-type MobileProductCardVariant = 'to_order' | 'listing';
-
-const VARIANT_LABEL: Record<MobileProductCardVariant, string> = {
+const VARIANT_LABEL: Record<ProductCardVariant, string> = {
     to_order: 'Order',
     listing: 'View Listing',
 };
@@ -14,7 +13,7 @@ interface MobileProductCardProps {
     bakerName: string;
     price: number;
     imageUrl?: string;
-    variant: MobileProductCardVariant;
+    variant: ProductCardVariant;
     itemDescription: string;
     ingredients: string[];
     allergens: string[];

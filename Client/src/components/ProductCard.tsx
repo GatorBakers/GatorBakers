@@ -1,9 +1,8 @@
+import type { ProductCardVariant } from '../types';
 import CardImage from './CardImage';
 import './ProductCard.css';
 import { useState } from 'react';
 import OrderSummaryModal from './OrderSummaryModal';
-
-type ProductCardVariant = 'to_order' | 'listing';
 
 const VARIANT_LABEL: Record<ProductCardVariant, string> = {
     to_order: 'Order',

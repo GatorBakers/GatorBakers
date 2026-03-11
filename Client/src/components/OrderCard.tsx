@@ -1,9 +1,7 @@
+import type { OrderStatus } from '../types';
 import StatusBadge from './StatusBadge';
-import type { OrderStatus } from './StatusBadge';
 import CardImage from './CardImage';
 import './OrderCard.css';
-
-export type { OrderStatus };
 
 interface OrderCardProps {
     itemName: string;

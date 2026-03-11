@@ -1,6 +1,6 @@
+import type { Listing } from '../../types';
 import MobileProductCard from './MobileProductCard';
 import EmptyState from '../EmptyState';
-import type { Listing } from '../UserListings';
 import './MobileUserListings.css';
 
 interface MobileUserListingsProps {

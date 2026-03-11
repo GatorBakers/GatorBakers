@@ -1,6 +1,5 @@
+import type { Listing, UserProfile } from '../../types';
 import UserListings from '../../components/UserListings';
-import type { Listing } from '../../components/UserListings';
-import type { UserProfile } from '../../hooks/useProfile';
 import './MobileProfilePage.css';
 
 interface MobileProfilePageProps {

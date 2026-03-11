@@ -1,18 +1,8 @@
+import type { Order, Listing } from '../../types';
 import MobileOrderCard from '../../components/mobile/MobileOrderCard';
-import type { OrderStatus } from '../../components/StatusBadge';
 import MobileUserListings from '../../components/mobile/MobileUserListings';
-import type { Listing } from '../../components/UserListings';
 import EmptyState from '../../components/EmptyState';
 import './MobileOrdersAndListingsPage.css';
-
-interface Order {
-    id: number;
-    itemName: string;
-    bakerName: string;
-    status: OrderStatus;
-    pickupTime: string;
-    pickupAddress: string;
-}
 
 interface MobileYourOrdersPageProps {
     // TODO: Once API calls are added in YourOrderPage.tsx, these props will carry real data.
