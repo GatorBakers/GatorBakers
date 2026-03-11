@@ -19,10 +19,11 @@ interface ProductCardProps {
     itemDescription: string;
     ingredients: string[];
     allergens: string[];
+    quantity?: number;
     // onAction?: () => void;
 }
 
-const ProductCard = ({ title, bakerName, price, imageUrl, variant, itemDescription, ingredients, allergens }: ProductCardProps) => {
+const ProductCard = ({ title, bakerName, price, imageUrl, variant, itemDescription, ingredients, allergens, quantity }: ProductCardProps) => {
     const [openModal, setOpenModal] = useState<boolean>(false);
     const [openOrderSummary, setOpenOrderSummary] = useState<boolean>(false);
 
@@ -60,6 +61,11 @@ const ProductCard = ({ title, bakerName, price, imageUrl, variant, itemDescripti
                             <p className="product-card-description">{itemDescription}</p>
                             <p className="product-card-ingredients">Ingredients: {ingredients.join(', ')}</p>
                             <p className="product-card-allergens">Allergens: {allergens.join(', ')}</p>
+                            {quantity !== undefined && (
+                                <p className="product-card-quantity">
+                                    {quantity > 0 ? `${quantity} available` : 'Out of stock'}
+                                </p>
+                            )}
                             {variant === 'to_order' && (
                                 <button className="product-card-action" onClick={() => setOpenOrderSummary(true)}>
                                     Purchase Now

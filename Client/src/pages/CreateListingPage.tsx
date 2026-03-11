@@ -10,6 +10,7 @@ interface ListingForm {
     name: string;
     description: string;
     price: string;
+    quantity: string;
     ingredients: string[];
     allergens: string[];
     image: File | null;
@@ -19,6 +20,7 @@ const INITIAL_LISTING: ListingForm = {
     name: '',
     description: '',
     price: '',
+    quantity: '',
     ingredients: [],
     allergens: [],
     image: null,
@@ -41,6 +43,7 @@ const CreateListingPage = () => {
         formData.append('name', listing.name.trim());
         formData.append('description', listing.description.trim());
         formData.append('price', listing.price.trim());
+        formData.append('quantity', String(parseInt(listing.quantity.trim(), 10)));
         listing.ingredients.forEach(i => formData.append('ingredients[]', i));
         listing.allergens.forEach(a => formData.append('allergens[]', a));
         if (listing.image) formData.append('image', listing.image);
@@ -102,6 +105,22 @@ const CreateListingPage = () => {
                         }}
                         onBlur={() => {
                             if (listing.price) handleChange('price', parseFloat(listing.price).toFixed(2));
+                        }}
+                        onKeyDown={(e) => { if (e.key === 'Enter') e.preventDefault(); }}
+                    />
+                </label>
+                <label className="create-listing-label">
+                    Quantity Available
+                    <input
+                        className="create-listing-input"
+                        type="number"
+                        placeholder="e.g. 12"
+                        min="1"
+                        step="1"
+                        value={listing.quantity}
+                        onChange={(e) => {
+                            const val = e.target.value;
+                            if (/^\d*$/.test(val)) handleChange('quantity', val);
                         }}
                         onKeyDown={(e) => { if (e.key === 'Enter') e.preventDefault(); }}
                     />
