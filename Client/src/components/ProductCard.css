@@ -130,6 +130,13 @@
     font-weight: 600;
 }
 
+.product-card-quantity {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-brand-medium);
+    margin: 4px 0 0;
+}
+
 .product-card-modal-close {
     position: absolute;
     top: 14px;

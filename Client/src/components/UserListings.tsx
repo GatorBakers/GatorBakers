@@ -10,6 +10,7 @@ export interface Listing {
     itemDescription: string;
     ingredients: string[];
     allergens: string[];
+    quantity: number;
 }
 
 interface UserListingsProps {
@@ -38,6 +39,7 @@ const UserListings = ({ listings }: UserListingsProps) => {
                             itemDescription={listing.itemDescription}
                             ingredients={listing.ingredients}
                             allergens={listing.allergens}
+                            quantity={listing.quantity}
                         />
                     ))
                 )}
