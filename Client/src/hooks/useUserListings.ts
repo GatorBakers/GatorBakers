@@ -21,8 +21,8 @@ function toListing(data: ListingData): Listing {
         bakerName: `${data.user.first_name} ${data.user.last_name}`,
         price: parseFloat(data.price),
         itemDescription: data.description,
-        ingredients: data.ingredients,
-        allergens: data.allergens,
+        ingredients: data.ingredients ?? [],
+        allergens: data.allergens ?? [],
         quantity: data.quantity ?? data.remaining_inventory ?? 0,
         imageUrl: data.photo_url,
     };
