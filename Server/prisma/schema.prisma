@@ -22,7 +22,10 @@ enum Account_Status {
 enum Listing_Status {
   AVAILABLE
   PENDING
+  CONFIRMED
   SOLD
+  COMPLETED
+  CANCELLED
 }
 
 enum US_State {
@@ -118,7 +121,6 @@ model Listing {
   photo_url String
   created_at DateTime @default(now())
   location Location?
-
   @@index([user_id])
 }
 
@@ -147,7 +149,7 @@ model Order {
   user_id Int
   user   User @relation(fields: [user_id], references: [id])
   listing_id Int
+  pickup_location String 
   status  Listing_Status
-
   @@index([user_id])
 } 

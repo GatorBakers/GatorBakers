@@ -73,7 +73,8 @@ interface tokenData {
 
 app.post("/refresh", async (req: Request, res: Response) => {
   const refresh_token = req.cookies?.refresh_token;
-  if (!refresh_token) return res.status(401).json({ message: "No refresh token provided" });
+  if (!refresh_token)
+    return res.status(401).json({ message: "No refresh token provided" });
 
   let data: tokenData;
   try {
@@ -136,7 +137,9 @@ app.post("/logout", async (req: Request, res: Response) => {
   if (refresh_token) {
     try {
       const data = jwt.verify(refresh_token, refresh_secret!) as tokenData;
-      await prisma.token.delete({ where: { user_id: data.id } }).catch(() => {});
+      await prisma.token
+        .delete({ where: { user_id: data.id } })
+        .catch(() => {});
     } catch {
       // Token invalid/expired, still clear cookie
     }
@@ -394,6 +397,7 @@ app.delete("/listing/:id", async (req: Request, res: Response) => {
 app.post("/listing/:id/order", async (req: Request, res: Response) => {
   const listing_id = Number(req.params.id);
   const user_id = Number(req.body.user_id);
+  const pickup_location = req.body.pickup_location;
 
   if (!listing_id || isNaN(listing_id)) {
     return res.status(400).json({ message: "Invalid listing id" });
@@ -438,10 +442,50 @@ app.post("/listing/:id/order", async (req: Request, res: Response) => {
         user_id,
         listing_id,
         status: "PENDING",
+        pickup_location,
       },
     });
 
     return res.status(201).json(order);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+app.patch("/order/:id", async (req: Request, res: Response) => {
+  const order_id = Number(req.params.id);
+  const { status } = req.body;
+  const validStatuses = ["PENDING", "CONFIRMED", "COMPLETED", "CANCELLED"];
+
+  if (!order_id || isNaN(order_id)) {
+    return res.status(400).json({ message: "Invalid order id" });
+  }
+  if (!status) {
+    return res.status(400).json({ message: "Status is required" });
+  }
+  if (!validStatuses.includes(status)) {
+    return res.status(400).json({ message: "Invalid status" });
+  }
+
+  try {
+    const order = await prisma.order.findUnique({
+      where: {
+        id: order_id,
+      },
+    });
+    if (!order) {
+      return res.status(404).json({ message: "Order does not exist" });
+    }
+    const updated_order = await prisma.order.update({
+      where: {
+        id: order_id,
+      },
+      data: {
+        status,
+      },
+    });
+    return res.status(200).json(updated_order);
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Server error" });
