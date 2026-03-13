@@ -9,6 +9,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dayjs from "dayjs";
 import { validateRegInput, validateLoginInput } from "./src/utils/validation";
+import { use } from "react";
 
 const saltRounds = 10;
 const adapter = new PrismaPg({
@@ -486,6 +487,92 @@ app.patch("/order/:id", async (req: Request, res: Response) => {
       },
     });
     return res.status(200).json(updated_order);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+app.get("/orders/user/:id", async (req: Request, res: Response) => {
+  const user_id = Number(req.params.id);
+
+  if (isNaN(user_id)) {
+    return res.status(400).json({ message: "Invalid user id" });
+  }
+
+  try {
+    const orders = await prisma.order.findMany({
+      where: { user_id },
+      select: {
+        id: true,
+        created_at: true,
+        pickup_location: true,
+        status: true,
+        listing: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            price: true,
+            remaining_inventory: true,
+            listing_status: true,
+            photo_url: true,
+          },
+        },
+      },
+    });
+
+    return res.status(200).json(orders);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+app.get("/orders/seller/:id", async (req: Request, res: Response) => {
+  const seller_id = Number(req.params.id);
+
+  if (isNaN(seller_id)) {
+    return res.status(400).json({ message: "Invalid user id" });
+  }
+  try {
+    const orders = await prisma.order.findMany({
+      where: { listing: { user_id: seller_id } },
+      select: {
+        id: true,
+        created_at: true,
+        pickup_location: true,
+        status: true,
+        listing: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            price: true,
+            remaining_inventory: true,
+            listing_status: true,
+            photo_url: true,
+          },
+        },
+        user: {
+          select: {
+            id: true,
+            first_name: true,
+            last_name: true,
+          },
+        },
+      },
+    });
+
+    const pending_orders = orders.filter(o => o.status === "PENDING");
+    const confirmed_orders = orders.filter(o =>
+      ["CONFIRMED", "COMPLETED"].includes(o.status),
+    );
+    const cancelled_orders = orders.filter(o => o.status === "CANCELLED");
+
+    return res
+      .status(200)
+      .json({ pending_orders, confirmed_orders, cancelled_orders });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Server error" });
