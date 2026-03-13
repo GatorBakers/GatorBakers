@@ -4,8 +4,11 @@ import CompassIcon from '../assets/Compass.svg';
 import SearchIcon from '../assets/Search.svg';
 import HandbagIcon from '../assets/Handbag.svg';
 import MessagesIcon from '../assets/Messages.svg';
+import { useProfile } from '../hooks/useProfile';
 
 const Navbar = () => {
+    const { profile } = useProfile();
+    const initial = profile?.name.charAt(0).toUpperCase();
     return (
         <nav className="navbar">
             <NavLink to="/discover" className="navbar-logo">
@@ -35,7 +38,7 @@ const Navbar = () => {
                     + Create Listing
                 </NavLink>
                 <NavLink to="/profile" className="navbar-avatar">
-                    P
+                    {initial}
                 </NavLink>
             </div>
         </nav>

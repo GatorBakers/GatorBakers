@@ -22,7 +22,10 @@ enum Account_Status {
 enum Listing_Status {
   AVAILABLE
   PENDING
+  CONFIRMED
   SOLD
+  COMPLETED
+  CANCELLED
 }
 
 enum US_State {
@@ -120,8 +123,9 @@ model Listing {
   allergens String[]
   created_at DateTime @default(now())
   location Location?
-
+  orders Order[]
   @@index([user_id])
+  
 }
 
 model Coords {
@@ -149,7 +153,9 @@ model Order {
   user_id Int
   user   User @relation(fields: [user_id], references: [id])
   listing_id Int
+  listing Listing @relation(fields: [listing_id], references: [id])
+  pickup_location String 
   status  Listing_Status
-
   @@index([user_id])
+  @@index([listing_id])
 } 

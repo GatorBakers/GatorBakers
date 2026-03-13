@@ -10,6 +10,7 @@ export interface Listing {
     itemDescription: string;
     ingredients: string[];
     allergens: string[];
+    quantity: number;
     imageUrl: string;
 }
 
@@ -22,6 +23,7 @@ function toListing(data: ListingData): Listing {
         itemDescription: data.description,
         ingredients: data.ingredients,
         allergens: data.allergens,
+        quantity: data.quantity ?? data.remaining_inventory ?? 0,
         imageUrl: data.photo_url,
     };
 }

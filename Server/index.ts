@@ -9,6 +9,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dayjs from "dayjs";
 import { validateRegInput, validateLoginInput } from "./src/utils/validation";
+import { use } from "react";
 
 const saltRounds = 10;
 const adapter = new PrismaPg({
@@ -20,6 +21,13 @@ const app = express();
 const PORT = 4000;
 const access_secret = process.env.ACCESS_TOKEN_SECRET!;
 const refresh_secret = process.env.REFRESH_TOKEN_SECRET!;
+
+function serializeListing<T extends { remaining_inventory: number }>(listing: T) {
+  return {
+    ...listing,
+    quantity: listing.remaining_inventory,
+  };
+}
 
 if (!access_secret) {
   throw new Error("access_secret is not defined ");
@@ -73,7 +81,8 @@ interface tokenData {
 
 app.post("/refresh", async (req: Request, res: Response) => {
   const refresh_token = req.cookies?.refresh_token;
-  if (!refresh_token) return res.status(401).json({ message: "No refresh token provided" });
+  if (!refresh_token)
+    return res.status(401).json({ message: "No refresh token provided" });
 
   let data: tokenData;
   try {
@@ -136,7 +145,9 @@ app.post("/logout", async (req: Request, res: Response) => {
   if (refresh_token) {
     try {
       const data = jwt.verify(refresh_token, refresh_secret!) as tokenData;
-      await prisma.token.delete({ where: { user_id: data.id } }).catch(() => {});
+      await prisma.token
+        .delete({ where: { user_id: data.id } })
+        .catch(() => {});
     } catch {
       // Token invalid/expired, still clear cookie
     }
@@ -287,7 +298,7 @@ app.get("/user/:id/listings", async (req: Request, res: Response) => {
       include: { user: { select: { first_name: true, last_name: true } } },
       orderBy: { created_at: "desc" },
     });
-    return res.status(200).json(listings);
+    return res.status(200).json(listings.map(serializeListing));
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Database error" });
@@ -302,7 +313,7 @@ app.get("/my-listings", authenticate, async (req: Request, res: Response) => {
       include: { user: { select: { first_name: true, last_name: true } } },
       orderBy: { created_at: "desc" },
     });
-    return res.status(200).json(listings);
+      return res.status(200).json(listings.map(serializeListing));
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Database error" });
@@ -325,7 +336,7 @@ app.get("/listing/:id", async (req: Request, res: Response) => {
     if (!listing) {
       return res.status(404).json({ message: "Listing not found" });
     }
-    return res.status(200).json(listing);
+      return res.status(200).json(serializeListing(listing));
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Database error" });
@@ -348,6 +359,7 @@ app.post("/listing", authenticate, async (req: Request, res: Response) => {
     title,
     description,
     price,
+      quantity,
     remaining_inventory,
     photo_url,
     ingredients,
@@ -365,7 +377,8 @@ app.post("/listing", authenticate, async (req: Request, res: Response) => {
   if (isNaN(parsedPrice) || parsedPrice < 0) {
     return res.status(400).json({ message: "Price must be a non-negative number" });
   }
-  const parsedInventory = remaining_inventory !== undefined ? Number(remaining_inventory) : 1;
+  const inventoryInput = quantity !== undefined ? quantity : remaining_inventory;
+  const parsedInventory = inventoryInput !== undefined ? Number(inventoryInput) : 1;
   if (isNaN(parsedInventory) || parsedInventory < 0 || !Number.isInteger(parsedInventory)) {
     return res.status(400).json({ message: "Inventory must be a non-negative integer" });
   }
@@ -391,7 +404,7 @@ app.post("/listing", authenticate, async (req: Request, res: Response) => {
       },
       include: { user: { select: { first_name: true, last_name: true } } },
     });
-    return res.status(201).json(new_listing);
+      return res.status(201).json(serializeListing(new_listing));
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Server error" });
@@ -410,6 +423,9 @@ app.patch("/listing/:id", async (req: Request, res: Response) => {
 
   if (req.body.price !== undefined)
     updateData.price = req.body.price.toString();
+
+  if (req.body.quantity !== undefined)
+    updateData.remaining_inventory = Number(req.body.quantity);
 
   if (req.body.remaining_inventory !== undefined)
     updateData.remaining_inventory = Number(req.body.remaining_inventory);
@@ -462,6 +478,7 @@ app.delete("/listing/:id", async (req: Request, res: Response) => {
 app.post("/listing/:id/order", async (req: Request, res: Response) => {
   const listing_id = Number(req.params.id);
   const user_id = Number(req.body.user_id);
+  const pickup_location = req.body.pickup_location;
 
   if (!listing_id || isNaN(listing_id)) {
     return res.status(400).json({ message: "Invalid listing id" });
@@ -506,10 +523,136 @@ app.post("/listing/:id/order", async (req: Request, res: Response) => {
         user_id,
         listing_id,
         status: "PENDING",
+        pickup_location,
       },
     });
 
     return res.status(201).json(order);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+app.patch("/order/:id", async (req: Request, res: Response) => {
+  const order_id = Number(req.params.id);
+  const { status } = req.body;
+  const validStatuses = ["PENDING", "CONFIRMED", "COMPLETED", "CANCELLED"];
+
+  if (!order_id || isNaN(order_id)) {
+    return res.status(400).json({ message: "Invalid order id" });
+  }
+  if (!status) {
+    return res.status(400).json({ message: "Status is required" });
+  }
+  if (!validStatuses.includes(status)) {
+    return res.status(400).json({ message: "Invalid status" });
+  }
+
+  try {
+    const order = await prisma.order.findUnique({
+      where: {
+        id: order_id,
+      },
+    });
+    if (!order) {
+      return res.status(404).json({ message: "Order does not exist" });
+    }
+    const updated_order = await prisma.order.update({
+      where: {
+        id: order_id,
+      },
+      data: {
+        status,
+      },
+    });
+    return res.status(200).json(updated_order);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+app.get("/orders/user/:id", async (req: Request, res: Response) => {
+  const user_id = Number(req.params.id);
+
+  if (isNaN(user_id)) {
+    return res.status(400).json({ message: "Invalid user id" });
+  }
+
+  try {
+    const orders = await prisma.order.findMany({
+      where: { user_id },
+      select: {
+        id: true,
+        created_at: true,
+        pickup_location: true,
+        status: true,
+        listing: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            price: true,
+            remaining_inventory: true,
+            listing_status: true,
+            photo_url: true,
+          },
+        },
+      },
+    });
+
+    return res.status(200).json(orders);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+app.get("/orders/seller/:id", async (req: Request, res: Response) => {
+  const seller_id = Number(req.params.id);
+
+  if (isNaN(seller_id)) {
+    return res.status(400).json({ message: "Invalid user id" });
+  }
+  try {
+    const orders = await prisma.order.findMany({
+      where: { listing: { user_id: seller_id } },
+      select: {
+        id: true,
+        created_at: true,
+        pickup_location: true,
+        status: true,
+        listing: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            price: true,
+            remaining_inventory: true,
+            listing_status: true,
+            photo_url: true,
+          },
+        },
+        user: {
+          select: {
+            id: true,
+            first_name: true,
+            last_name: true,
+          },
+        },
+      },
+    });
+
+    const pending_orders = orders.filter(o => o.status === "PENDING");
+    const confirmed_orders = orders.filter(o =>
+      ["CONFIRMED", "COMPLETED"].includes(o.status),
+    );
+    const cancelled_orders = orders.filter(o => o.status === "CANCELLED");
+
+    return res
+      .status(200)
+      .json({ pending_orders, confirmed_orders, cancelled_orders });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Server error" });

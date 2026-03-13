@@ -32,6 +32,7 @@ const UserListings = ({ listings }: UserListingsProps) => {
                             itemDescription={listing.itemDescription}
                             ingredients={listing.ingredients}
                             allergens={listing.allergens}
+                            quantity={listing.quantity}
                         />
                     ))
                 )}

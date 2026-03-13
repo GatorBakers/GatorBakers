@@ -18,9 +18,10 @@ interface MobileProductCardProps {
     itemDescription: string;
     ingredients: string[];
     allergens: string[];
+    quantity?: number;
 }
 
-const MobileProductCard = ({ title, bakerName, price, imageUrl, variant, itemDescription, ingredients, allergens }: MobileProductCardProps) => {
+const MobileProductCard = ({ title, bakerName, price, imageUrl, variant, itemDescription, ingredients, allergens, quantity }: MobileProductCardProps) => {
     const [openModal, setOpenModal] = useState<boolean>(false);
 
     return (
@@ -59,6 +60,11 @@ const MobileProductCard = ({ title, bakerName, price, imageUrl, variant, itemDes
                             <p className="m-product-card-description">{itemDescription}</p>
                             <p className="m-product-card-ingredients">Ingredients: {ingredients.join(', ')}</p>
                             <p className="m-product-card-allergens">Allergens: {allergens.join(', ')}</p>
+                            {quantity !== undefined && (
+                                <p className="m-product-card-quantity">
+                                    {quantity > 0 ? `${quantity} available` : 'Out of stock'}
+                                </p>
+                            )}
                             {variant === 'to_order' && (
                                 <button className="m-product-card-order">
                                     Purchase Now

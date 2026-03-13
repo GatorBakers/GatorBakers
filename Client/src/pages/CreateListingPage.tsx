@@ -14,6 +14,7 @@ interface ListingForm {
     name: string;
     description: string;
     price: string;
+    quantity: string;
     ingredients: string[];
     allergens: string[];
     image: File | null;
@@ -23,6 +24,7 @@ const INITIAL_LISTING: ListingForm = {
     name: '',
     description: '',
     price: '',
+    quantity: '',
     ingredients: [],
     allergens: [],
     image: null,
@@ -53,11 +55,15 @@ const CreateListingPage = () => {
         const trimmedName = listing.name.trim();
         const trimmedDesc = listing.description.trim();
         const trimmedPrice = listing.price.trim();
+        const trimmedQuantity = listing.quantity.trim();
 
         if (!trimmedName) { setError('Item name is required.'); return; }
         if (!trimmedDesc) { setError('Description is required.'); return; }
         if (!trimmedPrice || isNaN(parseFloat(trimmedPrice)) || parseFloat(trimmedPrice) < 0) {
             setError('Enter a valid price.'); return;
+        }
+        if (!trimmedQuantity || isNaN(Number(trimmedQuantity)) || !Number.isInteger(Number(trimmedQuantity)) || Number(trimmedQuantity) < 1) {
+            setError('Enter a valid quantity.'); return;
         }
 
         setSubmitting(true);
@@ -83,11 +89,13 @@ const CreateListingPage = () => {
                 title: trimmedName,
                 description: trimmedDesc,
                 price: trimmedPrice,
+                quantity: Number(trimmedQuantity),
                 ingredients: listing.ingredients,
                 allergens: listing.allergens,
                 photo_url,
             });
             queryClient.invalidateQueries({ queryKey: ['my-listings'] });
+            queryClient.invalidateQueries({ queryKey: ['profile'] });
             setListing(INITIAL_LISTING);
             setResetKey(k => k + 1);
             navigate('/orders&listings');
@@ -147,6 +155,22 @@ const CreateListingPage = () => {
                         }}
                         onBlur={() => {
                             if (listing.price) handleChange('price', parseFloat(listing.price).toFixed(2));
+                        }}
+                        onKeyDown={(e) => { if (e.key === 'Enter') e.preventDefault(); }}
+                    />
+                </label>
+                <label className="create-listing-label">
+                    Quantity Available
+                    <input
+                        className="create-listing-input"
+                        type="number"
+                        placeholder="e.g. 12"
+                        min="1"
+                        step="1"
+                        value={listing.quantity}
+                        onChange={(e) => {
+                            const val = e.target.value;
+                            if (/^\d*$/.test(val)) handleChange('quantity', val);
                         }}
                         onKeyDown={(e) => { if (e.key === 'Enter') e.preventDefault(); }}
                     />

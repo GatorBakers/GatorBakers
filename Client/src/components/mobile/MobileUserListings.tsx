@@ -29,6 +29,7 @@ const MobileUserListings = ({ listings }: MobileUserListingsProps) => {
                             itemDescription={listing.itemDescription}
                             ingredients={listing.ingredients}
                             allergens={listing.allergens}
+                            quantity={listing.quantity}
                         />
                     ))
                 )}

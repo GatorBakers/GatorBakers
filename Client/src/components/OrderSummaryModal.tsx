@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import CardImage from './CardImage';
 import './OrderSummaryModal.css';
+import { pickupLocations, type PickupLocation } from '@shared/utils/pickupLocations';
 
 // TODO (Backend): Define the actual service/platform fee logic.
 //       This could come from GET /api/fees or be a fixed percentage returned by the order preview endpoint.
@@ -17,6 +19,7 @@ interface OrderSummaryModalProps {
 }
 
 const OrderSummaryModal = ({ isOpen, onClose, onBack, title, bakerName, price, imageUrl }: OrderSummaryModalProps) => {
+    const [selectedPickupLocation, setSelectedPickupLocation] = useState<PickupLocation | null>(null);
     if (!isOpen) return null;
 
     const total = price + PLATFORM_FEE;
@@ -27,6 +30,17 @@ const OrderSummaryModal = ({ isOpen, onClose, onBack, title, bakerName, price, i
     //       On error: display an inline error message to the user.
     const handleConfirmOrder = () => {
         console.log('TODO: POST /api/orders');
+        
+        const order = {
+            title,
+            bakerName,
+            price,
+            imageUrl,
+            pickupLocation: selectedPickupLocation,
+        }
+
+        console.log('Order:', order);
+
     };
 
     return (
@@ -75,10 +89,34 @@ const OrderSummaryModal = ({ isOpen, onClose, onBack, title, bakerName, price, i
                 {/* Pickup details */}
                 {/* TODO: This area is subject to change. And could be based off of baker availability. */}
                 <div className="order-summary-pickup">
-                    <p className="order-summary-pickup-label">Pickup details</p>
-                    <p className="order-summary-pickup-placeholder">
-                        Pickup location and time will appear here once provided by the baker.
-                    </p>
+                    <p className="order-summary-pickup-label">Pickup Location</p>
+                    <select
+                        className="order-summary-pickup-dropdown"
+                        value={selectedPickupLocation ? selectedPickupLocation.name : ''}
+                        onChange={(e) => {
+                            const location = pickupLocations.find(loc => loc.name === e.target.value);
+                            setSelectedPickupLocation(location || null);
+                        }}
+                    >
+                        <option value="" disabled>
+                            Select a location...
+                        </option>
+                        {pickupLocations.map((location) => (
+                            <option key={location.name} value={location.name}>
+                                {location.name}
+                            </option>
+                        ))}
+                    </select>
+                    {selectedPickupLocation && (
+                        <div className="order-summary-pickup-details">
+                            <p className="order-summary-pickup-location-name">
+                                {selectedPickupLocation.name}
+                            </p>
+                            <p className="order-summary-pickup-location-address">
+                                {selectedPickupLocation.address}
+                            </p>
+                        </div>
+                    )}
                 </div>
 
                 <hr className="order-summary-divider" />
