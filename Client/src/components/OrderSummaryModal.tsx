@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import CardImage from './CardImage';
 import './OrderSummaryModal.css';
 import { pickupLocations, type PickupLocation } from '@shared/utils/pickupLocations';
@@ -20,6 +20,11 @@ interface OrderSummaryModalProps {
 
 const OrderSummaryModal = ({ isOpen, onClose, onBack, title, bakerName, price, imageUrl }: OrderSummaryModalProps) => {
     const [selectedPickupLocation, setSelectedPickupLocation] = useState<PickupLocation | null>(null);
+
+    useEffect(() => {
+        if (isOpen) setSelectedPickupLocation(null);
+    }, [isOpen]);
+
     if (!isOpen) return null;
 
     const total = price + PLATFORM_FEE;

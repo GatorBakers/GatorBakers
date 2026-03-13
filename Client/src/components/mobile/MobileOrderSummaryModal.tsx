@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import CardImage from '../CardImage';
 import './MobileOrderSummaryModal.css';
 import { pickupLocations, type PickupLocation } from '@shared/utils/pickupLocations';
@@ -17,6 +17,10 @@ interface MobileOrderSummaryModalProps {
 
 const MobileOrderSummaryModal = ({ isOpen, onClose, onBack, title, bakerName, price, imageUrl }: MobileOrderSummaryModalProps) => {
     const [selectedPickupLocation, setSelectedPickupLocation] = useState<PickupLocation | null>(null);
+
+    useEffect(() => {
+        if (isOpen) setSelectedPickupLocation(null);
+    }, [isOpen]);
 
     if (!isOpen) return null;
 
