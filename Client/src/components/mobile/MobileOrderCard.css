@@ -92,6 +92,44 @@
     color: var(--color-link-hover);
 }
 
+.m-order-card-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.m-order-card-confirm-btn,
+.m-order-card-deny-btn {
+    background: none;
+    border: 1.5px solid;
+    border-radius: 8px;
+    padding: 4px 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.m-order-card-confirm-btn {
+    color: var(--color-success);
+    border-color: var(--color-success);
+}
+
+.m-order-card-confirm-btn:active {
+    background-color: var(--color-status-success-bg);
+}
+
+.m-order-card-deny-btn {
+    color: var(--color-error);
+    border-color: var(--color-error);
+}
+
+.m-order-card-deny-btn:active {
+    background-color: var(--color-status-error-bg);
+}
+
 /* Mobile StatusBadge size override */
 .m-order-card .status-badge {
     padding: 3px 10px;

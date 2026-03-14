@@ -78,3 +78,41 @@
 .order-card-details-btn:hover {
     color: var(--color-link-hover);
 }
+
+.order-card-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.order-card-confirm-btn,
+.order-card-deny-btn {
+    background: none;
+    border: 1.5px solid;
+    border-radius: 8px;
+    padding: 5px 14px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.order-card-confirm-btn {
+    color: var(--color-success);
+    border-color: var(--color-success);
+}
+
+.order-card-confirm-btn:hover {
+    background-color: var(--color-status-success-bg);
+}
+
+.order-card-deny-btn {
+    color: var(--color-error);
+    border-color: var(--color-error);
+}
+
+.order-card-deny-btn:hover {
+    background-color: var(--color-status-error-bg);
+}
