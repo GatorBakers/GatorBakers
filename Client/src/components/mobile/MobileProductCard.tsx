@@ -1,6 +1,7 @@
 import CardImage from '../CardImage';
 import './MobileProductCard.css';
 import { useState } from 'react';
+import MobileOrderSummaryModal from './MobileOrderSummaryModal';
 
 type MobileProductCardVariant = 'to_order' | 'listing';
 
@@ -22,6 +23,7 @@ interface MobileProductCardProps {
 
 const MobileProductCard = ({ title, bakerName, price, imageUrl, variant, itemDescription, ingredients, allergens }: MobileProductCardProps) => {
     const [openModal, setOpenModal] = useState<boolean>(false);
+    const [openOrderSummary, setOpenOrderSummary] = useState<boolean>(false);
 
     return (
         <div className="m-product-card">
@@ -60,7 +62,7 @@ const MobileProductCard = ({ title, bakerName, price, imageUrl, variant, itemDes
                             <p className="m-product-card-ingredients">Ingredients: {ingredients.join(', ')}</p>
                             <p className="m-product-card-allergens">Allergens: {allergens.join(', ')}</p>
                             {variant === 'to_order' && (
-                                <button className="m-product-card-order">
+                                <button className="m-product-card-order" onClick={() => { setOpenModal(false); setOpenOrderSummary(true); }}>
                                     Purchase Now
                                 </button>
                             )}
@@ -73,6 +75,15 @@ const MobileProductCard = ({ title, bakerName, price, imageUrl, variant, itemDes
                     </div>
                 </div>
             )}
+        <MobileOrderSummaryModal
+                isOpen={openOrderSummary}
+                onClose={() => setOpenOrderSummary(false)}
+                onBack={() => { setOpenOrderSummary(false); setOpenModal(true); }}
+                title={title}
+                bakerName={bakerName}
+                price={price}
+                imageUrl={imageUrl}
+            />
         </div>
     );
 };

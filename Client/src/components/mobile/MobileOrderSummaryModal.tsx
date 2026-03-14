@@ -1,14 +1,11 @@
 import { useState, useEffect } from 'react';
-import CardImage from './CardImage';
-import './OrderSummaryModal.css';
+import CardImage from '../CardImage';
+import './MobileOrderSummaryModal.css';
 import { pickupLocations, type PickupLocation } from '@shared/utils/pickupLocations';
 
-// TODO (Backend): Define the actual service/platform fee logic.
-//       This could come from GET /api/fees or be a fixed percentage returned by the order preview endpoint.
-//       This is if we want to add a platform fee in the future.
 const PLATFORM_FEE = 0.00;
 
-interface OrderSummaryModalProps {
+interface MobileOrderSummaryModalProps {
     isOpen: boolean;
     onClose: () => void;
     onBack: () => void;
@@ -18,7 +15,7 @@ interface OrderSummaryModalProps {
     imageUrl?: string;
 }
 
-const OrderSummaryModal = ({ isOpen, onClose, onBack, title, bakerName, price, imageUrl }: OrderSummaryModalProps) => {
+const MobileOrderSummaryModal = ({ isOpen, onClose, onBack, title, bakerName, price, imageUrl }: MobileOrderSummaryModalProps) => {
     const [selectedPickupLocation, setSelectedPickupLocation] = useState<PickupLocation | null>(null);
 
     useEffect(() => {
@@ -35,68 +32,66 @@ const OrderSummaryModal = ({ isOpen, onClose, onBack, title, bakerName, price, i
     //       On error: display an inline error message to the user.
     const handleConfirmOrder = () => {
         console.log('TODO: POST /api/orders');
-        
+
         const order = {
             title,
             bakerName,
             price,
             imageUrl,
             pickupLocation: selectedPickupLocation,
-        }
+        };
 
         console.log('Order:', order);
-
     };
 
     return (
-        <div className="order-summary-overlay" onClick={onClose}>
-            <div className="order-summary-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="m-order-summary-overlay" onClick={onClose}>
+            <div className="m-order-summary-content" onClick={(e) => e.stopPropagation()}>
 
-                <button className="order-summary-close" onClick={onClose}>✕</button>
+                <button className="m-order-summary-close" onClick={onClose}>✕</button>
 
-                <h2 className="order-summary-heading">Order Summary</h2>
+                <h2 className="m-order-summary-heading">Order Summary</h2>
 
                 {/* Item preview */}
-                <div className="order-summary-item">
+                <div className="m-order-summary-item">
                     <CardImage
                         imageUrl={imageUrl}
                         alt={title}
                         placeholderText="Product Image"
-                        className="order-summary-item-image"
+                        className="m-order-summary-item-image"
                     />
-                    <div className="order-summary-item-info">
-                        <p className="order-summary-item-title">{title}</p>
-                        <p className="order-summary-item-baker">by {bakerName}</p>
+                    <div className="m-order-summary-item-info">
+                        <p className="m-order-summary-item-title">{title}</p>
+                        <p className="m-order-summary-item-baker">by {bakerName}</p>
                     </div>
                 </div>
 
-                <hr className="order-summary-divider" />
+                <hr className="m-order-summary-divider" />
 
                 {/* Pricing */}
-                <div className="order-summary-pricing">
-                    <div className="order-summary-pricing-row">
+                <div className="m-order-summary-pricing">
+                    <div className="m-order-summary-pricing-row">
                         <span>Item price</span>
                         <span>${price.toFixed(2)}</span>
                     </div>
-                    
-                    <div className="order-summary-pricing-row">
+                    <div className="m-order-summary-pricing-row">
                         <span>Platform fee</span>
                         <span>${PLATFORM_FEE.toFixed(2)}</span>
                     </div>
-                    <div className="order-summary-pricing-row order-summary-pricing-total">
+                    <div className="m-order-summary-pricing-row m-order-summary-pricing-total">
                         <span>Total</span>
                         <span>${total.toFixed(2)}</span>
                     </div>
                 </div>
 
-                <hr className="order-summary-divider" />
+                <hr className="m-order-summary-divider" />
 
                 {/* Pickup details */}
                 {/* TODO: This area is subject to change. And could be based off of baker availability. */}
-                <div className="order-summary-pickup">
-                    <p className="order-summary-pickup-label">Pickup Location</p>
+                <div className="m-order-summary-pickup">
+                    <p className="m-order-summary-pickup-label">Pickup Location</p>
                     <select
-                        className="order-summary-pickup-dropdown"
+                        className="m-order-summary-pickup-dropdown"
                         value={selectedPickupLocation ? selectedPickupLocation.name : ''}
                         onChange={(e) => {
                             const location = pickupLocations.find(loc => loc.name === e.target.value);
@@ -113,25 +108,25 @@ const OrderSummaryModal = ({ isOpen, onClose, onBack, title, bakerName, price, i
                         ))}
                     </select>
                     {selectedPickupLocation && (
-                        <div className="order-summary-pickup-details">
-                            <p className="order-summary-pickup-location-name">
+                        <div className="m-order-summary-pickup-details">
+                            <p className="m-order-summary-pickup-location-name">
                                 {selectedPickupLocation.name}
                             </p>
-                            <p className="order-summary-pickup-location-address">
+                            <p className="m-order-summary-pickup-location-address">
                                 {selectedPickupLocation.address}
                             </p>
                         </div>
                     )}
                 </div>
 
-                <hr className="order-summary-divider" />
+                <hr className="m-order-summary-divider" />
 
                 {/* Buttons */}
-                <div className="order-summary-actions">
-                    <button className="order-summary-btn-back" onClick={onBack}>
+                <div className="m-order-summary-actions">
+                    <button className="m-order-summary-btn-back" onClick={onBack}>
                         Back
                     </button>
-                    <button className="order-summary-btn-confirm" onClick={handleConfirmOrder}>
+                    <button className="m-order-summary-btn-confirm" onClick={handleConfirmOrder}>
                         Confirm Order — ${total.toFixed(2)}
                     </button>
                 </div>
@@ -141,4 +136,4 @@ const OrderSummaryModal = ({ isOpen, onClose, onBack, title, bakerName, price, i
     );
 };
 
-export default OrderSummaryModal;
+export default MobileOrderSummaryModal;
