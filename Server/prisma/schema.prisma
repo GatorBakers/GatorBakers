@@ -116,7 +116,7 @@ model Listing {
   title String
   description String
   price Decimal @db.Decimal(10, 2)
-  remaining_inventory Int
+  quantity Int
   listing_status Listing_Status
   photo_url String
   ingredients String[]

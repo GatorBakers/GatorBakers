@@ -22,13 +22,6 @@ const PORT = 4000;
 const access_secret = process.env.ACCESS_TOKEN_SECRET!;
 const refresh_secret = process.env.REFRESH_TOKEN_SECRET!;
 
-function serializeListing<T extends { remaining_inventory: number }>(listing: T) {
-  return {
-    ...listing,
-    quantity: listing.remaining_inventory,
-  };
-}
-
 if (!access_secret) {
   throw new Error("access_secret is not defined ");
 }
@@ -298,7 +291,7 @@ app.get("/user/:id/listings", async (req: Request, res: Response) => {
       include: { user: { select: { first_name: true, last_name: true } } },
       orderBy: { created_at: "desc" },
     });
-    return res.status(200).json(listings.map(serializeListing));
+    return res.status(200).json(listings);
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Database error" });
@@ -313,7 +306,7 @@ app.get("/my-listings", authenticate, async (req: Request, res: Response) => {
       include: { user: { select: { first_name: true, last_name: true } } },
       orderBy: { created_at: "desc" },
     });
-      return res.status(200).json(listings.map(serializeListing));
+      return res.status(200).json(listings);
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Database error" });
@@ -336,7 +329,7 @@ app.get("/listing/:id", async (req: Request, res: Response) => {
     if (!listing) {
       return res.status(404).json({ message: "Listing not found" });
     }
-      return res.status(200).json(serializeListing(listing));
+      return res.status(200).json(listing);
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Database error" });
@@ -359,8 +352,7 @@ app.post("/listing", authenticate, async (req: Request, res: Response) => {
     title,
     description,
     price,
-      quantity,
-    remaining_inventory,
+    quantity,
     photo_url,
     ingredients,
     allergens,
@@ -373,21 +365,47 @@ app.post("/listing", authenticate, async (req: Request, res: Response) => {
   if (!description || typeof description !== "string" || !description.trim()) {
     return res.status(400).json({ message: "Description is required" });
   }
-  const parsedPrice = parseFloat(price);
-  if (isNaN(parsedPrice) || parsedPrice < 0) {
-    return res.status(400).json({ message: "Price must be a non-negative number" });
+  if (price === undefined || price === null) {
+    return res.status(400).json({ message: "Price is required" });
   }
-  const inventoryInput = quantity !== undefined ? quantity : remaining_inventory;
-  const parsedInventory = inventoryInput !== undefined ? Number(inventoryInput) : 1;
+  const priceStr = String(price).trim();
+  if (!/^\d+(\.\d{1,2})?$/.test(priceStr)) {
+    return res.status(400).json({ message: "Price must be a non-negative number with up to 2 decimal places" });
+  }
+  const parsedInventory = quantity !== undefined ? Number(quantity) : 1;
   if (isNaN(parsedInventory) || parsedInventory < 0 || !Number.isInteger(parsedInventory)) {
     return res.status(400).json({ message: "Inventory must be a non-negative integer" });
   }
-  if (ingredients && !Array.isArray(ingredients)) {
-    return res.status(400).json({ message: "Ingredients must be an array" });
+  // TODO [AWS S3]: Once photo_url stores an S3 URL, tighten MAX_PHOTO_URL_LENGTH to ~500 chars.
+  // For now it matches the Express body limit so base64 data URLs are accepted during the interim.
+  const MAX_PHOTO_URL_LENGTH = 10 * 1024 * 1024; // 10 MB expressed as character count
+  if (photo_url !== undefined && photo_url !== "") {
+    if (typeof photo_url !== "string") {
+      return res.status(400).json({ message: "photo_url must be a string" });
+    }
+    if (photo_url.length > MAX_PHOTO_URL_LENGTH) {
+      return res.status(400).json({ message: "photo_url exceeds maximum allowed size" });
+    }
   }
-  if (allergens && !Array.isArray(allergens)) {
-    return res.status(400).json({ message: "Allergens must be an array" });
+  if (ingredients !== undefined) {
+    if (!Array.isArray(ingredients)) {
+      return res.status(400).json({ message: "Ingredients must be an array" });
+    }
+    if (!ingredients.every((item: unknown) => typeof item === "string")) {
+      return res.status(400).json({ message: "Each ingredient must be a string" });
+    }
   }
+  if (allergens !== undefined) {
+    if (!Array.isArray(allergens)) {
+      return res.status(400).json({ message: "Allergens must be an array" });
+    }
+    if (!allergens.every((item: unknown) => typeof item === "string")) {
+      return res.status(400).json({ message: "Each allergen must be a string" });
+    }
+  }
+
+  const normalizedIngredients: string[] = (ingredients ?? []).map((s: string) => s.trim()).filter((s: string) => s.length > 0);
+  const normalizedAllergens: string[] = (allergens ?? []).map((s: string) => s.trim()).filter((s: string) => s.length > 0);
 
   try {
     const new_listing = await prisma.listing.create({
@@ -395,16 +413,16 @@ app.post("/listing", authenticate, async (req: Request, res: Response) => {
         user_id,
         title: title.trim(),
         description: description.trim(),
-        price: parsedPrice,
-        remaining_inventory: parsedInventory,
+        price: priceStr,
+        quantity: parsedInventory,
         listing_status: "AVAILABLE",
         photo_url: photo_url || "",
-        ingredients: ingredients ?? [],
-        allergens: allergens ?? [],
+        ingredients: normalizedIngredients,
+        allergens: normalizedAllergens,
       },
       include: { user: { select: { first_name: true, last_name: true } } },
     });
-      return res.status(201).json(serializeListing(new_listing));
+    return res.status(201).json(new_listing);
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Server error" });
@@ -416,6 +434,8 @@ app.patch("/listing/:id", async (req: Request, res: Response) => {
   const id = Number(req.params.id);
   const updateData: any = {};
 
+  const inventoryInput = req.body.quantity;
+
   if (req.body.title !== undefined) updateData.title = req.body.title;
 
   if (req.body.description !== undefined)
@@ -424,11 +444,13 @@ app.patch("/listing/:id", async (req: Request, res: Response) => {
   if (req.body.price !== undefined)
     updateData.price = req.body.price.toString();
 
-  if (req.body.quantity !== undefined)
-    updateData.remaining_inventory = Number(req.body.quantity);
-
-  if (req.body.remaining_inventory !== undefined)
-    updateData.remaining_inventory = Number(req.body.remaining_inventory);
+  if (inventoryInput !== undefined) {
+    const parsedInventory = Number(inventoryInput);
+    if (isNaN(parsedInventory) || parsedInventory < 0 || !Number.isInteger(parsedInventory)) {
+      return res.status(400).json({ message: "Inventory must be a non-negative integer" });
+    }
+    updateData.quantity = parsedInventory;
+  }
 
   if (req.body.photo_url !== undefined)
     updateData.photo_url = req.body.photo_url;
@@ -499,11 +521,11 @@ app.post("/listing/:id/order", async (req: Request, res: Response) => {
         .json({ message: "User is the owner of the listing" });
     }
 
-    if (listing.remaining_inventory < 1) {
+    if (listing.quantity < 1) {
       await prisma.listing.update({
         where: { id: listing_id },
         data: {
-          remaining_inventory: 0,
+          quantity: 0,
           listing_status: "SOLD",
         },
       });
@@ -514,7 +536,7 @@ app.post("/listing/:id/order", async (req: Request, res: Response) => {
     await prisma.listing.update({
       where: { id: listing_id },
       data: {
-        remaining_inventory: listing.remaining_inventory - 1,
+        quantity: listing.quantity - 1,
       },
     });
 
@@ -594,7 +616,7 @@ app.get("/orders/user/:id", async (req: Request, res: Response) => {
             title: true,
             description: true,
             price: true,
-            remaining_inventory: true,
+            quantity: true,
             listing_status: true,
             photo_url: true,
           },
@@ -629,7 +651,7 @@ app.get("/orders/seller/:id", async (req: Request, res: Response) => {
             title: true,
             description: true,
             price: true,
-            remaining_inventory: true,
+            quantity: true,
             listing_status: true,
             photo_url: true,
           },

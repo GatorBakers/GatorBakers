@@ -5,10 +5,9 @@ export interface ListingData {
     user_id: number;
     title: string;
     description: string;
-    price: string;          // Decimal comes back as string from Prisma
-      quantity: number;
-      remaining_inventory?: number;
-    listing_status: 'AVAILABLE' | 'PENDING' | 'SOLD';
+    price: string;
+    quantity: number;
+    listing_status: 'AVAILABLE' | 'PENDING' | 'CONFIRMED' | 'SOLD' | 'COMPLETED' | 'CANCELLED';
     photo_url: string;
     ingredients: string[];
     allergens: string[];
@@ -23,7 +22,7 @@ export interface CreateListingPayload {
     title: string;
     description: string;
     price: string;
-      quantity: number;
+    quantity: number;
     photo_url?: string;
     ingredients: string[];
     allergens: string[];
