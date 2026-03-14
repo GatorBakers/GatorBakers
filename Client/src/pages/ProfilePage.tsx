@@ -1,16 +1,14 @@
 import './ProfilePage.css';
 import UserListings from '../components/UserListings';
-import type { Listing } from '../components/UserListings';
 import { useIsMobile } from '../hooks/useIsMobile';
 import MobileProfilePage from './mobile/MobileProfilePage';
 import { useProfile } from '../hooks/useProfile';
+import { useUserListings } from '../hooks/useUserListings';
 
 const ProfilePage = () => {
     const isMobile = useIsMobile();
     const { profile, isLoading, error } = useProfile();
-
-    // TODO: fetch user listings from backend
-    const listings: Listing[] = [];
+    const { listings, isLoading: listingsLoading, error: listingsError } = useUserListings();
 
     if (isLoading) {
         return <div className="profile-page"><p>Loading profile…</p></div>;
@@ -21,7 +19,14 @@ const ProfilePage = () => {
     }
 
     if (isMobile) {
-        return <MobileProfilePage userProfile={profile} listings={listings} />;
+        return (
+            <MobileProfilePage
+                userProfile={profile}
+                listings={listings}
+                listingsLoading={listingsLoading}
+                listingsError={listingsError}
+            />
+        );
     }
 
     const initial = profile.name.charAt(0).toUpperCase();
@@ -48,7 +53,13 @@ const ProfilePage = () => {
                 </div>
             </div>
 
-            <UserListings listings={listings} />
+            {listingsLoading ? (
+                <div className="profile-col"><p>Loading listings…</p></div>
+            ) : listingsError ? (
+                <div className="profile-col"><p className="profile-error">{listingsError}</p></div>
+            ) : (
+                <UserListings listings={listings} />
+            )}
         </div>
     );
 };

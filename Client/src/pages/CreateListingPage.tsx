@@ -2,8 +2,12 @@
 // TODO: Allergen Section (Present common allergens and allow users to add custom allergens)
 
 import { useState, type SubmitEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import ImageUpload from '../components/ImageUpload';
 import ButtonAddOn from '../components/ButtonAddOn';
+import { useAuth } from '../context/AuthContext';
+import { createListing } from '../services/listingService';
 import './CreateListingPage.css';
 
 interface ListingForm {
@@ -29,31 +33,77 @@ const INITIAL_LISTING: ListingForm = {
 const CreateListingPage = () => {
     const [listing, setListing] = useState<ListingForm>(INITIAL_LISTING);
     const [resetKey, setResetKey] = useState(0);
+    const [submitting, setSubmitting] = useState(false);
+    const [error, setError] = useState('');
+    const { accessToken } = useAuth();
+    const navigate = useNavigate();
+    const queryClient = useQueryClient();
 
     const handleChange = (field: keyof ListingForm, value: ListingForm[typeof field]) => {
         setListing(prev => ({ ...prev, [field]: value }));
     };
 
-    // TODO: Build FormData from `listing` and POST to /api/listings
-    const handleSubmit = (e: SubmitEvent) => {
+    const handleSubmit = async (e: SubmitEvent) => {
         e.preventDefault();
-        console.log('Listing to submit:', listing);
+        setError('');
 
-        const formData = new FormData();
-        formData.append('name', listing.name.trim());
-        formData.append('description', listing.description.trim());
-        formData.append('price', listing.price.trim());
-        formData.append('quantity', String(parseInt(listing.quantity.trim(), 10)));
-        listing.ingredients.forEach(i => formData.append('ingredients[]', i));
-        listing.allergens.forEach(a => formData.append('allergens[]', a));
-        if (listing.image) formData.append('image', listing.image);
-
-        for (const [key, value] of formData.entries()) {
-            console.log(`${key}: ${value}`);
+        if (!accessToken) {
+            setError('You must be logged in to create a listing.');
+            return;
         }
 
-        setListing(INITIAL_LISTING);
-        setResetKey(k => k + 1);
+        const trimmedName = listing.name.trim();
+        const trimmedDesc = listing.description.trim();
+        const trimmedPrice = listing.price.trim();
+        const trimmedQuantity = listing.quantity.trim();
+
+        if (!trimmedName) { setError('Item name is required.'); return; }
+        if (!trimmedDesc) { setError('Description is required.'); return; }
+        if (!trimmedPrice || isNaN(parseFloat(trimmedPrice)) || parseFloat(trimmedPrice) < 0) {
+            setError('Enter a valid price.'); return;
+        }
+        if (!trimmedQuantity || isNaN(Number(trimmedQuantity)) || !Number.isInteger(Number(trimmedQuantity)) || Number(trimmedQuantity) < 1) {
+            setError('Enter a valid quantity.'); return;
+        }
+
+        setSubmitting(true);
+        try {
+            // TODO [AWS S3]: Replace base64 data URL approach with S3 upload.
+            //  1. Create an S3 bucket with public-read ACL (or use presigned URLs).
+            //  2. POST listing.image (File) to a new server endpoint (e.g. POST /upload)
+            //     that uses @aws-sdk/client-s3 + PutObjectCommand to upload to S3.
+            //  3. The server returns the S3 object URL (https://<bucket>.s3.<region>.amazonaws.com/<key>).
+            //  4. Pass that URL as photo_url instead of the base64 string below.
+            //  This removes the large base64 payload from the JSON body and the DB column.
+            let photo_url = '';
+            if (listing.image) {
+                photo_url = await new Promise<string>((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result as string);
+                    reader.onerror = () => reject(new Error('Failed to read image'));
+                    reader.readAsDataURL(listing.image!);
+                });
+            }
+
+            await createListing(accessToken, {
+                title: trimmedName,
+                description: trimmedDesc,
+                price: trimmedPrice,
+                quantity: Number(trimmedQuantity),
+                ingredients: listing.ingredients,
+                allergens: listing.allergens,
+                photo_url,
+            });
+            queryClient.invalidateQueries({ queryKey: ['my-listings'] });
+            queryClient.invalidateQueries({ queryKey: ['profile'] });
+            setListing(INITIAL_LISTING);
+            setResetKey(k => k + 1);
+            navigate('/orders&listings');
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Failed to create listing.');
+        } finally {
+            setSubmitting(false);
+        }
     };
 
     return (
@@ -152,7 +202,10 @@ const CreateListingPage = () => {
                 />
             </div>
 
-            <button className="create-listing-submit" type="submit">Create Listing</button>
+            <button className="create-listing-submit" type="submit" disabled={submitting}>
+                {submitting ? 'Creating…' : 'Create Listing'}
+            </button>
+            {error && <p className="create-listing-error">{error}</p>}
         </form>
     );
 };

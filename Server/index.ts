@@ -29,7 +29,7 @@ if (!refresh_secret) {
   throw new Error("refresh_secret is not defined ");
 }
 
-app.use(express.json());
+app.use(express.json({ limit: "10mb" })); // Increased for base64 image payloads (revert once AWS S3 upload is implemented)
 app.use(cookieParser());
 app.use(
   cors({
@@ -281,13 +281,15 @@ app.post("/login", async (req: Request, res: Response) => {
 app.get("/user/:id/listings", async (req: Request, res: Response) => {
   const id = Number(req.params.id);
   if (!id || isNaN(id)) {
-    return res.status(400).json({ message: "Invalid listing id" });
+    return res.status(400).json({ message: "Invalid user id" });
   }
   try {
     const listings = await prisma.listing.findMany({
       where: {
         user_id: id,
       },
+      include: { user: { select: { first_name: true, last_name: true } } },
+      orderBy: { created_at: "desc" },
     });
     return res.status(200).json(listings);
   } catch (error) {
@@ -296,41 +298,134 @@ app.get("/user/:id/listings", async (req: Request, res: Response) => {
   }
 });
 
-app.post("/listing", async (req: Request, res: Response) => {
+app.get("/my-listings", authenticate, async (req: Request, res: Response) => {
+  const { id } = (req as any).user;
+  try {
+    const listings = await prisma.listing.findMany({
+      where: { user_id: id },
+      include: { user: { select: { first_name: true, last_name: true } } },
+      orderBy: { created_at: "desc" },
+    });
+      return res.status(200).json(listings);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Database error" });
+  }
+});
+
+app.get("/listing/:id", async (req: Request, res: Response) => {
+  const id = Number(req.params.id);
+  if (!id || isNaN(id)) {
+    return res.status(400).json({ message: "Invalid listing id" });
+  }
+  try {
+    const listing = await prisma.listing.findUnique({
+      where: { id },
+      include: {
+        user: { select: { first_name: true, last_name: true } },
+        location: { select: { city: true, state: true } },
+      },
+    });
+    if (!listing) {
+      return res.status(404).json({ message: "Listing not found" });
+    }
+      return res.status(200).json(listing);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Database error" });
+  }
+});
+
+// TODO [AWS S3]: Add a dedicated image upload endpoint:
+//  POST /upload (authenticate) — accepts multipart/form-data with an image file.
+//  1. npm install @aws-sdk/client-s3 multer
+//  2. Use multer for multipart parsing, then PutObjectCommand to upload to S3.
+//  3. Return { url: "https://<bucket>.s3.<region>.amazonaws.com/<key>" }.
+//  4. The client calls this endpoint first, then passes the returned URL as photo_url
+//     in the POST /listing body (instead of a base64 data URL).
+//  5. Update the Listing photo_url column to store the S3 URL (no schema change needed,
+//     just shorter strings). Consider adding a DELETE /upload/:key for cleanup.
+
+app.post("/listing", authenticate, async (req: Request, res: Response) => {
+  const { id: user_id } = (req as any).user;
   const {
-    user_id,
     title,
     description,
     price,
-    remaining_inventory,
-    listing_status,
+    quantity,
     photo_url,
-    location,
+    ingredients,
+    allergens,
   } = req.body;
-  const user = await prisma.user.findUnique({
-    where: {
-      id: user_id,
-    },
-  });
-  if (!user) {
-    return res.json("User not found");
+
+  // Validate required fields
+  if (!title || typeof title !== "string" || !title.trim()) {
+    return res.status(400).json({ message: "Title is required" });
   }
+  if (!description || typeof description !== "string" || !description.trim()) {
+    return res.status(400).json({ message: "Description is required" });
+  }
+  if (price === undefined || price === null) {
+    return res.status(400).json({ message: "Price is required" });
+  }
+  const priceStr = String(price).trim();
+  if (!/^\d+(\.\d{1,2})?$/.test(priceStr)) {
+    return res.status(400).json({ message: "Price must be a non-negative number with up to 2 decimal places" });
+  }
+  const parsedInventory = quantity !== undefined ? Number(quantity) : 1;
+  if (isNaN(parsedInventory) || parsedInventory < 0 || !Number.isInteger(parsedInventory)) {
+    return res.status(400).json({ message: "Inventory must be a non-negative integer" });
+  }
+  // TODO [AWS S3]: Once photo_url stores an S3 URL, tighten MAX_PHOTO_URL_LENGTH to ~500 chars.
+  // For now it matches the Express body limit so base64 data URLs are accepted during the interim.
+  const MAX_PHOTO_URL_LENGTH = 10 * 1024 * 1024; // 10 MB expressed as character count
+  if (photo_url !== undefined && photo_url !== "") {
+    if (typeof photo_url !== "string") {
+      return res.status(400).json({ message: "photo_url must be a string" });
+    }
+    if (photo_url.length > MAX_PHOTO_URL_LENGTH) {
+      return res.status(400).json({ message: "photo_url exceeds maximum allowed size" });
+    }
+  }
+  if (ingredients !== undefined) {
+    if (!Array.isArray(ingredients)) {
+      return res.status(400).json({ message: "Ingredients must be an array" });
+    }
+    if (!ingredients.every((item: unknown) => typeof item === "string")) {
+      return res.status(400).json({ message: "Each ingredient must be a string" });
+    }
+  }
+  if (allergens !== undefined) {
+    if (!Array.isArray(allergens)) {
+      return res.status(400).json({ message: "Allergens must be an array" });
+    }
+    if (!allergens.every((item: unknown) => typeof item === "string")) {
+      return res.status(400).json({ message: "Each allergen must be a string" });
+    }
+  }
+
+  const normalizedIngredients: string[] = (ingredients ?? []).map((s: string) => s.trim()).filter((s: string) => s.length > 0);
+  const normalizedAllergens: string[] = (allergens ?? []).map((s: string) => s.trim()).filter((s: string) => s.length > 0);
 
   try {
     const new_listing = await prisma.listing.create({
       data: {
         user_id,
-        title,
-        description,
-        price,
-        remaining_inventory,
-        listing_status,
-        photo_url,
+        title: title.trim(),
+        description: description.trim(),
+        price: priceStr,
+        quantity: parsedInventory,
+        listing_status: "AVAILABLE",
+        photo_url: photo_url || "",
+        ingredients: normalizedIngredients,
+        allergens: normalizedAllergens,
       },
+      include: { user: { select: { first_name: true, last_name: true } } },
     });
-    res.json(new_listing);
-  } catch {
-    res.json("Server error");
+    return res.status(201).json(new_listing);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error" });
   }
 });
 
@@ -338,6 +433,8 @@ app.patch("/listing/:id", async (req: Request, res: Response) => {
   // TODO: Add funcitonality for updating locations model
   const id = Number(req.params.id);
   const updateData: any = {};
+
+  const inventoryInput = req.body.quantity;
 
   if (req.body.title !== undefined) updateData.title = req.body.title;
 
@@ -347,8 +444,13 @@ app.patch("/listing/:id", async (req: Request, res: Response) => {
   if (req.body.price !== undefined)
     updateData.price = req.body.price.toString();
 
-  if (req.body.remaining_inventory !== undefined)
-    updateData.remaining_inventory = Number(req.body.remaining_inventory);
+  if (inventoryInput !== undefined) {
+    const parsedInventory = Number(inventoryInput);
+    if (isNaN(parsedInventory) || parsedInventory < 0 || !Number.isInteger(parsedInventory)) {
+      return res.status(400).json({ message: "Inventory must be a non-negative integer" });
+    }
+    updateData.quantity = parsedInventory;
+  }
 
   if (req.body.photo_url !== undefined)
     updateData.photo_url = req.body.photo_url;
@@ -419,11 +521,11 @@ app.post("/listing/:id/order", async (req: Request, res: Response) => {
         .json({ message: "User is the owner of the listing" });
     }
 
-    if (listing.remaining_inventory < 1) {
+    if (listing.quantity < 1) {
       await prisma.listing.update({
         where: { id: listing_id },
         data: {
-          remaining_inventory: 0,
+          quantity: 0,
           listing_status: "SOLD",
         },
       });
@@ -434,7 +536,7 @@ app.post("/listing/:id/order", async (req: Request, res: Response) => {
     await prisma.listing.update({
       where: { id: listing_id },
       data: {
-        remaining_inventory: listing.remaining_inventory - 1,
+        quantity: listing.quantity - 1,
       },
     });
 
@@ -514,7 +616,7 @@ app.get("/orders/user/:id", async (req: Request, res: Response) => {
             title: true,
             description: true,
             price: true,
-            remaining_inventory: true,
+            quantity: true,
             listing_status: true,
             photo_url: true,
           },
@@ -549,7 +651,7 @@ app.get("/orders/seller/:id", async (req: Request, res: Response) => {
             title: true,
             description: true,
             price: true,
-            remaining_inventory: true,
+            quantity: true,
             listing_status: true,
             photo_url: true,
           },
