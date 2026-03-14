@@ -16,6 +16,15 @@ interface Order {
     pickupAddress: string;
 }
 
+// TODO: Replace with useState + useEffect fetching pending orders on the seller's listings from the API.
+//       GET /orders/seller/:id 
+//       Adding a pendingOrders[] array could be useful. Once confirmed or denied, remove order and move to confirmed/cancelledOrders[]
+//       Handle loading and error states.
+const placeholderPendingOrders: Order[] = [
+    { id: 5, itemName: 'Item Name', bakerName: 'Buyer Name', status: 'pending', pickupTime: 'Pickup by 6:30 pm', pickupAddress: '123 Main Street' },
+    { id: 6, itemName: 'Item Name', bakerName: 'Buyer Name', status: 'pending', pickupTime: 'Pickup by 6:30 pm', pickupAddress: '123 Main Street' },
+];
+
 // TODO: Replace with useState + useEffect fetching the authenticated user's orders from the API.
 //       GET /api/orders?userId={userId} — should return Order[] for the current user.
 //       Handle loading and error states.
@@ -51,6 +60,7 @@ const YourOrdersPage = () => {
     if (isMobile) {
         return (
             <MobileYourOrdersPage
+                pendingOrders={placeholderPendingOrders}
                 orders={placeholderOrders}
                 listings={placeholderListings}
             />
@@ -60,6 +70,29 @@ const YourOrdersPage = () => {
     return (
         <div className="your-orders-page">
             <div className="your-orders-col">
+                <h2 className="your-orders-heading">Pending Orders</h2>
+                <div className="your-orders-list">
+                    {placeholderPendingOrders.length === 0 ? (
+                        <EmptyState
+                            title="No pending orders"
+                            subtitle="Order requests from buyers will appear here."
+                        />
+                    ) : (
+                        placeholderPendingOrders.map((order) => (
+                            <OrderCard
+                                key={order.id}
+                                itemName={order.itemName}
+                                bakerName={order.bakerName}
+                                status={order.status}
+                                pickupTime={order.pickupTime}
+                                pickupAddress={order.pickupAddress}
+                                onConfirm={() => {}}
+                                onDeny={() => {}}
+                            />
+                        ))
+                    )}
+                </div>
+
                 <h2 className="your-orders-heading">Your Orders</h2>
                 <div className="your-orders-list">
                     {placeholderOrders.length === 0 ? (
