@@ -36,7 +36,7 @@ const MobileYourOrdersPage = ({ pendingOrders, orders, listings }: MobileYourOrd
     return (
         <div className="m-your-orders-page">
             <section className="m-your-orders-section">
-                <h2 className="m-your-orders-heading">Pending Orders</h2>
+                <h2 className="m-your-orders-heading">Pending Orders From Others</h2>
                 <div className="m-your-orders-list">
                     {pendingOrders.length === 0 ? (
                         <EmptyState

@@ -70,7 +70,7 @@ const YourOrdersPage = () => {
     return (
         <div className="your-orders-page">
             <div className="your-orders-col">
-                <h2 className="your-orders-heading">Pending Orders</h2>
+                <h2 className="your-orders-heading">Pending Orders From Others</h2>
                 <div className="your-orders-list">
                     {placeholderPendingOrders.length === 0 ? (
                         <EmptyState
