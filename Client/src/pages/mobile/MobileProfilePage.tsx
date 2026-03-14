@@ -6,9 +6,11 @@ import './MobileProfilePage.css';
 interface MobileProfilePageProps {
     userProfile: UserProfile;
     listings: Listing[];
+    listingsLoading: boolean;
+    listingsError: string | null;
 }
 
-const MobileProfilePage = ({ userProfile, listings }: MobileProfilePageProps) => {
+const MobileProfilePage = ({ userProfile, listings, listingsLoading, listingsError }: MobileProfilePageProps) => {
     const initial = userProfile.name.charAt(0).toUpperCase();
     const locationText = userProfile.city && userProfile.state
         ? `${userProfile.city}, ${userProfile.state}`
@@ -37,7 +39,13 @@ const MobileProfilePage = ({ userProfile, listings }: MobileProfilePageProps) =>
                 </div>
             </section>
 
-            <UserListings listings={listings} />
+            {listingsLoading ? (
+                <p>Loading listings…</p>
+            ) : listingsError ? (
+                <p className="profile-error">{listingsError}</p>
+            ) : (
+                <UserListings listings={listings} />
+            )}
         </div>
     );
 };
