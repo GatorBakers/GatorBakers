@@ -13,6 +13,7 @@ interface OrderCardProps {
     pickupAddress: string;
     imageUrl?: string;
     onViewDetails?: () => void;
+    // TODO: Wire up onConfirm and onDeny to PATCH with status CONFIRMED or CANCELLED.
     onConfirm?: () => void;
     onDeny?: () => void;
 }
