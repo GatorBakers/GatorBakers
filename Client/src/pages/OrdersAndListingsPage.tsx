@@ -18,6 +18,7 @@ interface Order {
 
 // TODO: Replace with real order data from the API once order fetching is implemented.
 const placeholderOrders: Order[] = [];
+const placeholderPendingOrders: Order[] = [];
 
 const YourOrdersPage = () => {
     const isMobile = useIsMobile();
