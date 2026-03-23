@@ -116,7 +116,6 @@
     flex-direction: column;
     gap: 8px;
     min-width: 0;
-    overflow: hidden;
 }
 
 .m-order-summary-pickup-label {
