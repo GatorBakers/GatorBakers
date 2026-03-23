@@ -18,11 +18,12 @@ interface MobileYourOrdersPageProps {
     // TODO: Once API calls are added in YourOrderPage.tsx, these props will carry real data.
     //       Consider passing loading/error states here as well so the mobile view can show
     //       skeleton loaders or error messages.
+    pendingOrders: Order[];
     orders: Order[];
     listings: Listing[];
 }
 
-const MobileYourOrdersPage = ({ orders, listings }: MobileYourOrdersPageProps) => {
+const MobileYourOrdersPage = ({ pendingOrders, orders, listings }: MobileYourOrdersPageProps) => {
     // TODO: Auth context is resolved in the parent (YourOrderPage.tsx) — no userId needed here directly,
     //       but ensure the parent is not rendering this component before auth is confirmed.
 
@@ -34,6 +35,31 @@ const MobileYourOrdersPage = ({ orders, listings }: MobileYourOrdersPageProps) =
 
     return (
         <div className="m-your-orders-page">
+            <section className="m-your-orders-section">
+                <h2 className="m-your-orders-heading">Pending Orders From Others</h2>
+                <div className="m-your-orders-list">
+                    {pendingOrders.length === 0 ? (
+                        <EmptyState
+                            title="No pending orders"
+                            subtitle="Order requests from buyers will appear here."
+                        />
+                    ) : (
+                        pendingOrders.map((order) => (
+                            <MobileOrderCard
+                                key={order.id}
+                                itemName={order.itemName}
+                                bakerName={order.bakerName}
+                                status={order.status}
+                                pickupTime={order.pickupTime}
+                                pickupAddress={order.pickupAddress}
+                                onConfirm={() => {}}
+                                onDeny={() => {}}
+                            />
+                        ))
+                    )}
+                </div>
+            </section>
+
             <section className="m-your-orders-section">
                 <h2 className="m-your-orders-heading">Your Orders</h2>
                 <div className="m-your-orders-list">

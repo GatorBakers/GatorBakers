@@ -18,6 +18,7 @@ interface Order {
 
 // TODO: Replace with real order data from the API once order fetching is implemented.
 const placeholderOrders: Order[] = [];
+const placeholderPendingOrders: Order[] = [];
 
 const YourOrdersPage = () => {
     const isMobile = useIsMobile();
@@ -26,6 +27,7 @@ const YourOrdersPage = () => {
     if (isMobile) {
         return (
             <MobileYourOrdersPage
+                pendingOrders={placeholderPendingOrders}
                 orders={placeholderOrders}
                 listings={listings}
             />
@@ -35,6 +37,29 @@ const YourOrdersPage = () => {
     return (
         <div className="your-orders-page">
             <div className="your-orders-col">
+                <h2 className="your-orders-heading">Pending Orders From Others</h2>
+                <div className="your-orders-list">
+                    {placeholderPendingOrders.length === 0 ? (
+                        <EmptyState
+                            title="No pending orders"
+                            subtitle="Order requests from buyers will appear here."
+                        />
+                    ) : (
+                        placeholderPendingOrders.map((order) => (
+                            <OrderCard
+                                key={order.id}
+                                itemName={order.itemName}
+                                bakerName={order.bakerName}
+                                status={order.status}
+                                pickupTime={order.pickupTime}
+                                pickupAddress={order.pickupAddress}
+                                onConfirm={() => {}}
+                                onDeny={() => {}}
+                            />
+                        ))
+                    )}
+                </div>
+
                 <h2 className="your-orders-heading">Your Orders</h2>
                 <div className="your-orders-list">
                     {placeholderOrders.length === 0 ? (

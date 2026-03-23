@@ -13,6 +13,9 @@ interface OrderCardProps {
     pickupAddress: string;
     imageUrl?: string;
     onViewDetails?: () => void;
+    // TODO: Wire up onConfirm and onDeny to PATCH with status CONFIRMED or CANCELLED.
+    onConfirm?: () => void;
+    onDeny?: () => void;
 }
 
 const OrderCard = ({
@@ -23,6 +26,8 @@ const OrderCard = ({
     pickupAddress,
     imageUrl,
     onViewDetails,
+    onConfirm,
+    onDeny,
 }: OrderCardProps) => {
     return (
         <div className="order-card">
@@ -44,9 +49,16 @@ const OrderCard = ({
                 <p className="order-card-pickup-address">{pickupAddress}</p>
             </div>
 
-            <button className="order-card-details-btn" onClick={onViewDetails}>
-                View Details
-            </button>
+            {onConfirm && onDeny ? (
+                <div className="order-card-actions">
+                    <button className="order-card-confirm-btn" onClick={onConfirm}>Confirm</button>
+                    <button className="order-card-deny-btn" onClick={onDeny}>Deny</button>
+                </div>
+            ) : (
+                <button className="order-card-details-btn" onClick={onViewDetails}>
+                    View Details
+                </button>
+            )}
         </div>
     );
 };
