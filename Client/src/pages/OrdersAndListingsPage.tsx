@@ -1,10 +1,8 @@
 import OrderCard from '../components/OrderCard';
 import type { OrderStatus } from '../components/StatusBadge';
-import UserListings from '../components/UserListings';
 import EmptyState from '../components/EmptyState';
 import MobileYourOrdersPage from './mobile/MobileOrdersAndListingsPage';
 import { useIsMobile } from '../hooks/useIsMobile';
-import { useUserListings } from '../hooks/useUserListings';
 import './OrdersAndListingsPage.css';
 
 interface Order {
@@ -22,14 +20,12 @@ const placeholderPendingOrders: Order[] = [];
 
 const YourOrdersPage = () => {
     const isMobile = useIsMobile();
-    const { listings, isLoading: listingsLoading, error: listingsError } = useUserListings();
 
     if (isMobile) {
         return (
             <MobileYourOrdersPage
                 pendingOrders={placeholderPendingOrders}
                 orders={placeholderOrders}
-                listings={listings}
             />
         );
     }
@@ -37,7 +33,7 @@ const YourOrdersPage = () => {
     return (
         <div className="your-orders-page">
             <div className="your-orders-col">
-                <h2 className="your-orders-heading">Pending Orders From Others</h2>
+                <h2 className="your-orders-heading">Orders From Others</h2>
                 <div className="your-orders-list">
                     {placeholderPendingOrders.length === 0 ? (
                         <EmptyState
@@ -59,8 +55,10 @@ const YourOrdersPage = () => {
                         ))
                     )}
                 </div>
+            </div>
 
-                <h2 className="your-orders-heading">Your Orders</h2>
+            <div className="your-orders-col">
+                <h2 className="your-orders-heading">Orders You Placed</h2>
                 <div className="your-orders-list">
                     {placeholderOrders.length === 0 ? (
                         <EmptyState
@@ -81,14 +79,6 @@ const YourOrdersPage = () => {
                     )}
                 </div>
             </div>
-
-            {listingsLoading ? (
-                <div className="your-listings-col"><p>Loading listings…</p></div>
-            ) : listingsError ? (
-                <div className="your-listings-col"><p className="listings-error">{listingsError}</p></div>
-            ) : (
-                <UserListings listings={listings} />
-            )}
         </div>
     );
 };
