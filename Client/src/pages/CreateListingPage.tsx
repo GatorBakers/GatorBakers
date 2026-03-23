@@ -8,6 +8,7 @@ import ImageUpload from '../components/ImageUpload';
 import ButtonAddOn from '../components/ButtonAddOn';
 import { useAuth } from '../context/AuthContext';
 import { createListing } from '../services/listingService';
+import { queryKeys } from '../hooks/queryKeys';
 import './CreateListingPage.css';
 
 interface ListingForm {
@@ -94,8 +95,8 @@ const CreateListingPage = () => {
                 allergens: listing.allergens,
                 photo_url,
             });
-            queryClient.invalidateQueries({ queryKey: ['my-listings'] });
-            queryClient.invalidateQueries({ queryKey: ['profile'] });
+            queryClient.invalidateQueries({ queryKey: queryKeys.myListings });
+            queryClient.invalidateQueries({ queryKey: queryKeys.profile });
             setListing(INITIAL_LISTING);
             setResetKey(k => k + 1);
             navigate('/orders&listings');

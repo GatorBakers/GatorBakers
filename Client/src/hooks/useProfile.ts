@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '../context/AuthContext';
 import { fetchProfile, type ProfileData } from '../services/profileService';
+import { queryKeys } from './queryKeys';
 
 export interface UserProfile {
     name: string;
@@ -30,7 +31,7 @@ export function useProfile() {
     const { accessToken, isAuthLoading } = useAuth();
 
     const { data: profile, isLoading, error } = useQuery<UserProfile, Error>({
-        queryKey: ['profile'],
+        queryKey: queryKeys.profile,
         queryFn: async () => {
             const data = await fetchProfile(accessToken!);
             return toUserProfile(data);
