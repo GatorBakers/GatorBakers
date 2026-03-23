@@ -619,6 +619,8 @@ app.get("/orders/user/:id", async (req: Request, res: Response) => {
             quantity: true,
             listing_status: true,
             photo_url: true,
+            ingredients: true,
+            allergens: true,
           },
         },
       },
@@ -654,6 +656,8 @@ app.get("/orders/seller/:id", async (req: Request, res: Response) => {
             quantity: true,
             listing_status: true,
             photo_url: true,
+            ingredients: true,
+            allergens: true,
           },
         },
         user: {

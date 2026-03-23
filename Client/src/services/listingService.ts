@@ -1,32 +1,18 @@
 import { API_URL, throwApiError } from './api';
+import type {
+    BuyerOrder,
+    CreateListingRequest,
+    CreateOrderRequest,
+    ListingFeedParams,
+    ListingSummary,
+    OrderRecord,
+    SellerOrdersResponse,
+    UpdateOrderStatusRequest,
+} from '@shared/types';
 
-export interface ListingData {
-    id: number;
-    user_id: number;
-    title: string;
-    description: string;
-    price: string;
-    quantity: number;
-    listing_status: 'AVAILABLE' | 'PENDING' | 'CONFIRMED' | 'SOLD' | 'COMPLETED' | 'CANCELLED';
-    photo_url: string;
-    ingredients: string[];
-    allergens: string[];
-    created_at: string;
-    user: {
-        first_name: string;
-        last_name: string;
-    };
-}
+export type ListingData = ListingSummary;
 
-export interface CreateListingPayload {
-    title: string;
-    description: string;
-    price: string;
-    quantity: number;
-    photo_url?: string;
-    ingredients: string[];
-    allergens: string[];
-}
+export type CreateListingPayload = CreateListingRequest;
 
 export async function createListing(
     accessToken: string,
@@ -47,6 +33,31 @@ export async function createListing(
     }
 
     return response.json() as Promise<ListingData>;
+}
+
+export async function fetchListings(params: ListingFeedParams = {}): Promise<ListingData[]> {
+    const queryParams = new URLSearchParams();
+
+    if (params.search) {
+        queryParams.set('search', params.search);
+    }
+    if (params.category) {
+        queryParams.set('category', params.category);
+    }
+    if (params.status) {
+        queryParams.set('status', params.status);
+    }
+
+    const query = queryParams.toString();
+    const response = await fetch(`${API_URL}/listings${query ? `?${query}` : ''}`, {
+        credentials: 'include',
+    });
+
+    if (!response.ok) {
+        await throwApiError(response, 'Failed to load listings feed');
+    }
+
+    return response.json() as Promise<ListingData[]>;
 }
 
 export async function fetchMyListings(accessToken: string): Promise<ListingData[]> {
@@ -70,4 +81,68 @@ export async function fetchListing(id: number): Promise<ListingData> {
     }
 
     return response.json() as Promise<ListingData>;
+}
+
+export async function createOrder(
+    listingId: number,
+    payload: CreateOrderRequest,
+): Promise<OrderRecord> {
+    const response = await fetch(`${API_URL}/listing/${listingId}/order`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+        await throwApiError(response, 'Failed to create order');
+    }
+
+    return response.json() as Promise<OrderRecord>;
+}
+
+export async function fetchBuyerOrders(userId: number): Promise<BuyerOrder[]> {
+    const response = await fetch(`${API_URL}/orders/user/${userId}`, {
+        credentials: 'include',
+    });
+
+    if (!response.ok) {
+        await throwApiError(response, 'Failed to load buyer orders');
+    }
+
+    return response.json() as Promise<BuyerOrder[]>;
+}
+
+export async function fetchSellerOrders(userId: number): Promise<SellerOrdersResponse> {
+    const response = await fetch(`${API_URL}/orders/seller/${userId}`, {
+        credentials: 'include',
+    });
+
+    if (!response.ok) {
+        await throwApiError(response, 'Failed to load seller orders');
+    }
+
+    return response.json() as Promise<SellerOrdersResponse>;
+}
+
+export async function updateOrderStatus(
+    orderId: number,
+    payload: UpdateOrderStatusRequest,
+): Promise<OrderRecord> {
+    const response = await fetch(`${API_URL}/order/${orderId}`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+        await throwApiError(response, 'Failed to update order status');
+    }
+
+    return response.json() as Promise<OrderRecord>;
 }
