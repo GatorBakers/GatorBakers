@@ -1,8 +1,8 @@
 export type ListingStatus = 'AVAILABLE' | 'PENDING' | 'CONFIRMED' | 'SOLD' | 'COMPLETED' | 'CANCELLED';
 
-export type OrderStatus = 'PENDING' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED' | 'SOLD';
+export type OrderStatus = 'PENDING' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED';
 
-export type UpdatableOrderStatus = 'PENDING' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED';
+export type UpdatableOrderStatus = OrderStatus;
 
 export interface ListingAuthor {
   id?: number;

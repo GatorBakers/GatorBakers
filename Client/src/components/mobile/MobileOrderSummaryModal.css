@@ -115,6 +115,7 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
+    min-width: 0;
 }
 
 .m-order-summary-pickup-label {
@@ -158,6 +159,28 @@
     margin: 0;
 }
 
+/* Time input */
+.m-order-summary-time-input {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    padding: 10px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: var(--color-text-dark);
+    background-color: var(--color-white);
+    cursor: pointer;
+    box-sizing: border-box;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.m-order-summary-time-input:focus {
+    outline: none;
+    border-color: var(--color-brand);
+}
+
 /* Actions */
 .m-order-summary-actions {
     display: flex;
@@ -194,6 +217,12 @@
     transition: background-color 0.2s ease;
 }
 
-.m-order-summary-btn-confirm:active {
+.m-order-summary-btn-confirm:active:not(:disabled) {
     background-color: var(--color-cta-hover);
+}
+
+.m-order-summary-btn-confirm:disabled {
+    background-color: var(--color-border);
+    color: var(--color-text-muted);
+    cursor: not-allowed;
 }

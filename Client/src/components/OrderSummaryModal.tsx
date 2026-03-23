@@ -20,9 +20,13 @@ interface OrderSummaryModalProps {
 
 const OrderSummaryModal = ({ isOpen, onClose, onBack, title, bakerName, price, imageUrl }: OrderSummaryModalProps) => {
     const [selectedPickupLocation, setSelectedPickupLocation] = useState<PickupLocation | null>(null);
+    const [selectedPickupTime, setSelectedPickupTime] = useState<string>('');
 
     useEffect(() => {
-        if (isOpen) setSelectedPickupLocation(null);
+        if (isOpen) {
+            setSelectedPickupLocation(null);
+            setSelectedPickupTime('');
+        }
     }, [isOpen]);
 
     if (!isOpen) return null;
@@ -42,6 +46,7 @@ const OrderSummaryModal = ({ isOpen, onClose, onBack, title, bakerName, price, i
             price,
             imageUrl,
             pickupLocation: selectedPickupLocation,
+            pickupTime: selectedPickupTime,
         }
 
         console.log('Order:', order);
@@ -124,6 +129,29 @@ const OrderSummaryModal = ({ isOpen, onClose, onBack, title, bakerName, price, i
                     )}
                 </div>
 
+                {/* Pickup time */}
+                <div className="order-summary-pickup">
+                    <p className="order-summary-pickup-label">Pickup Time</p>
+                    <input
+                        type="time"
+                        className="order-summary-time-input"
+                        value={selectedPickupTime}
+                        onChange={(e) => setSelectedPickupTime(e.target.value)}
+                    />
+                    {selectedPickupTime && (
+                        <div className="order-summary-pickup-details">
+                            <p className="order-summary-pickup-location-name">
+                                {(() => {
+                                    const [h, m] = selectedPickupTime.split(':').map(Number);
+                                    const period = h >= 12 ? 'PM' : 'AM';
+                                    const hour = h % 12 || 12;
+                                    return `${hour}:${String(m).padStart(2, '0')} ${period}`;
+                                })()}
+                            </p>
+                        </div>
+                    )}
+                </div>
+
                 <hr className="order-summary-divider" />
 
                 {/* Buttons */}
@@ -131,7 +159,11 @@ const OrderSummaryModal = ({ isOpen, onClose, onBack, title, bakerName, price, i
                     <button className="order-summary-btn-back" onClick={onBack}>
                         Back
                     </button>
-                    <button className="order-summary-btn-confirm" onClick={handleConfirmOrder}>
+                    <button
+                        className="order-summary-btn-confirm"
+                        onClick={handleConfirmOrder}
+                        disabled={!selectedPickupLocation || !selectedPickupTime}
+                    >
                         Confirm Order — ${total.toFixed(2)}
                     </button>
                 </div>
