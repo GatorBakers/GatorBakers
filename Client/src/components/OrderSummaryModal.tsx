@@ -20,11 +20,13 @@ interface OrderSummaryModalProps {
 
 const OrderSummaryModal = ({ isOpen, onClose, onBack, title, bakerName, price, imageUrl }: OrderSummaryModalProps) => {
     const [selectedPickupLocation, setSelectedPickupLocation] = useState<PickupLocation | null>(null);
+    const [selectedPickupDate, setSelectedPickupDate] = useState<string>('');
     const [selectedPickupTime, setSelectedPickupTime] = useState<string>('');
 
     useEffect(() => {
         if (isOpen) {
             setSelectedPickupLocation(null);
+            setSelectedPickupDate('');
             setSelectedPickupTime('');
         }
     }, [isOpen]);
@@ -46,6 +48,7 @@ const OrderSummaryModal = ({ isOpen, onClose, onBack, title, bakerName, price, i
             price,
             imageUrl,
             pickupLocation: selectedPickupLocation,
+            pickupDate: selectedPickupDate,
             pickupTime: selectedPickupTime,
         }
 
@@ -129,6 +132,30 @@ const OrderSummaryModal = ({ isOpen, onClose, onBack, title, bakerName, price, i
                     )}
                 </div>
 
+                {/* Pickup date */}
+                <div className="order-summary-pickup">
+                    <p className="order-summary-pickup-label">Pickup Date</p>
+                    <input
+                        type="date"
+                        className="order-summary-time-input"
+                        value={selectedPickupDate}
+                        min={new Date().toISOString().split('T')[0]}
+                        onChange={(e) => setSelectedPickupDate(e.target.value)}
+                    />
+                    {selectedPickupDate && (
+                        <div className="order-summary-pickup-details">
+                            <p className="order-summary-pickup-location-name">
+                                {new Date(selectedPickupDate + 'T00:00:00').toLocaleDateString('en-US', {
+                                    weekday: 'long',
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric',
+                                })}
+                            </p>
+                        </div>
+                    )}
+                </div>
+
                 {/* Pickup time */}
                 <div className="order-summary-pickup">
                     <p className="order-summary-pickup-label">Pickup Time</p>
@@ -162,7 +189,7 @@ const OrderSummaryModal = ({ isOpen, onClose, onBack, title, bakerName, price, i
                     <button
                         className="order-summary-btn-confirm"
                         onClick={handleConfirmOrder}
-                        disabled={!selectedPickupLocation || !selectedPickupTime}
+                        disabled={!selectedPickupLocation || !selectedPickupDate || !selectedPickupTime}
                     >
                         Confirm Order — ${total.toFixed(2)}
                     </button>
