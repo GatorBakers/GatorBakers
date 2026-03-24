@@ -4,6 +4,7 @@ export const queryKeys = {
     profileRoot: ['profile'] as const,
     myListingsRoot: ['my-listings'] as const,
     myListings: (scope: string | number | null) => ['my-listings', scope ?? 'anonymous'] as const,
+    listingsFeedRoot: ['listings-feed'] as const,
     listingsFeed: (params: ListingFeedParams = {}) => [
         'listings-feed',
         params.search ?? '',
