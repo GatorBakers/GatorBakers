@@ -7,10 +7,11 @@ interface MobileSearchPageProps {
     listings: ListingSummary[];
     isLoading: boolean;
     error: string | null;
-    buyerUserId?: number;
+    buyerUserId: number | null;
+    buyerIdentityLoading: boolean;
 }
 
-const MobileSearchPage = ({ listings, isLoading, error, buyerUserId }: MobileSearchPageProps) => {
+const MobileSearchPage = ({ listings, isLoading, error, buyerUserId, buyerIdentityLoading }: MobileSearchPageProps) => {
     return (
         <div className="m-search-page">
             <SearchBar />
@@ -31,6 +32,7 @@ const MobileSearchPage = ({ listings, isLoading, error, buyerUserId }: MobileSea
                                         listingId={listing.id}
                                         sellerUserId={listing.user_id}
                                         buyerUserId={buyerUserId}
+                                        buyerIdentityLoading={buyerIdentityLoading}
                                         title={listing.title}
                                         bakerName={`${listing.user.first_name} ${listing.user.last_name}`}
                                         price={Number(listing.price)}

@@ -9,10 +9,10 @@ import './SearchPage.css';
 const SearchPage = () => {
     const isMobile = useIsMobile();
     const { listings, isLoading, error } = useListingsFeed();
-    const { profile } = useProfile();
+    const { profile, isLoading: profileLoading } = useProfile();
 
     if (isMobile) {
-        return <MobileSearchPage listings={listings} isLoading={isLoading} error={error} buyerUserId={profile?.id} />;
+        return <MobileSearchPage listings={listings} isLoading={isLoading} error={error} buyerUserId={profile?.id ?? null} buyerIdentityLoading={profileLoading} />;
     }
 
     return (
@@ -34,7 +34,8 @@ const SearchPage = () => {
                                         key={listing.id}
                                         listingId={listing.id}
                                         sellerUserId={listing.user_id}
-                                        buyerUserId={profile?.id}
+                                        buyerUserId={profile?.id ?? null}
+                                        buyerIdentityLoading={profileLoading}
                                         title={listing.title}
                                         bakerName={`${listing.user.first_name} ${listing.user.last_name}`}
                                         price={Number(listing.price)}
