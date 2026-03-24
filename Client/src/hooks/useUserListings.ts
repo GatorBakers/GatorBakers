@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '../context/AuthContext';
 import { fetchMyListings, type ListingData } from '../services/listingService';
+import { queryKeys } from './queryKeys';
 
 export interface Listing {
     id: number;
@@ -32,7 +33,7 @@ export function useUserListings() {
     const { accessToken, isAuthLoading } = useAuth();
 
     const { data: listings, isLoading, error } = useQuery<Listing[], Error>({
-        queryKey: ['my-listings'],
+        queryKey: queryKeys.myListings(accessToken ? 'me' : null),
         queryFn: async () => {
             const data = await fetchMyListings(accessToken!);
             return data.map(toListing);
