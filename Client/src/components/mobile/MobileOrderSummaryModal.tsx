@@ -75,12 +75,8 @@ const MobileOrderSummaryModal = ({
                 listingId,
                 payload: {
                     user_id: buyerUserId,
-                    pickup_location: `${selectedPickupLocation.name} (${selectedPickupLocation.address}) @ ${(() => {
-                        const [h, m] = selectedPickupTime.split(':').map(Number);
-                        const period = h >= 12 ? 'PM' : 'AM';
-                        const hour = h % 12 || 12;
-                        return `${hour}:${String(m).padStart(2, '0')} ${period}`;
-                    })()}`,
+                    pickup_location: `${selectedPickupLocation.name} (${selectedPickupLocation.address})`,
+                    pickup_time: selectedPickupTime,
                 },
                 sellerUserId,
             });
