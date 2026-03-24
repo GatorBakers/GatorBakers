@@ -558,9 +558,9 @@ app.delete("/listing/:id", async (req: Request, res: Response) => {
   }
 });
 
-app.post("/listing/:id/order", async (req: Request, res: Response) => {
+app.post("/listing/:id/order", authenticate, async (req: Request, res: Response) => {
   const listing_id = Number(req.params.id);
-  const user_id = Number(req.body.user_id);
+  const { id: user_id } = (req as any).user;
   const pickup_location = req.body.pickup_location;
   const pickup_time = req.body.pickup_time;
 
@@ -583,10 +583,10 @@ app.post("/listing/:id/order", async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Listing does not exist" });
     }
 
-    if (listing.user_id == user_id) {
+    if (listing.user_id === user_id) {
       return res
-        .status(400)
-        .json({ message: "User is the owner of the listing" });
+        .status(403)
+        .json({ message: "You cannot place an order on your own listing" });
     }
 
     if (listing.quantity < 1) {
@@ -626,10 +626,11 @@ app.post("/listing/:id/order", async (req: Request, res: Response) => {
   }
 });
 
-app.patch("/order/:id", async (req: Request, res: Response) => {
+app.patch("/order/:id", authenticate, async (req: Request, res: Response) => {
+  const { id: requester_user_id } = (req as any).user;
   const order_id = Number(req.params.id);
   const { status } = req.body;
-  const validStatuses = ["PENDING", "CONFIRMED", "COMPLETED", "CANCELLED"];
+  const validStatuses = ["CONFIRMED", "CANCELLED"];
 
   if (!order_id || isNaN(order_id)) {
     return res.status(400).json({ message: "Invalid order id" });
@@ -646,9 +647,20 @@ app.patch("/order/:id", async (req: Request, res: Response) => {
       where: {
         id: order_id,
       },
+      select: {
+        id: true,
+        listing: {
+          select: {
+            user_id: true,
+          },
+        },
+      },
     });
     if (!order) {
       return res.status(404).json({ message: "Order does not exist" });
+    }
+    if (order.listing.user_id !== requester_user_id) {
+      return res.status(403).json({ message: "Forbidden: not your order to update" });
     }
     const updated_order = await prisma.order.update({
       where: {
@@ -694,6 +706,7 @@ app.get("/orders/user/:id", async (req: Request, res: Response) => {
             allergens: true,
             user: {
               select: {
+                id: true,
                 first_name: true,
                 last_name: true,
               },
