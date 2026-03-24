@@ -40,18 +40,21 @@ export async function createListing(
 export async function fetchListings(params: ListingFeedParams = {}): Promise<ListingData[]> {
     const queryParams = new URLSearchParams();
 
-    if (params.search) {
-        queryParams.set('search', params.search);
-    }
-    if (params.category) {
-        queryParams.set('category', params.category);
-    }
+    queryParams.set('sortBy', params.sortBy ?? 'recent');
+
+    // Search functionality deferred to future PR
+    // if (params.search) {
+    //     queryParams.set('search', params.search);
+    // }
+    // if (params.category) {
+    //     queryParams.set('category', params.category);
+    // }
     if (params.status) {
         queryParams.set('status', params.status);
     }
 
     const query = queryParams.toString();
-    const response = await fetch(`${API_URL}/listings${query ? `?${query}` : ''}`, {
+    const response = await fetch(`${API_URL}/discovery/listings${query ? `?${query}` : ''}`, {
         credentials: 'include',
     });
 

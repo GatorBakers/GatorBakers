@@ -278,6 +278,42 @@ app.post("/login", async (req: Request, res: Response) => {
   res.json({ access_token });
 });
 
+app.get("/discovery/listings", async (req: Request, res: Response) => {
+  const sortByRaw = req.query.sortBy;
+  const sortBy =
+    typeof sortByRaw === "string" && sortByRaw.length > 0
+      ? sortByRaw
+      : "recent";
+
+  let orderBy: any;
+
+  if (sortBy === "popular") {
+    orderBy = { pastries_sold: "desc" };
+  } else if (sortBy === "recent") {
+    orderBy = { created_at: "desc" };
+  } else {
+    return res
+      .status(400)
+      .json({ message: 'Invalid sortBy. Allowed values: "recent", "popular"' });
+  }
+
+  try {
+    const listing = await prisma.listing.findMany({
+      orderBy,
+      include: {
+        user: { select: { first_name: true, last_name: true } },
+        location: { select: { city: true, state: true } },
+      },
+      take: 40,
+    });
+
+    return res.status(200).json(listing);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Database error" });
+  }
+});
+
 app.get("/user/:id/listings", async (req: Request, res: Response) => {
   const id = Number(req.params.id);
   if (!id || isNaN(id)) {
@@ -306,7 +342,7 @@ app.get("/my-listings", authenticate, async (req: Request, res: Response) => {
       include: { user: { select: { first_name: true, last_name: true } } },
       orderBy: { created_at: "desc" },
     });
-      return res.status(200).json(listings);
+    return res.status(200).json(listings);
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Database error" });
@@ -329,7 +365,7 @@ app.get("/listing/:id", async (req: Request, res: Response) => {
     if (!listing) {
       return res.status(404).json({ message: "Listing not found" });
     }
-      return res.status(200).json(listing);
+    return res.status(200).json(listing);
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Database error" });
@@ -370,11 +406,20 @@ app.post("/listing", authenticate, async (req: Request, res: Response) => {
   }
   const priceStr = String(price).trim();
   if (!/^\d+(\.\d{1,2})?$/.test(priceStr)) {
-    return res.status(400).json({ message: "Price must be a non-negative number with up to 2 decimal places" });
+    return res.status(400).json({
+      message:
+        "Price must be a non-negative number with up to 2 decimal places",
+    });
   }
   const parsedInventory = quantity !== undefined ? Number(quantity) : 1;
-  if (isNaN(parsedInventory) || parsedInventory < 0 || !Number.isInteger(parsedInventory)) {
-    return res.status(400).json({ message: "Inventory must be a non-negative integer" });
+  if (
+    isNaN(parsedInventory) ||
+    parsedInventory < 0 ||
+    !Number.isInteger(parsedInventory)
+  ) {
+    return res
+      .status(400)
+      .json({ message: "Inventory must be a non-negative integer" });
   }
   // TODO [AWS S3]: Once photo_url stores an S3 URL, tighten MAX_PHOTO_URL_LENGTH to ~500 chars.
   // For now it matches the Express body limit so base64 data URLs are accepted during the interim.
@@ -384,7 +429,9 @@ app.post("/listing", authenticate, async (req: Request, res: Response) => {
       return res.status(400).json({ message: "photo_url must be a string" });
     }
     if (photo_url.length > MAX_PHOTO_URL_LENGTH) {
-      return res.status(400).json({ message: "photo_url exceeds maximum allowed size" });
+      return res
+        .status(400)
+        .json({ message: "photo_url exceeds maximum allowed size" });
     }
   }
   if (ingredients !== undefined) {
@@ -392,7 +439,9 @@ app.post("/listing", authenticate, async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Ingredients must be an array" });
     }
     if (!ingredients.every((item: unknown) => typeof item === "string")) {
-      return res.status(400).json({ message: "Each ingredient must be a string" });
+      return res
+        .status(400)
+        .json({ message: "Each ingredient must be a string" });
     }
   }
   if (allergens !== undefined) {
@@ -400,12 +449,18 @@ app.post("/listing", authenticate, async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Allergens must be an array" });
     }
     if (!allergens.every((item: unknown) => typeof item === "string")) {
-      return res.status(400).json({ message: "Each allergen must be a string" });
+      return res
+        .status(400)
+        .json({ message: "Each allergen must be a string" });
     }
   }
 
-  const normalizedIngredients: string[] = (ingredients ?? []).map((s: string) => s.trim()).filter((s: string) => s.length > 0);
-  const normalizedAllergens: string[] = (allergens ?? []).map((s: string) => s.trim()).filter((s: string) => s.length > 0);
+  const normalizedIngredients: string[] = (ingredients ?? [])
+    .map((s: string) => s.trim())
+    .filter((s: string) => s.length > 0);
+  const normalizedAllergens: string[] = (allergens ?? [])
+    .map((s: string) => s.trim())
+    .filter((s: string) => s.length > 0);
 
   try {
     const new_listing = await prisma.listing.create({
@@ -446,8 +501,14 @@ app.patch("/listing/:id", async (req: Request, res: Response) => {
 
   if (inventoryInput !== undefined) {
     const parsedInventory = Number(inventoryInput);
-    if (isNaN(parsedInventory) || parsedInventory < 0 || !Number.isInteger(parsedInventory)) {
-      return res.status(400).json({ message: "Inventory must be a non-negative integer" });
+    if (
+      isNaN(parsedInventory) ||
+      parsedInventory < 0 ||
+      !Number.isInteger(parsedInventory)
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Inventory must be a non-negative integer" });
     }
     updateData.quantity = parsedInventory;
   }
@@ -537,6 +598,7 @@ app.post("/listing/:id/order", async (req: Request, res: Response) => {
       where: { id: listing_id },
       data: {
         quantity: listing.quantity - 1,
+        pastries_sold: listing.pastries_sold + 1,
       },
     });
 
