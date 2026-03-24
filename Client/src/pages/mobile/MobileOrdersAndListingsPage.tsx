@@ -30,7 +30,7 @@ const MobileYourOrdersPage = ({ pendingOrders, orders }: MobileYourOrdersPagePro
     return (
         <div className="m-your-orders-page">
             <section className="m-your-orders-section">
-                <h2 className="m-your-orders-heading">Orders From Others</h2>
+                <h2 className="m-your-orders-heading">Incoming Orders</h2>
                 <div className="m-your-orders-list">
                     {pendingOrders.length === 0 ? (
                         <EmptyState
@@ -55,7 +55,7 @@ const MobileYourOrdersPage = ({ pendingOrders, orders }: MobileYourOrdersPagePro
             </section>
 
             <section className="m-your-orders-section">
-                <h2 className="m-your-orders-heading">Orders You Placed</h2>
+                <h2 className="m-your-orders-heading">Your Orders</h2>
                 <div className="m-your-orders-list">
                     {orders.length === 0 ? (
                         <EmptyState

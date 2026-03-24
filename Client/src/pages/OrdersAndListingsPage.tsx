@@ -37,7 +37,7 @@ const YourOrdersPage = () => {
     return (
         <div className="your-orders-page">
             <div className="your-orders-col">
-                <h2 className="your-orders-heading">Orders From Others</h2>
+                <h2 className="your-orders-heading">Incoming Orders</h2>
                 <div className="your-orders-list">
                     {placeholderPendingOrders.length === 0 ? (
                         <EmptyState
@@ -62,7 +62,7 @@ const YourOrdersPage = () => {
             </div>
 
             <div className="your-orders-col">
-                <h2 className="your-orders-heading">Orders You Placed</h2>
+                <h2 className="your-orders-heading">Your Orders</h2>
                 <div className="your-orders-list">
                     {placeholderOrders.length === 0 ? (
                         <EmptyState
