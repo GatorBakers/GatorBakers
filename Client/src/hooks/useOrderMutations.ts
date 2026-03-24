@@ -23,7 +23,7 @@ export function useCreateOrder() {
     return useMutation({
         mutationFn: async ({ listingId, payload }: CreateOrderInput) => createOrder(listingId, payload),
         onSuccess: (_createdOrder, variables) => {
-            queryClient.invalidateQueries({ queryKey: queryKeys.myListings });
+            queryClient.invalidateQueries({ queryKey: queryKeys.myListingsRoot });
 
             if (variables.buyerUserId) {
                 queryClient.invalidateQueries({ queryKey: queryKeys.buyerOrders(variables.buyerUserId) });
@@ -42,7 +42,7 @@ export function useUpdateOrderStatus() {
         mutationFn: async ({ orderId, status }: UpdateOrderStatusInput) =>
             updateOrderStatus(orderId, { status }),
         onSuccess: (_updatedOrder, variables) => {
-            queryClient.invalidateQueries({ queryKey: queryKeys.myListings });
+            queryClient.invalidateQueries({ queryKey: queryKeys.myListingsRoot });
 
             if (variables.buyerUserId) {
                 queryClient.invalidateQueries({ queryKey: queryKeys.buyerOrders(variables.buyerUserId) });

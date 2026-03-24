@@ -11,7 +11,7 @@ const emptySellerOrders: SellerOrdersResponse = {
 
 export function useSellerOrders(userId: number | null) {
     const { data, isLoading, error } = useQuery<SellerOrdersResponse, Error>({
-        queryKey: userId ? queryKeys.sellerOrders(userId) : ['orders', 'seller', 'none'],
+        queryKey: queryKeys.sellerOrders(userId ?? -1),
         queryFn: async () => fetchSellerOrders(userId!),
         enabled: userId !== null,
         staleTime: 60 * 1000,

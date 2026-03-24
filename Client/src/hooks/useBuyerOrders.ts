@@ -5,7 +5,7 @@ import { queryKeys } from './queryKeys';
 
 export function useBuyerOrders(userId: number | null) {
     const { data, isLoading, error } = useQuery<BuyerOrder[], Error>({
-        queryKey: userId ? queryKeys.buyerOrders(userId) : ['orders', 'buyer', 'none'],
+        queryKey: queryKeys.buyerOrders(userId ?? -1),
         queryFn: async () => fetchBuyerOrders(userId!),
         enabled: userId !== null,
         staleTime: 60 * 1000,
