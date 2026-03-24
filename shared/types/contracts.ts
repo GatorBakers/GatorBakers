@@ -96,4 +96,5 @@ export interface ListingFeedParams {
   search?: string;
   category?: string;
   status?: ListingStatus;
+  sortBy?: 'recent' | 'popular';
 }

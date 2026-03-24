@@ -7,9 +7,11 @@ interface Product {
     title: string;
     bakerName: string;
     price: number;
+    imageUrl?: string;
     itemDescription: string;
     ingredients: string[];
     allergens: string[];
+    quantity?: number;
 }
 
 interface MobileDiscoverPageProps {
@@ -43,10 +45,12 @@ const MobileDiscoverPage = ({ products }: MobileDiscoverPageProps) => {
                         title={product.title}
                         bakerName={product.bakerName}
                         price={product.price}
+                        imageUrl={product.imageUrl}
                         variant="to_order"
                         itemDescription={product.itemDescription}
                         ingredients={product.ingredients}
                         allergens={product.allergens}
+                        quantity={product.quantity}
                     />
                 ))}
             </div>

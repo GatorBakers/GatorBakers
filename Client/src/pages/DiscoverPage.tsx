@@ -2,28 +2,29 @@ import { useState } from 'react';
 import ProductCard from '../components/ProductCard';
 import MobileDiscoverPage from './mobile/MobileDiscoverPage';
 import { useIsMobile } from '../hooks/useIsMobile';
-
-/* Placeholder products for the discover page */
-const placeholderProducts = [
-    { id: 1, title: 'Product Title', bakerName: 'Baker Name', price: 0, itemDescription: 'Item Description 1', ingredients: ['Ingredient 1', 'Ingredient 2', 'Ingredient 3'], allergens: ['Allergen 1', 'Allergen 2', 'Allergen 3'], quantity: 10 },
-    { id: 2, title: 'Product Title', bakerName: 'Baker Name', price: 0, itemDescription: 'Item Description 2', ingredients: ['Ingredient 1', 'Ingredient 2', 'Ingredient 3'], allergens: ['Allergen 1', 'Allergen 2', 'Allergen 3'] },
-    { id: 3, title: 'Product Title', bakerName: 'Baker Name', price: 0, itemDescription: 'Item Description 3', ingredients: ['Ingredient 1', 'Ingredient 2', 'Ingredient 3'], allergens: ['Allergen 1', 'Allergen 2', 'Allergen 3'] },
-    { id: 4, title: 'Product Title', bakerName: 'Baker Name', price: 0, itemDescription: 'Item Description 4', ingredients: ['Ingredient 1', 'Ingredient 2', 'Ingredient 3'], allergens: ['Allergen 1', 'Allergen 2', 'Allergen 3'] },
-    { id: 5, title: 'Product Title', bakerName: 'Baker Name', price: 0, itemDescription: 'Item Description 5', ingredients: ['Ingredient 1', 'Ingredient 2', 'Ingredient 3'], allergens: ['Allergen 1', 'Allergen 2', 'Allergen 3'] },
-    { id: 6, title: 'Product Title', bakerName: 'Baker Name', price: 0, itemDescription: 'Item Description 6', ingredients: ['Ingredient 1', 'Ingredient 2', 'Ingredient 3'], allergens: ['Allergen 1', 'Allergen 2', 'Allergen 3'] },
-];
+import { useListingsFeed } from '../hooks/useListingsFeed';
 
 const DiscoverPage = () => {
     const isMobile = useIsMobile();
     const [sortBy, setSortBy] = useState<'recent' | 'popular'>('recent');
+    const { listings, isLoading, error } = useListingsFeed({ params: { sortBy } });
 
     const handleSort = (value: 'recent' | 'popular') => {
         setSortBy(value);
-        console.log(`Sort changed to: ${value}`);
     };
 
     if (isMobile) {
-        return <MobileDiscoverPage products={placeholderProducts} />;
+        return <MobileDiscoverPage products={listings.map(listing => ({
+            id: listing.id,
+            title: listing.title,
+            bakerName: `${listing.user.first_name} ${listing.user.last_name}`,
+            price: Number(listing.price),
+            imageUrl: listing.photo_url,
+            itemDescription: listing.description,
+            ingredients: listing.ingredients,
+            allergens: listing.allergens,
+            quantity: listing.quantity,
+        }))} />;
     }
 
     return (
@@ -38,21 +39,28 @@ const DiscoverPage = () => {
                 <button className={sortBy === 'popular' ? 'active' : ''} onClick={() => handleSort('popular')}>Popular</button>
             </div>
 
-            <div className="product-card-container">
-                {placeholderProducts.map((product) => (
-                    <ProductCard
-                        key={product.id}
-                        title={product.title}
-                        bakerName={product.bakerName}
-                        price={product.price}
-                        variant="to_order"
-                        itemDescription={product.itemDescription}
-                        ingredients={product.ingredients}
-                        allergens={product.allergens}
-                        quantity={product.quantity}
-                    />
-                ))}
-            </div>
+            {isLoading && <p>Loading listings...</p>}
+            {error && <p style={{ color: 'red' }}>Error: {error}</p>}
+            {!isLoading && listings.length === 0 && <p>No listings available at the moment.</p>}
+
+            {!isLoading && listings.length > 0 && (
+                <div className="product-card-container">
+                    {listings.map((listing) => (
+                        <ProductCard
+                            key={listing.id}
+                            title={listing.title}
+                            bakerName={`${listing.user.first_name} ${listing.user.last_name}`}
+                            price={Number(listing.price)}
+                            imageUrl={listing.photo_url}
+                            variant="to_order"
+                            itemDescription={listing.description}
+                            ingredients={listing.ingredients}
+                            allergens={listing.allergens}
+                            quantity={listing.quantity}
+                        />
+                    ))}
+                </div>
+            )}
         </div>
     );
 };
