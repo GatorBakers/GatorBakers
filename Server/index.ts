@@ -279,16 +279,22 @@ app.post("/login", async (req: Request, res: Response) => {
 });
 
 app.get("/discovery/listings", async (req: Request, res: Response) => {
-  const sortBy = req.query.sortBy as string;
+  const sortByRaw = req.query.sortBy;
+  const sortBy =
+    typeof sortByRaw === "string" && sortByRaw.length > 0
+      ? sortByRaw
+      : "recent";
 
   let orderBy: any;
 
-  if (sortBy === "Most Popular") {
+  if (sortBy === "popular") {
     orderBy = { pastries_sold: "desc" };
-  } else if (sortBy === "Most Recent") {
+  } else if (sortBy === "recent") {
     orderBy = { created_at: "desc" };
   } else {
-    return res.status(400).json({ message: "Wrong display found" });
+    return res
+      .status(400)
+      .json({ message: 'Invalid sortBy. Allowed values: "recent", "popular"' });
   }
 
   try {

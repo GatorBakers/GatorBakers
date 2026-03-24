@@ -40,14 +40,7 @@ export async function createListing(
 export async function fetchListings(params: ListingFeedParams = {}): Promise<ListingData[]> {
     const queryParams = new URLSearchParams();
 
-    // Map sortBy from client format ('recent'/'popular') to server format
-    if (params.sortBy) {
-        const serverSortBy = params.sortBy === 'recent' ? 'Most Recent' : params.sortBy === 'popular' ? 'Most Popular' : 'Most Recent';
-        queryParams.set('sortBy', serverSortBy);
-    } else {
-        // Default to 'Most Recent'
-        queryParams.set('sortBy', 'Most Recent');
-    }
+    queryParams.set('sortBy', params.sortBy ?? 'recent');
 
     // Search functionality deferred to future PR
     // if (params.search) {

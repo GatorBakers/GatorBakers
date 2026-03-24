@@ -14,17 +14,23 @@ const DiscoverPage = () => {
     };
 
     if (isMobile) {
-        return <MobileDiscoverPage products={listings.map(listing => ({
-            id: listing.id,
-            title: listing.title,
-            bakerName: `${listing.user.first_name} ${listing.user.last_name}`,
-            price: Number(listing.price),
-            imageUrl: listing.photo_url,
-            itemDescription: listing.description,
-            ingredients: listing.ingredients,
-            allergens: listing.allergens,
-            quantity: listing.quantity,
-        }))} />;
+        return (
+            <MobileDiscoverPage
+                sortBy={sortBy}
+                onSortChange={handleSort}
+                products={listings.map(listing => ({
+                    id: listing.id,
+                    title: listing.title,
+                    bakerName: `${listing.user.first_name} ${listing.user.last_name}`,
+                    price: Number(listing.price),
+                    imageUrl: listing.photo_url,
+                    itemDescription: listing.description,
+                    ingredients: listing.ingredients,
+                    allergens: listing.allergens,
+                    quantity: listing.quantity,
+                }))}
+            />
+        );
     }
 
     return (

@@ -10,7 +10,7 @@ const SearchPage = () => {
     const { listings, isLoading, error } = useListingsFeed();
 
     if (isMobile) {
-        return <MobileSearchPage />;
+        return <MobileSearchPage listings={listings} isLoading={isLoading} error={error} />;
     }
 
     return (
