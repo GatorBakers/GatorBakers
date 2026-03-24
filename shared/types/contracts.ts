@@ -36,7 +36,6 @@ export interface CreateListingRequest {
 }
 
 export interface CreateOrderRequest {
-  user_id: number;
   pickup_location: string;
   pickup_time: string;
 }
