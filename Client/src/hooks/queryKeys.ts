@@ -2,9 +2,8 @@ import type { ListingFeedParams } from '@shared/types';
 
 export const queryKeys = {
     profileRoot: ['profile'] as const,
-    profile: (scope: string | null) => ['profile', scope ?? 'anonymous'] as const,
     myListingsRoot: ['my-listings'] as const,
-    myListings: (scope: string | null) => ['my-listings', scope ?? 'anonymous'] as const,
+    myListings: (scope: string | number | null) => ['my-listings', scope ?? 'anonymous'] as const,
     listingsFeed: (params: ListingFeedParams = {}) => [
         'listings-feed',
         params.search ?? '',

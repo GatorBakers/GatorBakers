@@ -31,7 +31,7 @@ export function useProfile() {
     const { accessToken, isAuthLoading } = useAuth();
 
     const { data: profile, isLoading, error } = useQuery<UserProfile, Error>({
-        queryKey: queryKeys.profile(accessToken),
+        queryKey: queryKeys.profileRoot,
         queryFn: async () => {
             const data = await fetchProfile(accessToken!);
             return toUserProfile(data);

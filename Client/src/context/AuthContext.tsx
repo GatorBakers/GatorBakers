@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useCallback, useEffect, useRef, type ReactNode } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { logoutUser, refreshAccessToken } from '../services/authService';
+import { queryKeys } from '../hooks/queryKeys';
 
 interface AuthContextType {
     accessToken: string | null;
@@ -16,25 +17,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [isAuthLoading, setIsAuthLoading] = useState(true);
     const queryClient = useQueryClient();
     const refreshCalled = useRef(false);
+
+    const clearAuthScopedQueries = useCallback(() => {
+        queryClient.removeQueries({ queryKey: queryKeys.profileRoot });
+        queryClient.removeQueries({ queryKey: queryKeys.myListingsRoot });
+    }, [queryClient]);
+
+    const updateAccessToken = useCallback((token: string | null) => {
+        setAccessToken(prev => {
+            const hasAuthBoundaryChanged = (!!prev && !token) || (!prev && !!token);
+            if (hasAuthBoundaryChanged) {
+                clearAuthScopedQueries();
+            }
+            return token;
+        });
+    }, [clearAuthScopedQueries]);
     
     useEffect(() => {
         if (refreshCalled.current) return;
         refreshCalled.current = true;
 
         refreshAccessToken()
-            .then(({ access_token }) => setAccessToken(access_token))
+            .then(({ access_token }) => updateAccessToken(access_token))
             .catch(() => {})
             .finally(() => setIsAuthLoading(false));
-    }, []);
+    }, [updateAccessToken]);
 
     const logout = useCallback(async () => {
-        setAccessToken(null);
-        queryClient.removeQueries();
+        updateAccessToken(null);
         await logoutUser().catch(() => {});
-    }, [queryClient]);
+    }, [updateAccessToken]);
 
     return (
-        <AuthContext.Provider value={{ accessToken, isAuthLoading, setAccessToken, logout }}>
+        <AuthContext.Provider value={{ accessToken, isAuthLoading, setAccessToken: updateAccessToken, logout }}>
             {children}
         </AuthContext.Provider>
     );
