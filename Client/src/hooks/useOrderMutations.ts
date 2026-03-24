@@ -6,7 +6,6 @@ import { queryKeys } from './queryKeys';
 interface CreateOrderInput {
     listingId: number;
     payload: CreateOrderRequest;
-    buyerUserId?: number;
     sellerUserId?: number;
 }
 
@@ -24,9 +23,10 @@ export function useCreateOrder() {
         mutationFn: async ({ listingId, payload }: CreateOrderInput) => createOrder(listingId, payload),
         onSuccess: (_createdOrder, variables) => {
             queryClient.invalidateQueries({ queryKey: queryKeys.myListingsRoot });
+            queryClient.invalidateQueries({ queryKey: queryKeys.listingsFeedRoot });
 
-            if (variables.buyerUserId) {
-                queryClient.invalidateQueries({ queryKey: queryKeys.buyerOrders(variables.buyerUserId) });
+            if (variables.payload.user_id) {
+                queryClient.invalidateQueries({ queryKey: queryKeys.buyerOrders(variables.payload.user_id) });
             }
             if (variables.sellerUserId) {
                 queryClient.invalidateQueries({ queryKey: queryKeys.sellerOrders(variables.sellerUserId) });
@@ -43,6 +43,7 @@ export function useUpdateOrderStatus() {
             updateOrderStatus(orderId, { status }),
         onSuccess: (_updatedOrder, variables) => {
             queryClient.invalidateQueries({ queryKey: queryKeys.myListingsRoot });
+            queryClient.invalidateQueries({ queryKey: queryKeys.listingsFeedRoot });
 
             if (variables.buyerUserId) {
                 queryClient.invalidateQueries({ queryKey: queryKeys.buyerOrders(variables.buyerUserId) });
