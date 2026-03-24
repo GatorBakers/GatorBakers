@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import ProductCard from '../components/ProductCard';
 import MobileDiscoverPage from './mobile/MobileDiscoverPage';
 import { useIsMobile } from '../hooks/useIsMobile';
@@ -14,6 +15,12 @@ const placeholderProducts = [
 
 const DiscoverPage = () => {
     const isMobile = useIsMobile();
+    const [sortBy, setSortBy] = useState<'recent' | 'popular'>('recent');
+
+    const handleSort = (value: 'recent' | 'popular') => {
+        setSortBy(value);
+        console.log(`Sort changed to: ${value}`);
+    };
 
     if (isMobile) {
         return <MobileDiscoverPage products={placeholderProducts} />;
@@ -24,6 +31,11 @@ const DiscoverPage = () => {
             <div className="headline-container">
                 <h1>Fresh from local bakers</h1>
                 <p>Discover homemade breads, pastries, and treats from bakers in your neighborhood</p>
+            </div>
+
+            <div className="sort-toggle">
+                <button className={sortBy === 'recent' ? 'active' : ''} onClick={() => handleSort('recent')}>Recent</button>
+                <button className={sortBy === 'popular' ? 'active' : ''} onClick={() => handleSort('popular')}>Popular</button>
             </div>
 
             <div className="product-card-container">

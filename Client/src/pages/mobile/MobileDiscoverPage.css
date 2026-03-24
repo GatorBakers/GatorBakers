@@ -20,6 +20,30 @@
     margin: 0;
 }
 
+.m-sort-toggle {
+    display: flex;
+    justify-content: center;
+    margin: 16px auto 20px;
+    border: 1.5px solid var(--color-brand);
+    border-radius: 999px;
+    overflow: hidden;
+    width: fit-content;
+}
+
+.m-sort-toggle button {
+    padding: 7px 22px;
+    border: none;
+    background: transparent;
+    color: var(--color-brand);
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.m-sort-toggle button.active {
+    background: var(--color-brand);
+    color: white;
+}
+
 .m-discover-list {
     display: flex;
     flex-direction: column;

@@ -27,7 +27,7 @@ function App() {
           <Route path="/" element={<Navigate to="/login" replace/>} />
           <Route path="/discover" element={<DiscoverPage />} />
           <Route path="/search" element={<SearchPage />} />
-          <Route path="/orders&listings" element={<YourOrdersPage />} />
+          <Route path="/orders" element={<YourOrdersPage />} />
           <Route path="/messages" element={<></>} /> {/* TODO: Add Messages Page */}
           <Route path="/create-listing" element={<CreateListingPage />} />
           <Route path="/profile" element={<ProfilePage/>} />

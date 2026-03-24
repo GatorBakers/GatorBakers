@@ -22,6 +22,30 @@
   margin: 0;
 }
 
+.sort-toggle {
+  display: flex;
+  justify-content: center;
+  margin: 20px auto 0;
+  border: 1.5px solid var(--color-brand);
+  border-radius: 999px;
+  overflow: hidden;
+  width: fit-content;
+}
+
+.sort-toggle button {
+  padding: 8px 24px;
+  border: none;
+  background: transparent;
+  color: var(--color-brand);
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.sort-toggle button.active {
+  background: var(--color-brand);
+  color: white;
+}
+
 .product-card-container {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
