@@ -10,6 +10,7 @@ export const queryKeys = {
         params.search ?? '',
         params.category ?? '',
         params.status ?? '',
+        params.sortBy ?? 'recent',
     ] as const,
     buyerOrders: (userId: number) => ['orders', 'buyer', userId] as const,
     sellerOrders: (userId: number) => ['orders', 'seller', userId] as const,
