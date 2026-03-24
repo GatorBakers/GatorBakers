@@ -7,9 +7,10 @@ interface MobileSearchPageProps {
     listings: ListingSummary[];
     isLoading: boolean;
     error: string | null;
+    buyerUserId?: number;
 }
 
-const MobileSearchPage = ({ listings, isLoading, error }: MobileSearchPageProps) => {
+const MobileSearchPage = ({ listings, isLoading, error, buyerUserId }: MobileSearchPageProps) => {
     return (
         <div className="m-search-page">
             <SearchBar />
@@ -27,6 +28,9 @@ const MobileSearchPage = ({ listings, isLoading, error }: MobileSearchPageProps)
                                 {listings.map((listing) => (
                                     <MobileProductCard
                                         key={listing.id}
+                                        listingId={listing.id}
+                                        sellerUserId={listing.user_id}
+                                        buyerUserId={buyerUserId}
                                         title={listing.title}
                                         bakerName={`${listing.user.first_name} ${listing.user.last_name}`}
                                         price={Number(listing.price)}

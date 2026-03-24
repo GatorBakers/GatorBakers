@@ -11,6 +11,9 @@ const VARIANT_LABEL: Record<MobileProductCardVariant, string> = {
 };
 
 interface MobileProductCardProps {
+    listingId?: number;
+    sellerUserId?: number;
+    buyerUserId?: number;
     title: string;
     bakerName: string;
     price: number;
@@ -22,7 +25,7 @@ interface MobileProductCardProps {
     quantity?: number;
 }
 
-const MobileProductCard = ({ title, bakerName, price, imageUrl, variant, itemDescription, ingredients, allergens, quantity }: MobileProductCardProps) => {
+const MobileProductCard = ({ listingId, sellerUserId, buyerUserId, title, bakerName, price, imageUrl, variant, itemDescription, ingredients, allergens, quantity }: MobileProductCardProps) => {
     const [openModal, setOpenModal] = useState<boolean>(false);
     const [openOrderSummary, setOpenOrderSummary] = useState<boolean>(false);
 
@@ -85,6 +88,9 @@ const MobileProductCard = ({ title, bakerName, price, imageUrl, variant, itemDes
                 isOpen={openOrderSummary}
                 onClose={() => setOpenOrderSummary(false)}
                 onBack={() => { setOpenOrderSummary(false); setOpenModal(true); }}
+            listingId={listingId}
+            sellerUserId={sellerUserId}
+            buyerUserId={buyerUserId}
                 title={title}
                 bakerName={bakerName}
                 price={price}

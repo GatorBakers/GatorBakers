@@ -11,6 +11,9 @@ const VARIANT_LABEL: Record<ProductCardVariant, string> = {
 };
 
 interface ProductCardProps {
+    listingId?: number;
+    sellerUserId?: number;
+    buyerUserId?: number;
     title: string;
     bakerName: string;
     price: number;
@@ -23,7 +26,7 @@ interface ProductCardProps {
     // onAction?: () => void;
 }
 
-const ProductCard = ({ title, bakerName, price, imageUrl, variant, itemDescription, ingredients, allergens, quantity }: ProductCardProps) => {
+const ProductCard = ({ listingId, sellerUserId, buyerUserId, title, bakerName, price, imageUrl, variant, itemDescription, ingredients, allergens, quantity }: ProductCardProps) => {
     const [openModal, setOpenModal] = useState<boolean>(false);
     const [openOrderSummary, setOpenOrderSummary] = useState<boolean>(false);
 
@@ -85,6 +88,9 @@ const ProductCard = ({ title, bakerName, price, imageUrl, variant, itemDescripti
             isOpen={openOrderSummary}
             onClose={() => { setOpenOrderSummary(false); setOpenModal(false); }}
             onBack={() => setOpenOrderSummary(false)}
+            listingId={listingId}
+            sellerUserId={sellerUserId}
+            buyerUserId={buyerUserId}
             title={title}
             bakerName={bakerName}
             price={price}
