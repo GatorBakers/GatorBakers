@@ -11,22 +11,32 @@ const VARIANT_LABEL: Record<ProductCardVariant, string> = {
 };
 
 interface ProductCardProps {
-    listingId?: number;
-    sellerUserId?: number;
-    buyerUserId?: number;
     title: string;
     bakerName: string;
     price: number;
     imageUrl?: string;
-    variant: ProductCardVariant;
     itemDescription: string;
     ingredients: string[];
     allergens: string[];
     quantity?: number;
-    // onAction?: () => void;
 }
 
-const ProductCard = ({ listingId, sellerUserId, buyerUserId, title, bakerName, price, imageUrl, variant, itemDescription, ingredients, allergens, quantity }: ProductCardProps) => {
+type ProductCardToOrderProps = ProductCardProps & {
+    variant: 'to_order';
+    listingId: number;
+    sellerUserId: number;
+    buyerUserId: number | null;
+    buyerIdentityLoading: boolean;
+};
+
+type ProductCardListingProps = ProductCardProps & {
+    variant: 'listing';
+};
+
+type ProductCardAllProps = ProductCardToOrderProps | ProductCardListingProps;
+
+const ProductCard = (props: ProductCardAllProps) => {
+    const { title, bakerName, price, imageUrl, variant, itemDescription, ingredients, allergens, quantity } = props;
     const [openModal, setOpenModal] = useState<boolean>(false);
     const [openOrderSummary, setOpenOrderSummary] = useState<boolean>(false);
 
@@ -84,18 +94,21 @@ const ProductCard = ({ listingId, sellerUserId, buyerUserId, title, bakerName, p
                 </div>
             )}
 
-        <OrderSummaryModal
-            isOpen={openOrderSummary}
-            onClose={() => { setOpenOrderSummary(false); setOpenModal(false); }}
-            onBack={() => setOpenOrderSummary(false)}
-            listingId={listingId}
-            sellerUserId={sellerUserId}
-            buyerUserId={buyerUserId}
-            title={title}
-            bakerName={bakerName}
-            price={price}
-            imageUrl={imageUrl}
-        />
+        {variant === 'to_order' && (
+            <OrderSummaryModal
+                isOpen={openOrderSummary}
+                onClose={() => { setOpenOrderSummary(false); setOpenModal(false); }}
+                onBack={() => setOpenOrderSummary(false)}
+                listingId={props.listingId}
+                sellerUserId={props.sellerUserId}
+                buyerUserId={props.buyerUserId}
+                buyerIdentityLoading={props.buyerIdentityLoading}
+                title={title}
+                bakerName={bakerName}
+                price={price}
+                imageUrl={imageUrl}
+            />
+        )}
 
         </div>
     );

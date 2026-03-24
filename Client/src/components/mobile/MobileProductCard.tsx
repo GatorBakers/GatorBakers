@@ -11,21 +11,32 @@ const VARIANT_LABEL: Record<MobileProductCardVariant, string> = {
 };
 
 interface MobileProductCardProps {
-    listingId?: number;
-    sellerUserId?: number;
-    buyerUserId?: number;
     title: string;
     bakerName: string;
     price: number;
     imageUrl?: string;
-    variant: MobileProductCardVariant;
     itemDescription: string;
     ingredients: string[];
     allergens: string[];
     quantity?: number;
 }
 
-const MobileProductCard = ({ listingId, sellerUserId, buyerUserId, title, bakerName, price, imageUrl, variant, itemDescription, ingredients, allergens, quantity }: MobileProductCardProps) => {
+type MobileProductCardToOrderProps = MobileProductCardProps & {
+    variant: 'to_order';
+    listingId: number;
+    sellerUserId: number;
+    buyerUserId: number | null;
+    buyerIdentityLoading: boolean;
+};
+
+type MobileProductCardListingProps = MobileProductCardProps & {
+    variant: 'listing';
+};
+
+type MobileProductCardAllProps = MobileProductCardToOrderProps | MobileProductCardListingProps;
+
+const MobileProductCard = (props: MobileProductCardAllProps) => {
+    const { title, bakerName, price, imageUrl, variant, itemDescription, ingredients, allergens, quantity } = props;
     const [openModal, setOpenModal] = useState<boolean>(false);
     const [openOrderSummary, setOpenOrderSummary] = useState<boolean>(false);
 
@@ -84,18 +95,19 @@ const MobileProductCard = ({ listingId, sellerUserId, buyerUserId, title, bakerN
                     </div>
                 </div>
             )}
-        <MobileOrderSummaryModal
+        {variant === 'to_order' && (<MobileOrderSummaryModal
                 isOpen={openOrderSummary}
                 onClose={() => setOpenOrderSummary(false)}
                 onBack={() => { setOpenOrderSummary(false); setOpenModal(true); }}
-            listingId={listingId}
-            sellerUserId={sellerUserId}
-            buyerUserId={buyerUserId}
+            listingId={props.listingId}
+            sellerUserId={props.sellerUserId}
+            buyerUserId={props.buyerUserId}
+            buyerIdentityLoading={props.buyerIdentityLoading}
                 title={title}
                 bakerName={bakerName}
                 price={price}
                 imageUrl={imageUrl}
-            />
+            />)}
         </div>
     );
 };

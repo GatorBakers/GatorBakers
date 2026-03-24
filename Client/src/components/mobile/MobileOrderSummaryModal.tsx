@@ -10,9 +10,10 @@ interface MobileOrderSummaryModalProps {
     isOpen: boolean;
     onClose: () => void;
     onBack: () => void;
-    listingId?: number;
-    sellerUserId?: number;
-    buyerUserId?: number;
+    listingId: number;
+    sellerUserId: number;
+    buyerUserId: number | null;
+    buyerIdentityLoading: boolean;
     title: string;
     bakerName: string;
     price: number;
@@ -26,6 +27,7 @@ const MobileOrderSummaryModal = ({
     listingId,
     sellerUserId,
     buyerUserId,
+    buyerIdentityLoading,
     title,
     bakerName,
     price,
@@ -51,8 +53,8 @@ const MobileOrderSummaryModal = ({
     const total = price + PLATFORM_FEE;
 
     const handleConfirmOrder = async () => {
-        if (!listingId) {
-            setSubmitError('Unable to place order: missing listing id.');
+        if (buyerIdentityLoading) {
+            setSubmitError('Still loading your account. Please try again in a moment.');
             return;
         }
 
@@ -73,7 +75,12 @@ const MobileOrderSummaryModal = ({
                 listingId,
                 payload: {
                     user_id: buyerUserId,
-                    pickup_location: `${selectedPickupLocation.name} @ ${selectedPickupTime}`,
+                    pickup_location: `${selectedPickupLocation.name} (${selectedPickupLocation.address}) @ ${(() => {
+                        const [h, m] = selectedPickupTime.split(':').map(Number);
+                        const period = h >= 12 ? 'PM' : 'AM';
+                        const hour = h % 12 || 12;
+                        return `${hour}:${String(m).padStart(2, '0')} ${period}`;
+                    })()}`,
                 },
                 sellerUserId,
             });
@@ -216,7 +223,7 @@ const MobileOrderSummaryModal = ({
                     <button
                         className="m-order-summary-btn-confirm"
                         onClick={handleConfirmOrder}
-                        disabled={!selectedPickupLocation || !selectedPickupDate || !selectedPickupTime || createOrderMutation.isPending}
+                        disabled={buyerIdentityLoading || !selectedPickupLocation || !selectedPickupDate || !selectedPickupTime || createOrderMutation.isPending}
                     >
                         {createOrderMutation.isPending ? 'Placing Order...' : `Confirm Order — $${total.toFixed(2)}`}
                     </button>

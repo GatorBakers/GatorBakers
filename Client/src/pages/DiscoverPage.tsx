@@ -9,7 +9,7 @@ const DiscoverPage = () => {
     const isMobile = useIsMobile();
     const [sortBy, setSortBy] = useState<'recent' | 'popular'>('recent');
     const { listings, isLoading, error } = useListingsFeed({ params: { sortBy } });
-    const { profile } = useProfile();
+    const { profile, isLoading: profileLoading } = useProfile();
 
     const handleSort = (value: 'recent' | 'popular') => {
         setSortBy(value);
@@ -24,7 +24,8 @@ const DiscoverPage = () => {
                     id: listing.id,
                     listingId: listing.id,
                     sellerUserId: listing.user_id,
-                    buyerUserId: profile?.id,
+                    buyerUserId: profile?.id ?? null,
+                    buyerIdentityLoading: profileLoading,
                     title: listing.title,
                     bakerName: `${listing.user.first_name} ${listing.user.last_name}`,
                     price: Number(listing.price),
@@ -61,7 +62,8 @@ const DiscoverPage = () => {
                             key={listing.id}
                             listingId={listing.id}
                             sellerUserId={listing.user_id}
-                            buyerUserId={profile?.id}
+                            buyerUserId={profile?.id ?? null}
+                            buyerIdentityLoading={profileLoading}
                             title={listing.title}
                             bakerName={`${listing.user.first_name} ${listing.user.last_name}`}
                             price={Number(listing.price)}
