@@ -218,7 +218,13 @@ const MobileOrderSummaryModal = ({
                     <button
                         className="m-order-summary-btn-confirm"
                         onClick={handleConfirmOrder}
-                        disabled={buyerIdentityLoading || !selectedPickupLocation || !selectedPickupDate || !selectedPickupTime || createOrderMutation.isPending}
+                        disabled={
+                            buyerIdentityLoading ||
+                            !selectedPickupLocation ||
+                            !selectedPickupDate ||
+                            !selectedPickupTime ||
+                            createOrderMutation.isPending
+                        }
                     >
                         {createOrderMutation.isPending ? 'Placing Order...' : `Confirm Order — $${total.toFixed(2)}`}
                     </button>
