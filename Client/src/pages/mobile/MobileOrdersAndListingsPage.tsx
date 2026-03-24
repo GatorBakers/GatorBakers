@@ -1,5 +1,6 @@
 import MobileOrderCard from '../../components/mobile/MobileOrderCard';
 import type { OrderStatus } from '../../components/StatusBadge';
+import type { PickupLocation } from '@shared/utils/pickupLocations';
 import EmptyState from '../../components/EmptyState';
 import './MobileOrdersAndListingsPage.css';
 
@@ -8,8 +9,9 @@ interface Order {
     itemName: string;
     bakerName: string;
     status: OrderStatus;
+    pickupDate: string;
     pickupTime: string;
-    pickupAddress: string;
+    pickupLocation: PickupLocation;
 }
 
 interface MobileYourOrdersPageProps {
@@ -44,8 +46,9 @@ const MobileYourOrdersPage = ({ pendingOrders, orders }: MobileYourOrdersPagePro
                                 itemName={order.itemName}
                                 bakerName={order.bakerName}
                                 status={order.status}
+                                pickupDate={order.pickupDate}
                                 pickupTime={order.pickupTime}
-                                pickupAddress={order.pickupAddress}
+                                pickupLocation={order.pickupLocation}
                                 onConfirm={() => {}}
                                 onDeny={() => {}}
                             />
@@ -69,8 +72,9 @@ const MobileYourOrdersPage = ({ pendingOrders, orders }: MobileYourOrdersPagePro
                                 itemName={order.itemName}
                                 bakerName={order.bakerName}
                                 status={order.status}
+                                pickupDate={order.pickupDate}
                                 pickupTime={order.pickupTime}
-                                pickupAddress={order.pickupAddress}
+                                pickupLocation={order.pickupLocation}
                             />
                         ))
                     )}

@@ -1,6 +1,7 @@
 import StatusBadge from '../StatusBadge';
 import type { OrderStatus } from '../StatusBadge';
 import CardImage from '../CardImage';
+import type { PickupLocation } from '@shared/utils/pickupLocations';
 import './MobileOrderCard.css';
 
 export type { OrderStatus };
@@ -9,8 +10,9 @@ interface MobileOrderCardProps {
     itemName: string;
     bakerName: string;
     status: OrderStatus;
+    pickupDate: string;
     pickupTime: string;
-    pickupAddress: string;
+    pickupLocation: PickupLocation;
     imageUrl?: string;
     onViewDetails?: () => void;
     // TODO: Wire up onConfirm and onDeny to PATCH with status CONFIRMED or CANCELLED.
@@ -22,8 +24,9 @@ const MobileOrderCard = ({
     itemName,
     bakerName,
     status,
+    pickupDate,
     pickupTime,
-    pickupAddress,
+    pickupLocation,
     imageUrl,
     onViewDetails,
     onConfirm,
@@ -49,8 +52,9 @@ const MobileOrderCard = ({
 
                 <div className="m-order-card-bottom-row">
                     <div className="m-order-card-pickup">
-                        <p className="m-order-card-pickup-time">{pickupTime}</p>
-                        <p className="m-order-card-pickup-address">{pickupAddress}</p>
+                        <p className="m-order-card-pickup-time">{pickupDate} · {pickupTime}</p>
+                        <p className="m-order-card-pickup-address">{pickupLocation.name}</p>
+                        <p className="m-order-card-pickup-address">{pickupLocation.address}</p>
                     </div>
                     {onConfirm && onDeny ? (
                         <div className="m-order-card-actions">

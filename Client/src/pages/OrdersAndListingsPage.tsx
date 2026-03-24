@@ -1,5 +1,6 @@
 import OrderCard from '../components/OrderCard';
 import type { OrderStatus } from '../components/StatusBadge';
+import type { PickupLocation } from '@shared/utils/pickupLocations';
 import EmptyState from '../components/EmptyState';
 import MobileYourOrdersPage from './mobile/MobileOrdersAndListingsPage';
 import { useIsMobile } from '../hooks/useIsMobile';
@@ -14,8 +15,9 @@ interface Order {
     itemName: string;
     bakerName: string;
     status: OrderStatus;
+    pickupDate: string;
     pickupTime: string;
-    pickupAddress: string;
+    pickupLocation: PickupLocation;
 }
 
 // TODO: Replace with real order data from the API once order fetching is implemented.
@@ -51,8 +53,9 @@ const YourOrdersPage = () => {
                                 itemName={order.itemName}
                                 bakerName={order.bakerName}
                                 status={order.status}
+                                pickupDate={order.pickupDate}
                                 pickupTime={order.pickupTime}
-                                pickupAddress={order.pickupAddress}
+                                pickupLocation={order.pickupLocation}
                                 onConfirm={() => {}}
                                 onDeny={() => {}}
                             />
@@ -76,8 +79,9 @@ const YourOrdersPage = () => {
                                 itemName={order.itemName}
                                 bakerName={order.bakerName}
                                 status={order.status}
+                                pickupDate={order.pickupDate}
                                 pickupTime={order.pickupTime}
-                                pickupAddress={order.pickupAddress}
+                                pickupLocation={order.pickupLocation}
                             />
                         ))
                     )}
