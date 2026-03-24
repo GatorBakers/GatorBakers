@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import MobileProductCard from '../../components/mobile/MobileProductCard';
 import './MobileDiscoverPage.css';
 
@@ -15,17 +14,12 @@ interface Product {
 }
 
 interface MobileDiscoverPageProps {
+    sortBy: 'recent' | 'popular';
+    onSortChange: (value: 'recent' | 'popular') => void;
     products: Product[];
 }
 
-const MobileDiscoverPage = ({ products }: MobileDiscoverPageProps) => {
-    const [sortBy, setSortBy] = useState<'recent' | 'popular'>('recent');
-
-    const handleSort = (value: 'recent' | 'popular') => {
-        setSortBy(value);
-        console.log(`Sort changed to: ${value}`);
-    };
-
+const MobileDiscoverPage = ({ sortBy, onSortChange, products }: MobileDiscoverPageProps) => {
     return (
         <div className="m-discover-page">
             <div className="m-discover-headline">
@@ -34,8 +28,8 @@ const MobileDiscoverPage = ({ products }: MobileDiscoverPageProps) => {
             </div>
 
             <div className="m-sort-toggle">
-                <button className={sortBy === 'recent' ? 'active' : ''} onClick={() => handleSort('recent')}>Recent</button>
-                <button className={sortBy === 'popular' ? 'active' : ''} onClick={() => handleSort('popular')}>Popular</button>
+                <button className={sortBy === 'recent' ? 'active' : ''} onClick={() => onSortChange('recent')}>Recent</button>
+                <button className={sortBy === 'popular' ? 'active' : ''} onClick={() => onSortChange('popular')}>Popular</button>
             </div>
 
             <div className="m-discover-list">
