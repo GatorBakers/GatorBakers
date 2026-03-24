@@ -14,6 +14,7 @@ export type ListingData = ListingSummary;
 
 export type CreateListingPayload = CreateListingRequest;
 
+// Create a new listing for the logged-in user
 export async function createListing(
     accessToken: string,
     payload: CreateListingPayload,
@@ -35,6 +36,7 @@ export async function createListing(
     return response.json() as Promise<ListingData>;
 }
 
+// Fetch the public listings feed with optional filters
 export async function fetchListings(params: ListingFeedParams = {}): Promise<ListingData[]> {
     const queryParams = new URLSearchParams();
 
@@ -60,6 +62,7 @@ export async function fetchListings(params: ListingFeedParams = {}): Promise<Lis
     return response.json() as Promise<ListingData[]>;
 }
 
+// Fetch listings created by the logged-in user
 export async function fetchMyListings(accessToken: string): Promise<ListingData[]> {
     const response = await fetch(`${API_URL}/my-listings`, {
         headers: { Authorization: `Bearer ${accessToken}` },
@@ -73,6 +76,7 @@ export async function fetchMyListings(accessToken: string): Promise<ListingData[
     return response.json() as Promise<ListingData[]>;
 }
 
+// Fetch one listing by id
 export async function fetchListing(id: number): Promise<ListingData> {
     const response = await fetch(`${API_URL}/listing/${id}`);
 
@@ -83,6 +87,7 @@ export async function fetchListing(id: number): Promise<ListingData> {
     return response.json() as Promise<ListingData>;
 }
 
+// Create a new order for a listing
 export async function createOrder(
     listingId: number,
     payload: CreateOrderRequest,
@@ -103,6 +108,7 @@ export async function createOrder(
     return response.json() as Promise<OrderRecord>;
 }
 
+// Fetch all orders for a buyer
 export async function fetchBuyerOrders(userId: number): Promise<BuyerOrder[]> {
     const response = await fetch(`${API_URL}/orders/user/${userId}`, {
         credentials: 'include',
@@ -115,6 +121,7 @@ export async function fetchBuyerOrders(userId: number): Promise<BuyerOrder[]> {
     return response.json() as Promise<BuyerOrder[]>;
 }
 
+// Fetch all orders for a seller
 export async function fetchSellerOrders(userId: number): Promise<SellerOrdersResponse> {
     const response = await fetch(`${API_URL}/orders/seller/${userId}`, {
         credentials: 'include',
@@ -127,6 +134,7 @@ export async function fetchSellerOrders(userId: number): Promise<SellerOrdersRes
     return response.json() as Promise<SellerOrdersResponse>;
 }
 
+// Update an order status by id
 export async function updateOrderStatus(
     orderId: number,
     payload: UpdateOrderStatusRequest,
