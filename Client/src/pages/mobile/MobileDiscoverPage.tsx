@@ -3,6 +3,9 @@ import './MobileDiscoverPage.css';
 
 interface Product {
     id: number;
+    listingId: number;
+    sellerUserId: number;
+    buyerUserId?: number;
     title: string;
     bakerName: string;
     price: number;
@@ -36,6 +39,9 @@ const MobileDiscoverPage = ({ sortBy, onSortChange, products }: MobileDiscoverPa
                 {products.map((product) => (
                     <MobileProductCard
                         key={product.id}
+                        listingId={product.listingId}
+                        sellerUserId={product.sellerUserId}
+                        buyerUserId={product.buyerUserId}
                         title={product.title}
                         bakerName={product.bakerName}
                         price={product.price}
