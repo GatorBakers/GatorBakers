@@ -3,11 +3,13 @@ import ProductCard from '../components/ProductCard';
 import MobileDiscoverPage from './mobile/MobileDiscoverPage';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { useListingsFeed } from '../hooks/useListingsFeed';
+import { useProfile } from '../hooks/useProfile';
 
 const DiscoverPage = () => {
     const isMobile = useIsMobile();
     const [sortBy, setSortBy] = useState<'recent' | 'popular'>('recent');
     const { listings, isLoading, error } = useListingsFeed({ params: { sortBy } });
+    const { profile, isLoading: profileLoading } = useProfile();
 
     const handleSort = (value: 'recent' | 'popular') => {
         setSortBy(value);
@@ -20,6 +22,10 @@ const DiscoverPage = () => {
                 onSortChange={handleSort}
                 products={listings.map(listing => ({
                     id: listing.id,
+                    listingId: listing.id,
+                    sellerUserId: listing.user_id,
+                    buyerUserId: profile?.id ?? null,
+                    buyerIdentityLoading: profileLoading,
                     title: listing.title,
                     bakerName: `${listing.user.first_name} ${listing.user.last_name}`,
                     price: Number(listing.price),
@@ -54,6 +60,10 @@ const DiscoverPage = () => {
                     {listings.map((listing) => (
                         <ProductCard
                             key={listing.id}
+                            listingId={listing.id}
+                            sellerUserId={listing.user_id}
+                            buyerUserId={profile?.id ?? null}
+                            buyerIdentityLoading={profileLoading}
                             title={listing.title}
                             bakerName={`${listing.user.first_name} ${listing.user.last_name}`}
                             price={Number(listing.price)}
