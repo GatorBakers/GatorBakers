@@ -10,22 +10,30 @@ interface Order {
     status: OrderStatus;
     pickupTime: string;
     pickupAddress: string;
+    imageUrl?: string;
 }
 
 interface MobileYourOrdersPageProps {
-    // TODO: Once API calls are added in YourOrderPage.tsx, these props will carry real data.
-    //       Consider passing loading/error states here as well so the mobile view can show
-    //       skeleton loaders or error messages.
+    isLoading: boolean;
+    error: string | null;
     pendingOrders: Order[];
     orders: Order[];
 }
 
-const MobileYourOrdersPage = ({ pendingOrders, orders }: MobileYourOrdersPageProps) => {
+const MobileYourOrdersPage = ({ isLoading, error, pendingOrders, orders }: MobileYourOrdersPageProps) => {
     // TODO: Auth context is resolved in the parent (YourOrderPage.tsx) — no userId needed here directly,
     //       but ensure the parent is not rendering this component before auth is confirmed.
 
     // TODO: Wire up onViewDetails on each MobileOrderCard to navigate to the order detail page.
     //       e.g. navigate(`/orders/${order.id}`) — GET /api/orders/{orderId}.
+
+    if (isLoading) {
+        return <div className="m-your-orders-page"><p>Loading orders…</p></div>;
+    }
+
+    if (error) {
+        return <div className="m-your-orders-page"><p>{error}</p></div>;
+    }
 
     return (
         <div className="m-your-orders-page">
@@ -46,6 +54,7 @@ const MobileYourOrdersPage = ({ pendingOrders, orders }: MobileYourOrdersPagePro
                                 status={order.status}
                                 pickupTime={order.pickupTime}
                                 pickupAddress={order.pickupAddress}
+                                imageUrl={order.imageUrl}
                                 onConfirm={() => {}}
                                 onDeny={() => {}}
                             />
@@ -71,6 +80,7 @@ const MobileYourOrdersPage = ({ pendingOrders, orders }: MobileYourOrdersPagePro
                                 status={order.status}
                                 pickupTime={order.pickupTime}
                                 pickupAddress={order.pickupAddress}
+                                imageUrl={order.imageUrl}
                             />
                         ))
                     )}

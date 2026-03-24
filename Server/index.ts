@@ -562,9 +562,16 @@ app.post("/listing/:id/order", async (req: Request, res: Response) => {
   const listing_id = Number(req.params.id);
   const user_id = Number(req.body.user_id);
   const pickup_location = req.body.pickup_location;
+  const pickup_time = req.body.pickup_time;
 
   if (!listing_id || isNaN(listing_id)) {
     return res.status(400).json({ message: "Invalid listing id" });
+  }
+  if (!pickup_location || typeof pickup_location !== "string") {
+    return res.status(400).json({ message: "Pickup location is required" });
+  }
+  if (!pickup_time || typeof pickup_time !== "string") {
+    return res.status(400).json({ message: "Pickup time is required" });
   }
 
   try {
@@ -608,6 +615,7 @@ app.post("/listing/:id/order", async (req: Request, res: Response) => {
         listing_id,
         status: "PENDING",
         pickup_location,
+        pickup_time,
       },
     });
 
@@ -671,6 +679,7 @@ app.get("/orders/user/:id", async (req: Request, res: Response) => {
         id: true,
         created_at: true,
         pickup_location: true,
+        pickup_time: true,
         status: true,
         listing: {
           select: {
@@ -683,6 +692,12 @@ app.get("/orders/user/:id", async (req: Request, res: Response) => {
             photo_url: true,
             ingredients: true,
             allergens: true,
+            user: {
+              select: {
+                first_name: true,
+                last_name: true,
+              },
+            },
           },
         },
       },
@@ -708,6 +723,7 @@ app.get("/orders/seller/:id", async (req: Request, res: Response) => {
         id: true,
         created_at: true,
         pickup_location: true,
+        pickup_time: true,
         status: true,
         listing: {
           select: {
