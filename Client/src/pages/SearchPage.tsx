@@ -10,9 +10,12 @@ const SearchPage = () => {
     const isMobile = useIsMobile();
     const { listings, isLoading, error } = useListingsFeed();
     const { profile, isLoading: profileLoading } = useProfile();
+    const visibleListings = profile?.id
+        ? listings.filter((listing) => listing.user_id !== profile.id)
+        : listings;
 
     if (isMobile) {
-        return <MobileSearchPage listings={listings} isLoading={isLoading} error={error} buyerUserId={profile?.id ?? null} buyerIdentityLoading={profileLoading} />;
+        return <MobileSearchPage listings={visibleListings} isLoading={isLoading} error={error} buyerUserId={profile?.id ?? null} buyerIdentityLoading={profileLoading} />;
     }
 
     return (
@@ -24,12 +27,12 @@ const SearchPage = () => {
                 {error && <p style={{ color: 'red' }}>Error: {error}</p>}
                 {!isLoading && (
                     <>
-                        <p className="search-results-count">{listings.length} results</p>
-                        {listings.length === 0 ? (
+                        <p className="search-results-count">{visibleListings.length} results</p>
+                        {visibleListings.length === 0 ? (
                             <p>No listings found. Try adjusting your search.</p>
                         ) : (
                             <div className="search-results-grid">
-                                {listings.map((listing) => (
+                                {visibleListings.map((listing) => (
                                     <ProductCard
                                         key={listing.id}
                                         listingId={listing.id}

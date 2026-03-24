@@ -92,6 +92,7 @@ export async function fetchListing(id: number): Promise<ListingData> {
 
 // Create a new order for a listing
 export async function createOrder(
+    accessToken: string,
     listingId: number,
     payload: CreateOrderRequest,
 ): Promise<OrderRecord> {
@@ -99,6 +100,7 @@ export async function createOrder(
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
         },
         credentials: 'include',
         body: JSON.stringify(payload),
@@ -139,6 +141,7 @@ export async function fetchSellerOrders(userId: number): Promise<SellerOrdersRes
 
 // Update an order status by id
 export async function updateOrderStatus(
+    accessToken: string,
     orderId: number,
     payload: UpdateOrderStatusRequest,
 ): Promise<OrderRecord> {
@@ -146,6 +149,7 @@ export async function updateOrderStatus(
         method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
         },
         credentials: 'include',
         body: JSON.stringify(payload),

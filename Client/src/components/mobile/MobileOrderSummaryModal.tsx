@@ -74,7 +74,6 @@ const MobileOrderSummaryModal = ({
             await createOrderMutation.mutateAsync({
                 listingId,
                 payload: {
-                    user_id: buyerUserId,
                     pickup_location: `${selectedPickupLocation.name} (${selectedPickupLocation.address})`,
                     pickup_time: selectedPickupTime,
                 },
