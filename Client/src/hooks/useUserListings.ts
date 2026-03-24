@@ -33,7 +33,7 @@ export function useUserListings() {
     const { accessToken, isAuthLoading } = useAuth();
 
     const { data: listings, isLoading, error } = useQuery<Listing[], Error>({
-        queryKey: queryKeys.myListings,
+        queryKey: queryKeys.myListings(accessToken ? 'me' : null),
         queryFn: async () => {
             const data = await fetchMyListings(accessToken!);
             return data.map(toListing);

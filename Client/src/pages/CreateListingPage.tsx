@@ -95,8 +95,8 @@ const CreateListingPage = () => {
                 allergens: listing.allergens,
                 photo_url,
             });
-            queryClient.invalidateQueries({ queryKey: queryKeys.myListings });
-            queryClient.invalidateQueries({ queryKey: queryKeys.profile });
+            queryClient.invalidateQueries({ queryKey: queryKeys.myListingsRoot });
+            queryClient.invalidateQueries({ queryKey: queryKeys.profileRoot });
             setListing(INITIAL_LISTING);
             setResetKey(k => k + 1);
             navigate('/orders&listings');
