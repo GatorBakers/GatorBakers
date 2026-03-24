@@ -5,6 +5,10 @@ import MobileYourOrdersPage from './mobile/MobileOrdersAndListingsPage';
 import { useIsMobile } from '../hooks/useIsMobile';
 import './OrdersAndListingsPage.css';
 
+// TODO: Create a PATCH endpoint to update the state of an order.
+// * onConfirm - set order status to COMPLETED
+// * onDeny - set order status to CANCELLED
+
 interface Order {
     id: number;
     itemName: string;
