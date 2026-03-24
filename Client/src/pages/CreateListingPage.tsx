@@ -98,7 +98,7 @@ const CreateListingPage = () => {
             queryClient.invalidateQueries({ queryKey: ['profile'] });
             setListing(INITIAL_LISTING);
             setResetKey(k => k + 1);
-            navigate('/orders&listings');
+            navigate('/orders');
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Failed to create listing.');
         } finally {
