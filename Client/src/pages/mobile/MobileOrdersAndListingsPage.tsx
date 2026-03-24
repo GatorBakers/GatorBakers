@@ -1,7 +1,5 @@
 import MobileOrderCard from '../../components/mobile/MobileOrderCard';
 import type { OrderStatus } from '../../components/StatusBadge';
-import MobileUserListings from '../../components/mobile/MobileUserListings';
-import type { Listing } from '../../components/UserListings';
 import EmptyState from '../../components/EmptyState';
 import './MobileOrdersAndListingsPage.css';
 
@@ -20,23 +18,19 @@ interface MobileYourOrdersPageProps {
     //       skeleton loaders or error messages.
     pendingOrders: Order[];
     orders: Order[];
-    listings: Listing[];
 }
 
-const MobileYourOrdersPage = ({ pendingOrders, orders, listings }: MobileYourOrdersPageProps) => {
+const MobileYourOrdersPage = ({ pendingOrders, orders }: MobileYourOrdersPageProps) => {
     // TODO: Auth context is resolved in the parent (YourOrderPage.tsx) — no userId needed here directly,
     //       but ensure the parent is not rendering this component before auth is confirmed.
 
     // TODO: Wire up onViewDetails on each MobileOrderCard to navigate to the order detail page.
     //       e.g. navigate(`/orders/${order.id}`) — GET /api/orders/{orderId}.
 
-    // TODO: Wire up onAction on each listing ProductCard to navigate to the listing edit page.
-    //       e.g. navigate(`/listings/${listing.id}/edit`) — GET/PATCH /api/listings/{listingId}.
-
     return (
         <div className="m-your-orders-page">
             <section className="m-your-orders-section">
-                <h2 className="m-your-orders-heading">Pending Orders From Others</h2>
+                <h2 className="m-your-orders-heading">Incoming Orders</h2>
                 <div className="m-your-orders-list">
                     {pendingOrders.length === 0 ? (
                         <EmptyState
@@ -82,8 +76,6 @@ const MobileYourOrdersPage = ({ pendingOrders, orders, listings }: MobileYourOrd
                     )}
                 </div>
             </section>
-
-            <MobileUserListings listings={listings} />
         </div>
     );
 };
