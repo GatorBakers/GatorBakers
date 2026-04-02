@@ -5,8 +5,8 @@ node_modules
 /generated/prisma
 
 # Meilisearch
-Server/data.ms/
-meilisearch/
+.data.ms
+.meilisearch
 
 # Dependencies
 node_modules/
