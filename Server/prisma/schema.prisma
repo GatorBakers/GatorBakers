@@ -98,6 +98,7 @@ model User {
   token Token[]
   listings Listing[]
   orders Order[]
+  reviews Review[]
 }
 
 model Token {
@@ -125,6 +126,8 @@ model Listing {
   created_at DateTime @default(now())
   location Location?
   orders Order[]
+  reviews Review[]
+
   @@index([user_id])
   
 }
@@ -160,3 +163,19 @@ model Order {
   @@index([user_id])
   @@index([listing_id])
 } 
+
+model Review {
+  id  Int @id @default(autoincrement())
+  created_at DateTime @default(now())
+  user_id Int
+  user   User @relation(fields: [user_id], references: [id])
+  listing_id Int
+  listing Listing @relation(fields: [listing_id], references: [id])
+  title   String
+  description String
+  rating  Float
+
+  @@unique([user_id, listing_id])
+  @@index([user_id])
+  @@index([listing_id])
+}
