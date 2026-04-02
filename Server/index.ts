@@ -737,6 +737,69 @@ app.get("/orders/seller/:id", async (req: Request, res: Response) => {
   }
 });
 
-// app.post("/review/listing/:id", async(req: Request, res: Response))
+app.post("/review/listing", async (req: Request, res: Response) => {
+  const listing_id = Number(req.body.listing_id);
+  const user_id = Number(req.body.user_id);
+  const rating = Number(req.body.rating);
+  const { title, description } = req.body;
+
+  if (!title || !description) {
+    return res.status(400).json({ message: "Missing title or description" });
+  }
+
+  if (isNaN(listing_id) || isNaN(user_id) || isNaN(rating)) {
+    return res.status(400).json({ message: "Invalid user or listing id" });
+  }
+
+  if (rating < 1 || rating > 5) {
+    return res.status(400).json({ message: "Rating must be 1-5" });
+  }
+  try {
+    const review = await prisma.review.create({
+      data: {
+        listing_id,
+        user_id,
+        title,
+        description,
+        rating,
+      },
+    });
+    return res.status(201).json(review);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+app.put("/review/:id", async (req: Request, res: Response) => {
+  const review_id = Number(req.params.id);
+  const { title, description } = req.body;
+
+  if (isNaN(review_id)) {
+    return res.status(400).json({ message: "Invalid review id" });
+  }
+
+  if (!title && !description) {
+    return res.status(400).json({ message: "Nothing to update" });
+  }
+
+  try {
+    const edited_review = await prisma.review.update({
+      where: {
+        id: review_id,
+      },
+      data: {
+        title,
+        description,
+      },
+    });
+
+    return res.status(200).json(edited_review);
+  } catch (error) {
+
+    console.error(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
 
 app.listen(PORT, () => console.log("Server running on port " + PORT));

@@ -179,3 +179,4 @@ model Review {
   @@index([user_id])
   @@index([listing_id])
 }
+
