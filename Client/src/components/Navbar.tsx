@@ -10,34 +10,57 @@ const Navbar = () => {
     const { profile } = useProfile();
     const initial = profile?.name.charAt(0).toUpperCase();
     return (
-        <nav className="navbar">
-            <NavLink to="/discover" className="navbar-logo">
+        <nav className="navbar" aria-label="Main navigation">
+            <NavLink to="/discover" className="navbar-logo" aria-label="GatorBakers — go to Discover">
                 Bake
             </NavLink>
 
             <div className="navbar-center">
-                <NavLink to="/discover" className="navbar-link">
-                    <img src={CompassIcon} alt="Discover" className="navbar-icon" />
+                <NavLink
+                    to="/discover"
+                    className={({ isActive }) => `navbar-link${isActive ? ' active' : ''}`}
+                    aria-current={undefined}
+                >
+                    <img src={CompassIcon} alt="" className="navbar-icon" aria-hidden="true" />
                     <span>Discover</span>
                 </NavLink>
-                <NavLink to="/search" className="navbar-link">
-                    <img src={SearchIcon} alt="Search" className="navbar-icon" />
+                <NavLink
+                    to="/search"
+                    className={({ isActive }) => `navbar-link${isActive ? ' active' : ''}`}
+                    aria-current={undefined}
+                >
+                    <img src={SearchIcon} alt="" className="navbar-icon" aria-hidden="true" />
                     <span>Search</span>
                 </NavLink>
-                <NavLink to="/orders" className="navbar-link">
-                    <img src={HandbagIcon} alt="Your Orders" className="navbar-icon" />
+                <NavLink
+                    to="/orders"
+                    className={({ isActive }) => `navbar-link${isActive ? ' active' : ''}`}
+                    aria-current={undefined}
+                >
+                    <img src={HandbagIcon} alt="" className="navbar-icon" aria-hidden="true" />
                     <span>Orders</span>
                 </NavLink>
             </div>
 
             <div className="navbar-right">
-                <NavLink to="/messages" className="navbar-messages">
-                    <img src={MessagesIcon} alt="Messages" className="navbar-icon" />
+                <NavLink
+                    to="/messages"
+                    className={({ isActive }) => `navbar-messages${isActive ? ' active' : ''}`}
+                    aria-label="Messages"
+                >
+                    <img src={MessagesIcon} alt="" className="navbar-icon" aria-hidden="true" />
                 </NavLink>
-                <NavLink to="/create-listing" className="navbar-create-listing">
+                <NavLink
+                    to="/create-listing"
+                    className={({ isActive }) => `navbar-create-listing${isActive ? ' active' : ''}`}
+                >
                     + Create Listing
                 </NavLink>
-                <NavLink to="/profile" className="navbar-avatar">
+                <NavLink
+                    to="/profile"
+                    className={({ isActive }) => `navbar-avatar${isActive ? ' active' : ''}`}
+                    aria-label={profile?.name ? `Profile — ${profile.name}` : 'Profile'}
+                >
                     {initial}
                 </NavLink>
             </div>

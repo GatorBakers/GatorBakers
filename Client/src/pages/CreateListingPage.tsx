@@ -206,7 +206,7 @@ const CreateListingPage = () => {
             <button className="create-listing-submit" type="submit" disabled={submitting}>
                 {submitting ? 'Creating…' : 'Create Listing'}
             </button>
-            {error && <p className="create-listing-error">{error}</p>}
+            {error && <p className="create-listing-error" role="alert" aria-live="polite">{error}</p>}
         </form>
     );
 };

@@ -39,6 +39,20 @@
   margin: 0 0 28px;
 }
 
+.auth-input-group {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.auth-input-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
 .auth-input {
   width: 100%;
   padding: 14px 16px;
@@ -50,7 +64,7 @@
   background-color: var(--color-background);
   outline: none;
   transition: border-color 0.2s ease;
-  margin-bottom: 16px;
+  margin-bottom: 0;
 }
 
 .auth-input::placeholder {

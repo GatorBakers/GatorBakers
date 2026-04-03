@@ -32,20 +32,26 @@ const SearchBar = ({ onSearch, onCategoryChange }: SearchBarProps) => {
         <div className="search-bar-wrapper">
             <div className="search-input-container">
                 <img src={SearchIcon} alt="Search" className="search-icon" />
+                <label htmlFor="search-listings" className="sr-only">
+                    Search listings
+                </label>
                 <input
+                    id="search-listings"
                     type="text"
                     className="search-input"
                     placeholder="Search for breads, pastries, bakers..."
                     value={query}
                     onChange={handleInputChange}
+                    aria-label="Search listings"
                 />
             </div>
 
-            <div className="category-filters">
+            <div className="category-filters" role="group" aria-label="Filter by category">
                 {categories.map((category) => (
                     <button
                         key={category}
                         className={`category-btn ${activeCategory === category ? 'active' : ''}`}
+                        aria-pressed={activeCategory === category}
                         onClick={() => handleCategoryClick(category)}
                     >
                         {category}

@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import CardImage from './CardImage';
 import './OrderSummaryModal.css';
 import { pickupLocations, type PickupLocation } from '@shared/utils/pickupLocations';
+import useFocusTrap from '../hooks/useFocusTrap';
 
 // TODO (Backend): Define the actual service/platform fee logic.
 //       This could come from GET /api/fees or be a fixed percentage returned by the order preview endpoint.
@@ -22,6 +23,9 @@ const OrderSummaryModal = ({ isOpen, onClose, onBack, title, bakerName, price, i
     const [selectedPickupLocation, setSelectedPickupLocation] = useState<PickupLocation | null>(null);
     const [selectedPickupDate, setSelectedPickupDate] = useState<string>('');
     const [selectedPickupTime, setSelectedPickupTime] = useState<string>('');
+    const modalRef = useRef<HTMLDivElement>(null);
+
+    useFocusTrap(modalRef, isOpen);
 
     useEffect(() => {
         if (isOpen) {
@@ -30,6 +34,15 @@ const OrderSummaryModal = ({ isOpen, onClose, onBack, title, bakerName, price, i
             setSelectedPickupTime('');
         }
     }, [isOpen]);
+
+    useEffect(() => {
+        if (!isOpen) return;
+        const handleEscape = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') onClose();
+        };
+        document.addEventListener('keydown', handleEscape);
+        return () => document.removeEventListener('keydown', handleEscape);
+    }, [isOpen, onClose]);
 
     if (!isOpen) return null;
 
@@ -57,12 +70,19 @@ const OrderSummaryModal = ({ isOpen, onClose, onBack, title, bakerName, price, i
     };
 
     return (
-        <div className="order-summary-overlay" onClick={onClose}>
-            <div className="order-summary-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="order-summary-overlay" onClick={onClose} aria-hidden="true">
+            <div
+                ref={modalRef}
+                className="order-summary-modal"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="order-summary-title"
+                onClick={(e) => e.stopPropagation()}
+            >
 
-                <button className="order-summary-close" onClick={onClose}>✕</button>
+                <button className="order-summary-close" aria-label="Close" onClick={onClose}>✕</button>
 
-                <h2 className="order-summary-heading">Order Summary</h2>
+                <h2 id="order-summary-title" className="order-summary-heading">Order Summary</h2>
 
                 {/* Item preview */}
                 <div className="order-summary-item">
@@ -102,8 +122,11 @@ const OrderSummaryModal = ({ isOpen, onClose, onBack, title, bakerName, price, i
                 {/* Pickup details */}
                 {/* TODO: This area is subject to change. And could be based off of baker availability. */}
                 <div className="order-summary-pickup">
-                    <p className="order-summary-pickup-label">Pickup Location</p>
+                    <label htmlFor="pickup-location" className="order-summary-pickup-label">
+                        Pickup Location
+                    </label>
                     <select
+                        id="pickup-location"
                         className="order-summary-pickup-dropdown"
                         value={selectedPickupLocation ? selectedPickupLocation.name : ''}
                         onChange={(e) => {
@@ -134,8 +157,11 @@ const OrderSummaryModal = ({ isOpen, onClose, onBack, title, bakerName, price, i
 
                 {/* Pickup date */}
                 <div className="order-summary-pickup">
-                    <p className="order-summary-pickup-label">Pickup Date</p>
+                    <label htmlFor="pickup-date" className="order-summary-pickup-label">
+                        Pickup Date
+                    </label>
                     <input
+                        id="pickup-date"
                         type="date"
                         className="order-summary-time-input"
                         value={selectedPickupDate}
@@ -158,8 +184,11 @@ const OrderSummaryModal = ({ isOpen, onClose, onBack, title, bakerName, price, i
 
                 {/* Pickup time */}
                 <div className="order-summary-pickup">
-                    <p className="order-summary-pickup-label">Pickup Time</p>
+                    <label htmlFor="pickup-time" className="order-summary-pickup-label">
+                        Pickup Time
+                    </label>
                     <input
+                        id="pickup-time"
                         type="time"
                         className="order-summary-time-input"
                         value={selectedPickupTime}

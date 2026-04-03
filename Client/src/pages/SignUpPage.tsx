@@ -72,34 +72,49 @@ const SignUpPage = () => {
     return (
         <AuthCard subtitle="Create an Account" onSubmit={handleSignUp}>
             <AuthInput
+                id="signup-first-name"
+                label="First Name"
                 type="text"
                 placeholder="First Name"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
+                autoComplete="given-name"
             />
             <AuthInput
+                id="signup-last-name"
+                label="Last Name"
                 type="text"
                 placeholder="Last Name"
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
+                autoComplete="family-name"
             />
             <AuthInput
+                id="signup-email"
+                label="Email"
                 type="email"
-                placeholder="Email"
+                placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                autoComplete="email"
             />
             <AuthInput
+                id="signup-password"
+                label="Password"
                 type="password"
-                placeholder="Password"
+                placeholder="Create a password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                autoComplete="new-password"
             />
             <AuthInput
+                id="signup-confirm-password"
+                label="Confirm Password"
                 type="password"
-                placeholder="Confirm Password"
+                placeholder="Confirm your password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
+                autoComplete="new-password"
             />
             {error && <p className="auth-error" role="alert" aria-live="polite">{error}</p>}
             <AuthButton label={loading ? 'Signing Up...' : 'Sign Up'} disabled={loading} />

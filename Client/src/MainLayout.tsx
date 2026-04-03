@@ -17,7 +17,9 @@ const MainLayout = () => {
             ) : (
                 <Navbar />
             )}
-            <Outlet />
+            <main id="main-content">
+                <Outlet />
+            </main>
         </div>
     );
 };

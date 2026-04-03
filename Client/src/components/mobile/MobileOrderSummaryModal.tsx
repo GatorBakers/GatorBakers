@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import CardImage from '../CardImage';
 import './MobileOrderSummaryModal.css';
 import { pickupLocations, type PickupLocation } from '@shared/utils/pickupLocations';
+import useFocusTrap from '../../hooks/useFocusTrap';
 
 const PLATFORM_FEE = 0.00;
 
@@ -19,6 +20,9 @@ const MobileOrderSummaryModal = ({ isOpen, onClose, onBack, title, bakerName, pr
     const [selectedPickupLocation, setSelectedPickupLocation] = useState<PickupLocation | null>(null);
     const [selectedPickupDate, setSelectedPickupDate] = useState<string>('');
     const [selectedPickupTime, setSelectedPickupTime] = useState<string>('');
+    const modalRef = useRef<HTMLDivElement>(null);
+
+    useFocusTrap(modalRef, isOpen);
 
     useEffect(() => {
         if (isOpen) {
@@ -27,6 +31,15 @@ const MobileOrderSummaryModal = ({ isOpen, onClose, onBack, title, bakerName, pr
             setSelectedPickupTime('');
         }
     }, [isOpen]);
+
+    useEffect(() => {
+        if (!isOpen) return;
+        const handleEscape = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') onClose();
+        };
+        document.addEventListener('keydown', handleEscape);
+        return () => document.removeEventListener('keydown', handleEscape);
+    }, [isOpen, onClose]);
 
     if (!isOpen) return null;
 
@@ -53,12 +66,19 @@ const MobileOrderSummaryModal = ({ isOpen, onClose, onBack, title, bakerName, pr
     };
 
     return (
-        <div className="m-order-summary-overlay" onClick={onClose}>
-            <div className="m-order-summary-content" onClick={(e) => e.stopPropagation()}>
+        <div className="m-order-summary-overlay" onClick={onClose} aria-hidden="true">
+            <div
+                ref={modalRef}
+                className="m-order-summary-content"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="m-order-summary-title"
+                onClick={(e) => e.stopPropagation()}
+            >
 
-                <button className="m-order-summary-close" onClick={onClose}>✕</button>
+                <button className="m-order-summary-close" aria-label="Close" onClick={onClose}>✕</button>
 
-                <h2 className="m-order-summary-heading">Order Summary</h2>
+                <h2 id="m-order-summary-title" className="m-order-summary-heading">Order Summary</h2>
 
                 {/* Item preview */}
                 <div className="m-order-summary-item">
@@ -97,8 +117,11 @@ const MobileOrderSummaryModal = ({ isOpen, onClose, onBack, title, bakerName, pr
                 {/* Pickup details */}
                 {/* TODO: This area is subject to change. And could be based off of baker availability. */}
                 <div className="m-order-summary-pickup">
-                    <p className="m-order-summary-pickup-label">Pickup Location</p>
+                    <label htmlFor="m-pickup-location" className="m-order-summary-pickup-label">
+                        Pickup Location
+                    </label>
                     <select
+                        id="m-pickup-location"
                         className="m-order-summary-pickup-dropdown"
                         value={selectedPickupLocation ? selectedPickupLocation.name : ''}
                         onChange={(e) => {
@@ -129,8 +152,11 @@ const MobileOrderSummaryModal = ({ isOpen, onClose, onBack, title, bakerName, pr
 
                 {/* Pickup date */}
                 <div className="m-order-summary-pickup">
-                    <p className="m-order-summary-pickup-label">Pickup Date</p>
+                    <label htmlFor="m-pickup-date" className="m-order-summary-pickup-label">
+                        Pickup Date
+                    </label>
                     <input
+                        id="m-pickup-date"
                         type="date"
                         className="m-order-summary-time-input"
                         value={selectedPickupDate}
@@ -153,8 +179,11 @@ const MobileOrderSummaryModal = ({ isOpen, onClose, onBack, title, bakerName, pr
 
                 {/* Pickup time */}
                 <div className="m-order-summary-pickup">
-                    <p className="m-order-summary-pickup-label">Pickup Time</p>
+                    <label htmlFor="m-pickup-time" className="m-order-summary-pickup-label">
+                        Pickup Time
+                    </label>
                     <input
+                        id="m-pickup-time"
                         type="time"
                         className="m-order-summary-time-input"
                         value={selectedPickupTime}
