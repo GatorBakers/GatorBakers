@@ -18,7 +18,7 @@ const adapter = new PrismaPg({
 });
 
 export const prisma = new PrismaClient({ adapter });
-const app = express();
+export const app = express();
 const PORT = 4000;
 const access_secret = process.env.ACCESS_TOKEN_SECRET!;
 const refresh_secret = process.env.REFRESH_TOKEN_SECRET!;
@@ -781,4 +781,6 @@ app.get("/orders/seller/:id", authenticate, async (req: Request, res: Response) 
   }
 });
 
-app.listen(PORT, () => console.log("Server running on port " + PORT));
+if (process.env.NODE_ENV !== "test" && process.env.VITEST !== "true") {
+  app.listen(PORT, () => console.log("Server running on port " + PORT));
+}
