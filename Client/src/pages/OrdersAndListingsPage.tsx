@@ -11,10 +11,6 @@ import { useUpdateOrderStatus } from '../hooks/useOrderMutations';
 import type { BuyerOrder, SellerOrder, OrderStatus as ApiOrderStatus } from '@shared/types';
 import './OrdersAndListingsPage.css';
 
-// TODO: Create a PATCH endpoint to update the state of an order.
-// * onConfirm - set order status to COMPLETED
-// * onDeny - set order status to CANCELLED
-
 interface Order {
     id: number;
     buyerUserId?: number;
