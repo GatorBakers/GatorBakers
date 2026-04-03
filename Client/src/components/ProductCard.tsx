@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom';
 import CardImage from './CardImage';
 import './ProductCard.css';
 import { useRef, useState, useEffect } from 'react';
@@ -61,7 +62,7 @@ const ProductCard = ({ title, bakerName, price, imageUrl, variant, itemDescripti
                 </button>
             </div>
 
-            {openModal && (
+            {openModal && createPortal(
                 <div
                     className="product-card-modal-overlay"
                     onClick={() => setOpenModal(false)}
@@ -84,7 +85,7 @@ const ProductCard = ({ title, bakerName, price, imageUrl, variant, itemDescripti
                         </button>
                         <CardImage
                             imageUrl={imageUrl}
-                            alt={title}
+                            alt=""
                             placeholderText="Product Image"
                             className="product-card-modal-image"
                         />
@@ -112,19 +113,19 @@ const ProductCard = ({ title, bakerName, price, imageUrl, variant, itemDescripti
                             )}
                         </div>
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
 
-        <OrderSummaryModal
-            isOpen={openOrderSummary}
-            onClose={() => { setOpenOrderSummary(false); setOpenModal(false); }}
-            onBack={() => setOpenOrderSummary(false)}
-            title={title}
-            bakerName={bakerName}
-            price={price}
-            imageUrl={imageUrl}
-        />
-
+            <OrderSummaryModal
+                isOpen={openOrderSummary}
+                onClose={() => { setOpenOrderSummary(false); setOpenModal(false); }}
+                onBack={() => setOpenOrderSummary(false)}
+                title={title}
+                bakerName={bakerName}
+                price={price}
+                imageUrl={imageUrl}
+            />
         </article>
     );
 };

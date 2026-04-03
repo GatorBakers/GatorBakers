@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import CardImage from './CardImage';
 import './OrderSummaryModal.css';
 import { pickupLocations, type PickupLocation } from '@shared/utils/pickupLocations';
@@ -69,7 +70,7 @@ const OrderSummaryModal = ({ isOpen, onClose, onBack, title, bakerName, price, i
 
     };
 
-    return (
+    return createPortal(
         <div className="order-summary-overlay" onClick={onClose}>
             <div
                 ref={modalRef}
@@ -226,7 +227,8 @@ const OrderSummaryModal = ({ isOpen, onClose, onBack, title, bakerName, price, i
                 </div>
 
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 

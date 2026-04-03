@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom';
 import CardImage from '../CardImage';
 import './MobileProductCard.css';
 import { useRef, useState, useEffect } from 'react';
@@ -63,7 +64,7 @@ const MobileProductCard = ({ title, bakerName, price, imageUrl, variant, itemDes
                 </div>
             </div>
 
-            {openModal && (
+            {openModal && createPortal(
                 <div
                     className="m-product-card-modal-overlay"
                     onClick={() => setOpenModal(false)}
@@ -86,7 +87,7 @@ const MobileProductCard = ({ title, bakerName, price, imageUrl, variant, itemDes
                         </button>
                         <CardImage
                             imageUrl={imageUrl}
-                            alt={title}
+                            alt=""
                             placeholderText="Product Image"
                             className="m-product-card-modal-image"
                         />
@@ -114,9 +115,11 @@ const MobileProductCard = ({ title, bakerName, price, imageUrl, variant, itemDes
                             )}
                         </div>
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
-        <MobileOrderSummaryModal
+
+            <MobileOrderSummaryModal
                 isOpen={openOrderSummary}
                 onClose={() => setOpenOrderSummary(false)}
                 onBack={() => { setOpenOrderSummary(false); setOpenModal(true); }}
