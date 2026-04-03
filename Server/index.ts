@@ -10,7 +10,6 @@ import jwt from "jsonwebtoken";
 import dayjs from "dayjs";
 import { validateRegInput, validateLoginInput } from "./src/utils/validation";
 import { getOrdersAccessError } from "./src/utils/ordersAccess";
-import { use } from "react";
 
 const saltRounds = 10;
 const adapter = new PrismaPg({
