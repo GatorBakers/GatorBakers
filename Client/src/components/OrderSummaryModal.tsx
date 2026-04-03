@@ -64,122 +64,125 @@ const OrderSummaryModal = ({ isOpen, onClose, onBack, title, bakerName, price, i
 
                 <h2 className="order-summary-heading">Order Summary</h2>
 
-                {/* Item preview */}
-                <div className="order-summary-item">
-                    <CardImage
-                        imageUrl={imageUrl}
-                        alt={title}
-                        placeholderText="Product Image"
-                        className="order-summary-item-image"
-                    />
-                    <div className="order-summary-item-info">
-                        <p className="order-summary-item-title">{title}</p>
-                        <p className="order-summary-item-baker">by {bakerName}</p>
-                    </div>
-                </div>
+                {/* Scrollable content */}
+                <div className="order-summary-content">
 
-                <hr className="order-summary-divider" />
-
-                {/* Pricing */}
-                <div className="order-summary-pricing">
-                    <div className="order-summary-pricing-row">
-                        <span>Item price</span>
-                        <span>${price.toFixed(2)}</span>
+                    {/* Item preview */}
+                    <div className="order-summary-item">
+                        <CardImage
+                            imageUrl={imageUrl}
+                            alt={title}
+                            placeholderText="Product Image"
+                            className="order-summary-item-image"
+                        />
+                        <div className="order-summary-item-info">
+                            <p className="order-summary-item-title">{title}</p>
+                            <p className="order-summary-item-baker">by {bakerName}</p>
+                        </div>
                     </div>
-                    
-                    <div className="order-summary-pricing-row">
-                        <span>Platform fee</span>
-                        <span>${PLATFORM_FEE.toFixed(2)}</span>
-                    </div>
-                    <div className="order-summary-pricing-row order-summary-pricing-total">
-                        <span>Total</span>
-                        <span>${total.toFixed(2)}</span>
-                    </div>
-                </div>
 
-                <hr className="order-summary-divider" />
+                    <hr className="order-summary-divider" />
 
-                {/* Pickup details */}
-                {/* TODO: This area is subject to change. And could be based off of baker availability. */}
-                <div className="order-summary-pickup">
-                    <p className="order-summary-pickup-label">Pickup Location</p>
-                    <select
-                        className="order-summary-pickup-dropdown"
-                        value={selectedPickupLocation ? selectedPickupLocation.name : ''}
-                        onChange={(e) => {
-                            const location = pickupLocations.find(loc => loc.name === e.target.value);
-                            setSelectedPickupLocation(location || null);
-                        }}
-                    >
-                        <option value="" disabled>
-                            Select a location...
-                        </option>
-                        {pickupLocations.map((location) => (
-                            <option key={location.name} value={location.name}>
-                                {location.name}
+                    {/* Pricing */}
+                    <div className="order-summary-pricing">
+                        <div className="order-summary-pricing-row">
+                            <span>Item price</span>
+                            <span>${price.toFixed(2)}</span>
+                        </div>
+                        
+                        <div className="order-summary-pricing-row">
+                            <span>Platform fee</span>
+                            <span>${PLATFORM_FEE.toFixed(2)}</span>
+                        </div>
+                        <div className="order-summary-pricing-row order-summary-pricing-total">
+                            <span>Total</span>
+                            <span>${total.toFixed(2)}</span>
+                        </div>
+                    </div>
+
+                    <hr className="order-summary-divider" />
+
+                    {/* Pickup details */}
+                    {/* TODO: This area is subject to change. And could be based off of baker availability. */}
+                    <div className="order-summary-pickup">
+                        <p className="order-summary-pickup-label">Pickup Location</p>
+                        <select
+                            className="order-summary-pickup-dropdown"
+                            value={selectedPickupLocation ? selectedPickupLocation.name : ''}
+                            onChange={(e) => {
+                                const location = pickupLocations.find(loc => loc.name === e.target.value);
+                                setSelectedPickupLocation(location || null);
+                            }}
+                        >
+                            <option value="" disabled>
+                                Select a location...
                             </option>
-                        ))}
-                    </select>
-                    {selectedPickupLocation && (
-                        <div className="order-summary-pickup-details">
-                            <p className="order-summary-pickup-location-name">
-                                {selectedPickupLocation.name}
-                            </p>
-                            <p className="order-summary-pickup-location-address">
-                                {selectedPickupLocation.address}
-                            </p>
-                        </div>
-                    )}
-                </div>
+                            {pickupLocations.map((location) => (
+                                <option key={location.name} value={location.name}>
+                                    {location.name}
+                                </option>
+                            ))}
+                        </select>
+                        {selectedPickupLocation && (
+                            <div className="order-summary-pickup-details">
+                                <p className="order-summary-pickup-location-name">
+                                    {selectedPickupLocation.name}
+                                </p>
+                                <p className="order-summary-pickup-location-address">
+                                    {selectedPickupLocation.address}
+                                </p>
+                            </div>
+                        )}
+                    </div>
 
-                {/* Pickup date */}
-                <div className="order-summary-pickup">
-                    <p className="order-summary-pickup-label">Pickup Date</p>
-                    <input
-                        type="date"
-                        className="order-summary-time-input"
-                        value={selectedPickupDate}
-                        min={new Date().toISOString().split('T')[0]}
-                        onChange={(e) => setSelectedPickupDate(e.target.value)}
-                    />
-                    {selectedPickupDate && (
-                        <div className="order-summary-pickup-details">
-                            <p className="order-summary-pickup-location-name">
-                                {new Date(selectedPickupDate + 'T00:00:00').toLocaleDateString('en-US', {
-                                    weekday: 'long',
-                                    year: 'numeric',
-                                    month: 'long',
-                                    day: 'numeric',
-                                })}
-                            </p>
-                        </div>
-                    )}
-                </div>
+                    {/* Pickup date */}
+                    <div className="order-summary-pickup">
+                        <p className="order-summary-pickup-label">Pickup Date</p>
+                        <input
+                            type="date"
+                            className="order-summary-time-input"
+                            value={selectedPickupDate}
+                            min={new Date().toISOString().split('T')[0]}
+                            onChange={(e) => setSelectedPickupDate(e.target.value)}
+                        />
+                        {selectedPickupDate && (
+                            <div className="order-summary-pickup-details">
+                                <p className="order-summary-pickup-location-name">
+                                    {new Date(selectedPickupDate + 'T00:00:00').toLocaleDateString('en-US', {
+                                        weekday: 'long',
+                                        year: 'numeric',
+                                        month: 'long',
+                                        day: 'numeric',
+                                    })}
+                                </p>
+                            </div>
+                        )}
+                    </div>
 
-                {/* Pickup time */}
-                <div className="order-summary-pickup">
-                    <p className="order-summary-pickup-label">Pickup Time</p>
-                    <input
-                        type="time"
-                        className="order-summary-time-input"
-                        value={selectedPickupTime}
-                        onChange={(e) => setSelectedPickupTime(e.target.value)}
-                    />
-                    {selectedPickupTime && (
-                        <div className="order-summary-pickup-details">
-                            <p className="order-summary-pickup-location-name">
-                                {(() => {
-                                    const [h, m] = selectedPickupTime.split(':').map(Number);
-                                    const period = h >= 12 ? 'PM' : 'AM';
-                                    const hour = h % 12 || 12;
-                                    return `${hour}:${String(m).padStart(2, '0')} ${period}`;
-                                })()}
-                            </p>
-                        </div>
-                    )}
-                </div>
+                    {/* Pickup time */}
+                    <div className="order-summary-pickup">
+                        <p className="order-summary-pickup-label">Pickup Time</p>
+                        <input
+                            type="time"
+                            className="order-summary-time-input"
+                            value={selectedPickupTime}
+                            onChange={(e) => setSelectedPickupTime(e.target.value)}
+                        />
+                        {selectedPickupTime && (
+                            <div className="order-summary-pickup-details">
+                                <p className="order-summary-pickup-location-name">
+                                    {(() => {
+                                        const [h, m] = selectedPickupTime.split(':').map(Number);
+                                        const period = h >= 12 ? 'PM' : 'AM';
+                                        const hour = h % 12 || 12;
+                                        return `${hour}:${String(m).padStart(2, '0')} ${period}`;
+                                    })()}
+                                </p>
+                            </div>
+                        )}
+                    </div>
 
-                <hr className="order-summary-divider" />
+                </div>{/* end order-summary-content */}
 
                 {/* Buttons */}
                 <div className="order-summary-actions">
