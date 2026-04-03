@@ -1,7 +1,7 @@
-import { describe, it, expect } from "vitest";
+import { afterAll, describe, it, expect } from "vitest";
 import request from "supertest";
 import jwt from "jsonwebtoken";
-import { app } from "../../index";
+import { app, prisma } from "../../index";
 
 const accessSecret = process.env.ACCESS_TOKEN_SECRET;
 
@@ -16,6 +16,10 @@ function makeAccessToken(id: number) {
     { expiresIn: "5m" },
   );
 }
+
+afterAll(async () => {
+  await prisma.$disconnect();
+});
 
 describe("orders routes auth integration", () => {
   it("GET /orders/user/:id returns 401 without token", async () => {
