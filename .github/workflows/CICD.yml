@@ -37,15 +37,19 @@ jobs:
           node-version: "22"
 
       - name: Install server dependencies
-        working-directory: Server
+        working-directory: server
         run: npm ci
 
+      - name: Generate Prisma client
+        working-directory: server
+        run: npx prisma generate
+
       - name: Apply Prisma migrations
-        working-directory: Server
+        working-directory: server
         run: npx prisma migrate deploy
 
       - name: Run server tests
-        working-directory: Server
+        working-directory: server
         run: npm test
 
   DeployDev:
