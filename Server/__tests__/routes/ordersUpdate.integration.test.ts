@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterAll, afterEach, describe, expect, it } from "vitest";
 import request from "supertest";
 import jwt from "jsonwebtoken";
 import { app, prisma } from "../../index";
@@ -83,6 +83,10 @@ afterEach(async () => {
     });
     createdUserIds.length = 0;
   }
+});
+
+afterAll(async () => {
+  await prisma.$disconnect();
 });
 
 describe("update order status route integration", () => {
