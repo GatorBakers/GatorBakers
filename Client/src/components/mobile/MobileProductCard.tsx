@@ -1,7 +1,9 @@
+import { createPortal } from 'react-dom';
 import CardImage from '../CardImage';
 import './MobileProductCard.css';
-import { useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import MobileOrderSummaryModal from './MobileOrderSummaryModal';
+import useFocusTrap from '../../hooks/useFocusTrap';
 
 type MobileProductCardVariant = 'to_order' | 'listing';
 
@@ -25,12 +27,25 @@ interface MobileProductCardProps {
 const MobileProductCard = ({ title, bakerName, price, imageUrl, variant, itemDescription, ingredients, allergens, quantity }: MobileProductCardProps) => {
     const [openModal, setOpenModal] = useState<boolean>(false);
     const [openOrderSummary, setOpenOrderSummary] = useState<boolean>(false);
+    const modalRef = useRef<HTMLDivElement>(null);
+    const titleId = `m-product-dialog-title-${title.replace(/\s+/g, '-').toLowerCase()}`;
+
+    useFocusTrap(modalRef, openModal);
+
+    useEffect(() => {
+        if (!openModal) return;
+        const handleEscape = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') setOpenModal(false);
+        };
+        document.addEventListener('keydown', handleEscape);
+        return () => document.removeEventListener('keydown', handleEscape);
+    }, [openModal]);
 
     return (
-        <div className="m-product-card">
+        <article className="m-product-card" aria-label={`${title} by ${bakerName}`}>
             <CardImage
                 imageUrl={imageUrl}
-                alt={title}
+                alt=""
                 placeholderText="Product Image"
                 className="m-product-card-image"
             />
@@ -39,24 +54,45 @@ const MobileProductCard = ({ title, bakerName, price, imageUrl, variant, itemDes
                 <p className="m-product-card-baker">by {bakerName}</p>
                 <div className="m-product-card-bottom">
                     <p className="m-product-card-price">${price.toFixed(2)}</p>
-                    <button className="m-product-card-order" onClick={() => setOpenModal(true)}>
+                    <button
+                        className="m-product-card-order"
+                        aria-label={`${VARIANT_LABEL[variant]} ${title} by ${bakerName} — $${price.toFixed(2)}`}
+                        onClick={() => setOpenModal(true)}
+                    >
                         {VARIANT_LABEL[variant]}
                     </button>
                 </div>
             </div>
 
-            {openModal && (
-                <div className="m-product-card-modal-overlay" onClick={() => setOpenModal(false)}>
-                    <div className="m-product-card-modal-content" onClick={(e) => e.stopPropagation()}>
-                        <button className="m-product-card-modal-close" onClick={() => setOpenModal(false)}>✕</button>
+            {openModal && createPortal(
+                <div
+                    className="m-product-card-modal-overlay"
+                    onClick={() => setOpenModal(false)}
+                >
+                    <div
+                        ref={modalRef}
+                        className="m-product-card-modal-content"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby={titleId}
+                        tabIndex={-1}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <button
+                            className="m-product-card-modal-close"
+                            aria-label="Close"
+                            onClick={() => setOpenModal(false)}
+                        >
+                            ✕
+                        </button>
                         <CardImage
                             imageUrl={imageUrl}
-                            alt={title}
+                            alt=""
                             placeholderText="Product Image"
                             className="m-product-card-modal-image"
                         />
                         <div className="m-product-card-modal-info">
-                            <h2 className="m-product-card-title">{title}</h2>
+                            <h2 id={titleId} className="m-product-card-title">{title}</h2>
                             <p className="m-product-card-baker">by {bakerName}</p>
                             <p className="m-product-card-price">${price.toFixed(2)}</p>
                             <p className="m-product-card-description">{itemDescription}</p>
@@ -79,9 +115,11 @@ const MobileProductCard = ({ title, bakerName, price, imageUrl, variant, itemDes
                             )}
                         </div>
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
-        <MobileOrderSummaryModal
+
+            <MobileOrderSummaryModal
                 isOpen={openOrderSummary}
                 onClose={() => setOpenOrderSummary(false)}
                 onBack={() => { setOpenOrderSummary(false); setOpenModal(true); }}
@@ -90,7 +128,7 @@ const MobileProductCard = ({ title, bakerName, price, imageUrl, variant, itemDes
                 price={price}
                 imageUrl={imageUrl}
             />
-        </div>
+        </article>
     );
 };
 

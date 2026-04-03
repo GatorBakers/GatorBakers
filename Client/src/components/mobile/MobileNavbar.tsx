@@ -7,25 +7,40 @@ import MessagesIcon from '../../assets/Messages.svg';
 
 const MobileNavbar = () => {
     return (
-        <nav className="mobile-navbar">
-            <NavLink to="/discover" className="mobile-nav-tab">
-                <img src={CompassIcon} alt="Discover" className="mobile-nav-icon" />
+        <nav className="mobile-navbar" aria-label="Main navigation">
+            <NavLink
+                to="/discover"
+                className={({ isActive }) => `mobile-nav-tab${isActive ? ' active' : ''}`}
+            >
+                <img src={CompassIcon} alt="" className="mobile-nav-icon" aria-hidden="true" />
                 <span>Discover</span>
             </NavLink>
-            <NavLink to="/search" className="mobile-nav-tab">
-                <img src={SearchIcon} alt="Search" className="mobile-nav-icon" />
+            <NavLink
+                to="/search"
+                className={({ isActive }) => `mobile-nav-tab${isActive ? ' active' : ''}`}
+            >
+                <img src={SearchIcon} alt="" className="mobile-nav-icon" aria-hidden="true" />
                 <span>Search</span>
             </NavLink>
-            <NavLink to="/orders" className="mobile-nav-tab">
-                <img src={HandbagIcon} alt="Orders" className="mobile-nav-icon" />
+            <NavLink
+                to="/orders"
+                className={({ isActive }) => `mobile-nav-tab${isActive ? ' active' : ''}`}
+            >
+                <img src={HandbagIcon} alt="" className="mobile-nav-icon" aria-hidden="true" />
                 <span>Orders</span>
             </NavLink>
-            <NavLink to="/messages" className="mobile-nav-tab">
-                <img src={MessagesIcon} alt="Messages" className="mobile-nav-icon" />
+            <NavLink
+                to="/messages"
+                className={({ isActive }) => `mobile-nav-tab${isActive ? ' active' : ''}`}
+            >
+                <img src={MessagesIcon} alt="" className="mobile-nav-icon" aria-hidden="true" />
                 <span>Messages</span>
             </NavLink>
-            <NavLink to="/profile" className="mobile-nav-tab">
-                <div className="mobile-nav-avatar">P</div>
+            <NavLink
+                to="/profile"
+                className={({ isActive }) => `mobile-nav-tab${isActive ? ' active' : ''}`}
+            >
+                <div className="mobile-nav-avatar" aria-hidden="true">P</div>
                 <span>Profile</span>
             </NavLink>
         </nav>

@@ -39,10 +39,15 @@ const ButtonAddOn = ({
 
     return (
         <div className="button-addon">
-            {label && <p className="button-addon-label">{label}</p>}
+            {label && (
+                <label htmlFor="button-addon-input" className="button-addon-label">
+                    {label}
+                </label>
+            )}
 
             <div className="button-addon-row">
                 <input
+                    id="button-addon-input"
                     className="button-addon-input"
                     type="text"
                     placeholder={placeholder}

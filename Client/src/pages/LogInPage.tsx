@@ -48,17 +48,23 @@ const LoginPage = () => {
         {successMessage && <p className="auth-success" role="alert" aria-live="polite">{successMessage}</p>}
         {error && <p className="auth-error" role="alert" aria-live="polite">{error}</p>}
         <AuthInput
+          id="login-email"
+          label="Email"
           type="email"
-          placeholder="Email"
+          placeholder="you@example.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          autoComplete="email"
         />
 
         <AuthInput
+          id="login-password"
+          label="Password"
           type="password"
-          placeholder="Password"
+          placeholder="Your password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          autoComplete="current-password"
         />
 
         <AuthButton label={loading ? 'Logging In...' : 'Log In'} disabled={loading} />

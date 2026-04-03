@@ -33,9 +33,21 @@ const DiscoverPage = () => {
                 <p>Discover homemade breads, pastries, and treats from bakers in your neighborhood</p>
             </div>
 
-            <div className="sort-toggle">
-                <button className={sortBy === 'recent' ? 'active' : ''} onClick={() => handleSort('recent')}>Recent</button>
-                <button className={sortBy === 'popular' ? 'active' : ''} onClick={() => handleSort('popular')}>Popular</button>
+            <div className="sort-toggle" role="group" aria-label="Sort listings by">
+                <button
+                    className={sortBy === 'recent' ? 'active' : ''}
+                    aria-pressed={sortBy === 'recent'}
+                    onClick={() => handleSort('recent')}
+                >
+                    Recent
+                </button>
+                <button
+                    className={sortBy === 'popular' ? 'active' : ''}
+                    aria-pressed={sortBy === 'popular'}
+                    onClick={() => handleSort('popular')}
+                >
+                    Popular
+                </button>
             </div>
 
             <div className="product-card-container">

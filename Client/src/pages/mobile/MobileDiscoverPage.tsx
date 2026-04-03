@@ -31,9 +31,21 @@ const MobileDiscoverPage = ({ products }: MobileDiscoverPageProps) => {
                 <p>Homemade breads, pastries, and treats nearby</p>
             </div>
 
-            <div className="m-sort-toggle">
-                <button className={sortBy === 'recent' ? 'active' : ''} onClick={() => handleSort('recent')}>Recent</button>
-                <button className={sortBy === 'popular' ? 'active' : ''} onClick={() => handleSort('popular')}>Popular</button>
+            <div className="m-sort-toggle" role="group" aria-label="Sort listings by">
+                <button
+                    className={sortBy === 'recent' ? 'active' : ''}
+                    aria-pressed={sortBy === 'recent'}
+                    onClick={() => handleSort('recent')}
+                >
+                    Recent
+                </button>
+                <button
+                    className={sortBy === 'popular' ? 'active' : ''}
+                    aria-pressed={sortBy === 'popular'}
+                    onClick={() => handleSort('popular')}
+                >
+                    Popular
+                </button>
             </div>
 
             <div className="m-discover-list">
