@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import type { SellerOrdersResponse } from '@shared/types';
+import { useAuth } from '../context/AuthContext';
 import { fetchSellerOrders } from '../services/listingService';
 import { queryKeys } from './queryKeys';
 
@@ -10,10 +11,12 @@ const emptySellerOrders: SellerOrdersResponse = {
 };
 
 export function useSellerOrders(userId: number | null) {
+    const { accessToken } = useAuth();
+
     const { data, isLoading, error } = useQuery<SellerOrdersResponse, Error>({
         queryKey: queryKeys.sellerOrders(userId ?? -1),
-        queryFn: async () => fetchSellerOrders(userId!),
-        enabled: userId !== null,
+        queryFn: async () => fetchSellerOrders(accessToken!, userId!),
+        enabled: userId !== null && !!accessToken,
         staleTime: 60 * 1000,
         retry: false,
     });

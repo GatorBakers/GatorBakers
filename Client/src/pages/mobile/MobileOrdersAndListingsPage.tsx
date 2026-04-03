@@ -18,9 +18,18 @@ interface MobileYourOrdersPageProps {
     error: string | null;
     pendingOrders: Order[];
     orders: Order[];
+    onConfirmOrder: (order: Order) => void;
+    onDenyOrder: (order: Order) => void;
 }
 
-const MobileYourOrdersPage = ({ isLoading, error, pendingOrders, orders }: MobileYourOrdersPageProps) => {
+const MobileYourOrdersPage = ({
+    isLoading,
+    error,
+    pendingOrders,
+    orders,
+    onConfirmOrder,
+    onDenyOrder,
+}: MobileYourOrdersPageProps) => {
     // TODO: Auth context is resolved in the parent (YourOrderPage.tsx) — no userId needed here directly,
     //       but ensure the parent is not rendering this component before auth is confirmed.
 
@@ -55,8 +64,8 @@ const MobileYourOrdersPage = ({ isLoading, error, pendingOrders, orders }: Mobil
                                 pickupTime={order.pickupTime}
                                 pickupAddress={order.pickupAddress}
                                 imageUrl={order.imageUrl}
-                                onConfirm={() => {}}
-                                onDeny={() => {}}
+                                onConfirm={order.status === 'pending' ? () => onConfirmOrder(order) : undefined}
+                                onDeny={order.status === 'pending' ? () => onDenyOrder(order) : undefined}
                             />
                         ))
                     )}

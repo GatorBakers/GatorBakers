@@ -92,6 +92,7 @@ export async function fetchListing(id: number): Promise<ListingData> {
 
 // Create a new order for a listing
 export async function createOrder(
+    accessToken: string,
     listingId: number,
     payload: CreateOrderRequest,
 ): Promise<OrderRecord> {
@@ -99,6 +100,7 @@ export async function createOrder(
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
         },
         credentials: 'include',
         body: JSON.stringify(payload),
@@ -112,8 +114,9 @@ export async function createOrder(
 }
 
 // Fetch all orders for a buyer
-export async function fetchBuyerOrders(userId: number): Promise<BuyerOrder[]> {
+export async function fetchBuyerOrders(accessToken: string, userId: number): Promise<BuyerOrder[]> {
     const response = await fetch(`${API_URL}/orders/user/${userId}`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
         credentials: 'include',
     });
 
@@ -125,8 +128,9 @@ export async function fetchBuyerOrders(userId: number): Promise<BuyerOrder[]> {
 }
 
 // Fetch all orders for a seller
-export async function fetchSellerOrders(userId: number): Promise<SellerOrdersResponse> {
+export async function fetchSellerOrders(accessToken: string, userId: number): Promise<SellerOrdersResponse> {
     const response = await fetch(`${API_URL}/orders/seller/${userId}`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
         credentials: 'include',
     });
 
@@ -139,6 +143,7 @@ export async function fetchSellerOrders(userId: number): Promise<SellerOrdersRes
 
 // Update an order status by id
 export async function updateOrderStatus(
+    accessToken: string,
     orderId: number,
     payload: UpdateOrderStatusRequest,
 ): Promise<OrderRecord> {
@@ -146,6 +151,7 @@ export async function updateOrderStatus(
         method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
         },
         credentials: 'include',
         body: JSON.stringify(payload),

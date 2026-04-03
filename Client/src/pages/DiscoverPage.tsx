@@ -10,6 +10,9 @@ const DiscoverPage = () => {
     const [sortBy, setSortBy] = useState<'recent' | 'popular'>('recent');
     const { listings, isLoading, error } = useListingsFeed({ params: { sortBy } });
     const { profile, isLoading: profileLoading } = useProfile();
+    const visibleListings = profile?.id
+        ? listings.filter((listing) => listing.user_id !== profile.id)
+        : listings;
 
     const handleSort = (value: 'recent' | 'popular') => {
         setSortBy(value);
@@ -20,7 +23,7 @@ const DiscoverPage = () => {
             <MobileDiscoverPage
                 sortBy={sortBy}
                 onSortChange={handleSort}
-                products={listings.map(listing => ({
+                products={visibleListings.map(listing => ({
                     id: listing.id,
                     listingId: listing.id,
                     sellerUserId: listing.user_id,
@@ -53,11 +56,11 @@ const DiscoverPage = () => {
 
             {isLoading && <p>Loading listings...</p>}
             {error && <p style={{ color: 'red' }}>Error: {error}</p>}
-            {!isLoading && listings.length === 0 && <p>No listings available at the moment.</p>}
+            {!isLoading && visibleListings.length === 0 && <p>No listings available at the moment.</p>}
 
-            {!isLoading && listings.length > 0 && (
+            {!isLoading && visibleListings.length > 0 && (
                 <div className="product-card-container">
-                    {listings.map((listing) => (
+                    {visibleListings.map((listing) => (
                         <ProductCard
                             key={listing.id}
                             listingId={listing.id}

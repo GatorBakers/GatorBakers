@@ -1,13 +1,16 @@
 import { useQuery } from '@tanstack/react-query';
 import type { BuyerOrder } from '@shared/types';
+import { useAuth } from '../context/AuthContext';
 import { fetchBuyerOrders } from '../services/listingService';
 import { queryKeys } from './queryKeys';
 
 export function useBuyerOrders(userId: number | null) {
+    const { accessToken } = useAuth();
+
     const { data, isLoading, error } = useQuery<BuyerOrder[], Error>({
         queryKey: queryKeys.buyerOrders(userId ?? -1),
-        queryFn: async () => fetchBuyerOrders(userId!),
-        enabled: userId !== null,
+        queryFn: async () => fetchBuyerOrders(accessToken!, userId!),
+        enabled: userId !== null && !!accessToken,
         staleTime: 60 * 1000,
         retry: false,
     });
