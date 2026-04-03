@@ -41,10 +41,10 @@ const MobileProductCard = ({ title, bakerName, price, imageUrl, variant, itemDes
     }, [openModal]);
 
     return (
-        <div className="m-product-card">
+        <article className="m-product-card" aria-label={`${title} by ${bakerName}`}>
             <CardImage
                 imageUrl={imageUrl}
-                alt={title}
+                alt=""
                 placeholderText="Product Image"
                 className="m-product-card-image"
             />
@@ -53,7 +53,11 @@ const MobileProductCard = ({ title, bakerName, price, imageUrl, variant, itemDes
                 <p className="m-product-card-baker">by {bakerName}</p>
                 <div className="m-product-card-bottom">
                     <p className="m-product-card-price">${price.toFixed(2)}</p>
-                    <button className="m-product-card-order" onClick={() => setOpenModal(true)}>
+                    <button
+                        className="m-product-card-order"
+                        aria-label={`${VARIANT_LABEL[variant]} ${title} by ${bakerName} — $${price.toFixed(2)}`}
+                        onClick={() => setOpenModal(true)}
+                    >
                         {VARIANT_LABEL[variant]}
                     </button>
                 </div>
@@ -121,7 +125,7 @@ const MobileProductCard = ({ title, bakerName, price, imageUrl, variant, itemDes
                 price={price}
                 imageUrl={imageUrl}
             />
-        </div>
+        </article>
     );
 };
 
