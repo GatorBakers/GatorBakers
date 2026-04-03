@@ -10,6 +10,24 @@ on:
 jobs:
   Build:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: gatorbakers_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres -d gatorbakers_test"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/gatorbakers_test
+      ACCESS_TOKEN_SECRET: ci-access-secret
+      REFRESH_TOKEN_SECRET: ci-refresh-secret
     steps:
       - uses: actions/checkout@v4
 
@@ -19,11 +37,15 @@ jobs:
           node-version: "22"
 
       - name: Install server dependencies
-        working-directory: Server
+        working-directory: server
         run: npm ci
 
+      - name: Apply Prisma migrations
+        working-directory: server
+        run: npx prisma migrate deploy
+
       - name: Run server tests
-        working-directory: Server
+        working-directory: server
         run: npm test
 
   DeployDev:
