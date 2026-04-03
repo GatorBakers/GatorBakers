@@ -114,8 +114,9 @@ export async function createOrder(
 }
 
 // Fetch all orders for a buyer
-export async function fetchBuyerOrders(userId: number): Promise<BuyerOrder[]> {
+export async function fetchBuyerOrders(accessToken: string, userId: number): Promise<BuyerOrder[]> {
     const response = await fetch(`${API_URL}/orders/user/${userId}`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
         credentials: 'include',
     });
 
@@ -127,8 +128,9 @@ export async function fetchBuyerOrders(userId: number): Promise<BuyerOrder[]> {
 }
 
 // Fetch all orders for a seller
-export async function fetchSellerOrders(userId: number): Promise<SellerOrdersResponse> {
+export async function fetchSellerOrders(accessToken: string, userId: number): Promise<SellerOrdersResponse> {
     const response = await fetch(`${API_URL}/orders/seller/${userId}`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
         credentials: 'include',
     });
 
