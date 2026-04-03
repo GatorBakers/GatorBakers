@@ -9,6 +9,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dayjs from "dayjs";
 import { validateRegInput, validateLoginInput } from "./src/utils/validation";
+import { getOrdersAccessError } from "./src/utils/ordersAccess";
 import { use } from "react";
 
 const saltRounds = 10;
@@ -677,11 +678,13 @@ app.patch("/order/:id", authenticate, async (req: Request, res: Response) => {
   }
 });
 
-app.get("/orders/user/:id", async (req: Request, res: Response) => {
+app.get("/orders/user/:id", authenticate, async (req: Request, res: Response) => {
+  const { id: requester_user_id } = (req as any).user;
   const user_id = Number(req.params.id);
 
-  if (isNaN(user_id)) {
-    return res.status(400).json({ message: "Invalid user id" });
+  const accessError = getOrdersAccessError(requester_user_id, user_id);
+  if (accessError) {
+    return res.status(accessError.status).json({ message: accessError.message });
   }
 
   try {
@@ -723,11 +726,13 @@ app.get("/orders/user/:id", async (req: Request, res: Response) => {
   }
 });
 
-app.get("/orders/seller/:id", async (req: Request, res: Response) => {
+app.get("/orders/seller/:id", authenticate, async (req: Request, res: Response) => {
+  const { id: requester_user_id } = (req as any).user;
   const seller_id = Number(req.params.id);
 
-  if (isNaN(seller_id)) {
-    return res.status(400).json({ message: "Invalid user id" });
+  const accessError = getOrdersAccessError(requester_user_id, seller_id);
+  if (accessError) {
+    return res.status(accessError.status).json({ message: accessError.message });
   }
   try {
     const orders = await prisma.order.findMany({
