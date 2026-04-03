@@ -11,8 +11,13 @@ const FOCUSABLE_SELECTORS = [
 
 /**
  * Traps keyboard focus within `containerRef` while `isOpen` is true.
- * Restores focus to the element that was active when the trap was activated
- * once `isOpen` becomes false.
+ *
+ * On open:  focuses the container itself first (so VoiceOver announces the
+ *           dialog name), then lets the user Tab to the first interactive element.
+ * On close: returns focus to the element that was active when the trap opened.
+ *
+ * Requires the container element to have tabIndex={-1} so it can receive
+ * programmatic focus without appearing in the natural Tab order.
  */
 function useFocusTrap<T extends HTMLElement>(
   containerRef: React.RefObject<T | null>,
@@ -31,9 +36,12 @@ function useFocusTrap<T extends HTMLElement>(
     const getFocusable = () =>
       Array.from(container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTORS));
 
-    // Move focus into the dialog on open
-    const firstFocusable = getFocusable()[0];
-    firstFocusable?.focus();
+    // Defer focus to the next paint so the dialog is fully rendered in the DOM.
+    // Focus the container first — VoiceOver reads the dialog's aria-labelledby
+    // name and announces "web dialog" before the user navigates its contents.
+    const frameId = requestAnimationFrame(() => {
+      container.focus();
+    });
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key !== 'Tab') return;
@@ -48,11 +56,13 @@ function useFocusTrap<T extends HTMLElement>(
       const last = focusable[focusable.length - 1];
 
       if (e.shiftKey) {
-        if (document.activeElement === first) {
+        // Shift+Tab from first focusable (or the container itself) → wrap to last
+        if (document.activeElement === first || document.activeElement === container) {
           e.preventDefault();
           last.focus();
         }
       } else {
+        // Tab from last focusable → wrap to first
         if (document.activeElement === last) {
           e.preventDefault();
           first.focus();
@@ -63,6 +73,7 @@ function useFocusTrap<T extends HTMLElement>(
     document.addEventListener('keydown', handleKeyDown);
 
     return () => {
+      cancelAnimationFrame(frameId);
       document.removeEventListener('keydown', handleKeyDown);
       previousFocusRef.current?.focus();
     };

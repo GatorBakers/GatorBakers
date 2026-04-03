@@ -67,7 +67,6 @@ const MobileProductCard = ({ title, bakerName, price, imageUrl, variant, itemDes
                 <div
                     className="m-product-card-modal-overlay"
                     onClick={() => setOpenModal(false)}
-                    aria-hidden="true"
                 >
                     <div
                         ref={modalRef}
@@ -75,6 +74,7 @@ const MobileProductCard = ({ title, bakerName, price, imageUrl, variant, itemDes
                         role="dialog"
                         aria-modal="true"
                         aria-labelledby={titleId}
+                        tabIndex={-1}
                         onClick={(e) => e.stopPropagation()}
                     >
                         <button

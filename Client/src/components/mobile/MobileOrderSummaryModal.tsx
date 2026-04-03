@@ -66,13 +66,14 @@ const MobileOrderSummaryModal = ({ isOpen, onClose, onBack, title, bakerName, pr
     };
 
     return (
-        <div className="m-order-summary-overlay" onClick={onClose} aria-hidden="true">
+        <div className="m-order-summary-overlay" onClick={onClose}>
             <div
                 ref={modalRef}
                 className="m-order-summary-content"
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="m-order-summary-title"
+                tabIndex={-1}
                 onClick={(e) => e.stopPropagation()}
             >
 
@@ -84,7 +85,7 @@ const MobileOrderSummaryModal = ({ isOpen, onClose, onBack, title, bakerName, pr
                 <div className="m-order-summary-item">
                     <CardImage
                         imageUrl={imageUrl}
-                        alt={title}
+                        alt=""
                         placeholderText="Product Image"
                         className="m-order-summary-item-image"
                     />
