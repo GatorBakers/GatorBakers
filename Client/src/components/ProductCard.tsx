@@ -1,6 +1,6 @@
 import CardImage from './CardImage';
 import './ProductCard.css';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import OrderSummaryModal from './OrderSummaryModal';
 
 type ProductCardVariant = 'to_order' | 'listing';
@@ -26,6 +26,17 @@ interface ProductCardProps {
 const ProductCard = ({ title, bakerName, price, imageUrl, variant, itemDescription, ingredients, allergens, quantity }: ProductCardProps) => {
     const [openModal, setOpenModal] = useState<boolean>(false);
     const [openOrderSummary, setOpenOrderSummary] = useState<boolean>(false);
+
+    useEffect(() => {
+        if (openModal) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, [openModal]);
 
     return (
         <div className="product-card">
