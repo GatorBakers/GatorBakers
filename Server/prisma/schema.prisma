@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
@@ -11,6 +5,88 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+}
+
+model User {
+  id               Int             @id @default(autoincrement())
+  email            String          @unique
+  password         String
+  first_name       String
+  last_name        String
+  photo_url        String?
+  created_at       DateTime        @default(now())
+  verified_account Boolean         @default(false)
+  account_status   Account_Status?
+  favorite_bake    String?
+  current_location Coords?
+  listings         Listing[]
+  search_location  Location?
+  orders           Order[]
+  token            Token?
+  reviews          Review[]
+}
+
+model Token {
+  token_id   Int      @id @default(autoincrement())
+  user_id    Int      @unique
+  token      String
+  created_at DateTime @default(now())
+  expired_at DateTime
+  user       User     @relation(fields: [user_id], references: [id])
+}
+
+model Listing {
+  id             Int            @id @default(autoincrement())
+  title          String
+  description    String
+  price          Decimal        @db.Decimal(10, 2)
+  quantity       Int
+  listing_status Listing_Status
+  photo_url      String
+  created_at     DateTime       @default(now())
+  user_id        Int
+  allergens      String[]
+  ingredients    String[]
+  pastries_sold  Int            @default(0)
+  user           User           @relation(fields: [user_id], references: [id])
+  location       Location?
+  orders         Order[]
+  reviews        Review[]
+
+  @@index([user_id])
+}
+
+model Coords {
+  id        Int   @id @default(autoincrement())
+  latitude  Float
+  longitude Float
+  user_id   Int   @unique
+  user      User  @relation(fields: [user_id], references: [id])
+}
+
+model Location {
+  id         Int      @id @default(autoincrement())
+  city       String
+  listing_id Int?     @unique
+  user_id    Int?     @unique
+  state      US_State
+  listing    Listing? @relation(fields: [listing_id], references: [id])
+  user       User?    @relation(fields: [user_id], references: [id])
+}
+
+model Order {
+  id              Int            @id @default(autoincrement())
+  created_at      DateTime       @default(now())
+  listing_id      Int
+  status          Listing_Status
+  user_id         Int
+  pickup_location String
+  pickup_time     String?
+  listing         Listing        @relation(fields: [listing_id], references: [id])
+  user            User           @relation(fields: [user_id], references: [id])
+
+  @@index([user_id])
+  @@index([listing_id])
 }
 
 enum Account_Status {
@@ -22,8 +98,8 @@ enum Account_Status {
 enum Listing_Status {
   AVAILABLE
   PENDING
-  CONFIRMED
   SOLD
+  CONFIRMED
   COMPLETED
   CANCELLED
 }
@@ -82,87 +158,6 @@ enum US_State {
   DC
 }
 
-model User {
-  id  Int @id @default(autoincrement())
-  email String  @unique
-  password  String  
-  first_name  String
-  last_name String
-  account_status Account_Status?
-  verified_account Boolean @default(false)
-  photo_url String?
-  favorite_bake String?
-  created_at DateTime @default(now())
-  current_location  Coords?
-  search_location Location?
-  token Token[]
-  listings Listing[]
-  orders Order[]
-  reviews Review[]
-}
-
-model Token {
-  token_id  Int       @id @default(autoincrement())
-  user_id    Int   @unique
-  user      User   @relation(fields: [user_id], references: [id])
-  token     String
-  created_at DateTime  @default(now())
-  expired_at DateTime
-}
-
-model Listing {
-  id  Int @id @default(autoincrement())
-  user_id Int
-  user   User @relation(fields: [user_id], references: [id])
-  title String
-  description String
-  price Decimal @db.Decimal(10, 2)
-  quantity Int
-  pastries_sold Int @default(0)
-  listing_status Listing_Status
-  photo_url String
-  ingredients String[]
-  allergens String[]
-  created_at DateTime @default(now())
-  location Location?
-  orders Order[]
-  reviews Review[]
-
-  @@index([user_id])
-  
-}
-
-model Coords {
-  id  Int @id @default(autoincrement())
-  user_id Int  @unique
-  user   User @relation(fields: [user_id], references: [id])
-  latitude Float
-  longitude Float
-}
-
-model Location {
-  id Int @id @default(autoincrement())
-  user_id    Int?     @unique
-  user      User?    @relation(fields: [user_id], references: [id])
-  listing_id Int?     @unique
-  listing   Listing? @relation(fields: [listing_id], references: [id])
-  city      String
-  state     US_State
-}
-
-
-model Order {
-  id  Int @id @default(autoincrement())
-  created_at DateTime @default(now())
-  user_id Int
-  user   User @relation(fields: [user_id], references: [id])
-  listing_id Int
-  listing Listing @relation(fields: [listing_id], references: [id])
-  pickup_location String 
-  status  Listing_Status
-  @@index([user_id])
-  @@index([listing_id])
-} 
 
 model Review {
   id  Int @id @default(autoincrement())
@@ -179,4 +174,3 @@ model Review {
   @@index([user_id])
   @@index([listing_id])
 }
-
