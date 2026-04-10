@@ -961,11 +961,9 @@ app.post("/chat/:orderId", async (req, res) => {
   }
 });
 
-app.get("/chat/token/:userId", async (req, res) => {
-  const user_id = req.params.userId;
-
-  const token = streamClient.createToken(user_id);
-
+app.get("/chat/token", authenticate, async (req, res) => {
+  const { id } = (req as any).user;
+  const token = streamClient.createToken(id.toString());
   res.json({ token });
 });
 
