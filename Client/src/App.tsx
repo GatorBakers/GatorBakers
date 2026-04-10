@@ -12,6 +12,7 @@ import YourOrdersPage from './pages/OrdersAndListingsPage';
 import SearchPage from './pages/SearchPage';
 import ProfilePage from './pages/ProfilePage';
 import CreateListingPage from './pages/CreateListingPage';
+import MessagesPage from './pages/MessagesPage';
 
 const queryClient = new QueryClient();
 
@@ -28,7 +29,7 @@ function App() {
           <Route path="/discover" element={<DiscoverPage />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/orders" element={<YourOrdersPage />} />
-          <Route path="/messages" element={<></>} /> {/* TODO: Add Messages Page */}
+          <Route path="/messages" element={<MessagesPage />} />
           <Route path="/create-listing" element={<CreateListingPage />} />
           <Route path="/profile" element={<ProfilePage/>} />
         </Route>
