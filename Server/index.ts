@@ -10,7 +10,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dayjs from "dayjs";
 import { validateRegInput, validateLoginInput } from "./src/utils/validation";
-import { use } from "react";
+import { StreamChat } from "stream-chat";
 
 const saltRounds = 10;
 const adapter = new PrismaPg({
@@ -21,6 +21,17 @@ const client = new MeiliSearch({
   host: process.env.MEILI_HOST!,
   apiKey: process.env.MEILI_API_KEY!,
 });
+
+const STREAM_API_KEY = process.env.STREAM_API_KEY!;
+const STREAM_API_SECRET = process.env.STREAM_API_SECRET!;
+
+if (!STREAM_API_KEY || !STREAM_API_SECRET) {
+  throw new Error(
+    "STREAM_API_KEY and STREAM_API_SECRET must be set in your environment",
+  );
+}
+
+const streamClient = StreamChat.getInstance(STREAM_API_KEY, STREAM_API_SECRET);
 
 export const prisma = new PrismaClient({ adapter });
 const app = express();
@@ -888,10 +899,72 @@ app.put("/review/:id", async (req: Request, res: Response) => {
 
     return res.status(200).json(edited_review);
   } catch (error) {
-
     console.error(error);
     return res.status(500).json({ message: "Server error" });
   }
+});
+
+app.post("/chat/:orderId", async (req, res) => {
+  const orderId = Number(req.params.orderId);
+  const customerId = Number(req.body.userId);
+
+  if (!orderId || isNaN(orderId)) {
+    return res.status(400).json({ message: "Invalid order id" });
+  }
+
+  try {
+    const order = await prisma.order.findUnique({
+      where: { id: Number(orderId) },
+      include: { listing: true },
+    });
+
+    if (!order) {
+      return res.status(404).json({ error: "Order not found" });
+    }
+    const vendorId = order.listing.user_id;
+
+    if (customerId !== order.user_id && customerId !== vendorId) {
+      return res.status(403).json({ error: "Unauthorized" });
+    }
+
+    let channel_connection = await prisma.channelConnection.findUnique({
+      where: { order_id: order.id },
+    });
+
+    if (!channel_connection) {
+      await streamClient.upsertUsers([
+        { id: customerId.toString() },
+        { id: vendorId.toString() },
+      ]);
+
+      const channel = streamClient.channel("messaging", orderId.toString(), {
+        members: [customerId.toString(), vendorId.toString()],
+        created_by_id: customerId.toString(),
+      });
+
+      await channel.create();
+
+      channel_connection = await prisma.channelConnection.create({
+        data: {
+          channel_id: orderId.toString(),
+          order_id: Number(orderId),
+          customer_id: customerId,
+          vendor_id: vendorId,
+        },
+      });
+    }
+
+    return res.json({ channelId: channel_connection.channel_id });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+app.get("/chat/token", authenticate, async (req, res) => {
+  const { id } = (req as any).user;
+  const token = streamClient.createToken(id.toString());
+  res.json({ token });
 });
 
 app.listen(PORT, () => console.log("Server running on port " + PORT));
