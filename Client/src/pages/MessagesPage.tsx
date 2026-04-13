@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useIsMobile } from '../hooks/useIsMobile';
 import EmptyState from '../components/EmptyState';
+import MobileMessagesPage from './MobileMessagePage';
 import './MessagesPage.css';
 
 export interface Conversation {
@@ -17,6 +18,18 @@ export interface Message {
     senderId: string;
     body: string;
     sentAt: string; // ISO timestamp
+}
+
+export interface MessagesPageProps {
+    conversations: Conversation[];
+    messages: Message[];
+    selectedId: string | null;
+    setSelectedId: (id: string | null) => void;
+    inputValue: string;
+    setInputValue: (value: string) => void;
+    handleSend: () => void;
+    handleKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
+    messagesEndRef: React.RefObject<HTMLDivElement | null>;
 }
 
 // TODO: Replace CURRENT_USER_ID with the authenticated user's ID
@@ -43,7 +56,7 @@ const PLACEHOLDER_MESSAGES: Record<string, Message[]> = {
     ]
 };
 
-function formatTime(isoString: string): string {
+export function formatTime(isoString: string): string {
     const date = new Date(isoString);
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
@@ -59,31 +72,22 @@ function formatTime(isoString: string): string {
     return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
 }
 
-function getInitial(name: string): string {
+export function getInitial(name: string): string {
     return name.charAt(0).toUpperCase();
 }
 
 const MessagesPage = () => {
     const isMobile = useIsMobile();
 
-    // TODO: Build page for mobile
-    if (isMobile) return null;
-
-    return <DesktopMessagesPage />;
-};
-
-const DesktopMessagesPage = () => {
     // TODO: get conversations from backend
     const conversations = PLACEHOLDER_CONVERSATIONS;
 
     const [selectedId, setSelectedId] = useState<string | null>(
-        conversations.length > 0 ? conversations[0].id : null
+        !isMobile && conversations.length > 0 ? conversations[0].id : null
     );
     const [inputValue, setInputValue] = useState('');
     const [localMessages, setLocalMessages] = useState<Record<string, Message[]>>(PLACEHOLDER_MESSAGES);
     const messagesEndRef = useRef<HTMLDivElement>(null);
-
-    const selectedConversation = conversations.find((c) => c.id === selectedId) ?? null;
 
     // TODO: get messages from backend
     const messages = selectedId ? (localMessages[selectedId] ?? []) : [];
@@ -117,6 +121,36 @@ const DesktopMessagesPage = () => {
             handleSend();
         }
     };
+
+    const sharedProps: MessagesPageProps = {
+        conversations,
+        messages,
+        selectedId,
+        setSelectedId,
+        inputValue,
+        setInputValue,
+        handleSend,
+        handleKeyDown,
+        messagesEndRef,
+    };
+
+    if (isMobile) return <MobileMessagesPage {...sharedProps} />;
+
+    return <DesktopMessagesPage {...sharedProps} />;
+};
+
+const DesktopMessagesPage = ({
+    conversations,
+    messages,
+    selectedId,
+    setSelectedId,
+    inputValue,
+    setInputValue,
+    handleSend,
+    handleKeyDown,
+    messagesEndRef,
+}: MessagesPageProps) => {
+    const selectedConversation = conversations.find((c) => c.id === selectedId) ?? null;
 
     return (
         <div className="messages-page">
