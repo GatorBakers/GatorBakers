@@ -21,7 +21,7 @@ const MobileMessagesPage = ({
 
     if (selectedConversation) {
         return (
-            <div className="mobile-messages-page">
+            <div className="mobile-thread-overlay">
                 <div className="mobile-thread-header">
                     <button
                         className="mobile-back-btn"
@@ -62,7 +62,7 @@ const MobileMessagesPage = ({
                     <div ref={messagesEndRef} />
                 </div>
 
-                <div className="compose-bar">
+                <div className="mobile-compose-bar">
                     <textarea
                         className="compose-input"
                         placeholder="Type a message…"
@@ -85,10 +85,6 @@ const MobileMessagesPage = ({
 
     return (
         <div className="mobile-messages-page">
-            <div className="mobile-inbox-header">
-                <h2 className="inbox-heading">Messages</h2>
-            </div>
-
             {conversations.length === 0 ? (
                 <EmptyState
                     title="No messages yet"
