@@ -200,7 +200,7 @@ app.get("/search/listings", async (req: Request, res: Response) => {
   try {
     const results = await client.index("listings").search(query, { limit: 20 });
 
-    const ids = results.hits.map((hit: any) => hit.id);
+    const ids: number[] = results.hits.map((hit: any) => Number(hit.id));
 
     if (ids.length === 0) {
       return res.status(200).json([]);
@@ -215,7 +215,7 @@ app.get("/search/listings", async (req: Request, res: Response) => {
     });
 
     const listingsMap = new Map(listings.map(l => [l.id, l]));
-    const orderedListings = ids.map(id => listingsMap.get(id));
+    const orderedListings = ids.map((id: number) => listingsMap.get(id));
 
     return res.status(200).json(orderedListings);
   } catch (error) {
