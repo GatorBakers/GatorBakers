@@ -1,5 +1,6 @@
 import "dotenv/config";
 import { PrismaClient } from "./generated/prisma";
+import { MeiliSearch } from "meilisearch";
 import express, { Request, Response } from "express";
 import { TokenExpiredError } from "jsonwebtoken";
 import { PrismaPg } from "@prisma/adapter-pg";
@@ -16,6 +17,11 @@ const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL!,
 });
 
+const client = new MeiliSearch({
+  host: process.env.MEILI_HOST!,
+  apiKey: process.env.MEILI_API_KEY!,
+});
+
 export const prisma = new PrismaClient({ adapter });
 export const app = express();
 const PORT = 4000;
@@ -29,6 +35,8 @@ if (!refresh_secret) {
   throw new Error("refresh_secret is not defined ");
 }
 
+let isSyncing = false;
+
 app.use(express.json({ limit: "10mb" })); // Increased for base64 image payloads (revert once AWS S3 upload is implemented)
 app.use(cookieParser());
 app.use(
@@ -39,6 +47,39 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"],
   }),
 );
+
+async function syncListingsToMeili() {
+  if (isSyncing) return;
+  isSyncing = true;
+
+  try {
+    const listings = await prisma.listing.findMany({
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        price: true,
+        quantity: true,
+        pastries_sold: true,
+        created_at: true,
+      },
+    });
+
+    if (listings.length === 0) {
+      return;
+    }
+
+    await client.index("listings").addDocuments(listings);
+    console.log("Sync Passed!");
+  } catch (error) {
+    console.error("Sync failed:", error);
+  } finally {
+    isSyncing = false;
+  }
+}
+
+syncListingsToMeili();
+setInterval(syncListingsToMeili, 30 * 60 * 1000);
 
 function authenticate(req: Request, res: Response, next: any) {
   const authHeader = req.headers.authorization;
@@ -151,6 +192,36 @@ app.post("/logout", async (req: Request, res: Response) => {
     sameSite: "strict",
   });
   res.json({ message: "Logged out" });
+});
+
+app.get("/search/listings", async (req: Request, res: Response) => {
+  const query = (req.query.q as string) || "";
+
+  try {
+    const results = await client.index("listings").search(query, { limit: 20 });
+
+    const ids = results.hits.map((hit: any) => hit.id);
+
+    if (ids.length === 0) {
+      return res.status(200).json([]);
+    }
+
+    const listings = await prisma.listing.findMany({
+      where: { id: { in: ids } },
+      include: {
+        user: { select: { first_name: true, last_name: true } },
+        location: { select: { city: true, state: true } },
+      },
+    });
+
+    const listingsMap = new Map(listings.map(l => [l.id, l]));
+    const orderedListings = ids.map(id => listingsMap.get(id));
+
+    return res.status(200).json(orderedListings);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Search failed" });
+  }
 });
 
 app.get("/profile", authenticate, async (req: Request, res: Response) => {
@@ -477,6 +548,17 @@ app.post("/listing", authenticate, async (req: Request, res: Response) => {
       },
       include: { user: { select: { first_name: true, last_name: true } } },
     });
+    await client.index("listings").addDocuments([
+      {
+        id: new_listing.id,
+        title: new_listing.title,
+        description: new_listing.description,
+        price: new_listing.price,
+        quantity: new_listing.quantity,
+        pastries_sold: new_listing.pastries_sold,
+        created_at: new_listing.created_at,
+      },
+    ]);
     return res.status(201).json(new_listing);
   } catch (error) {
     console.error(error);
@@ -527,6 +609,15 @@ app.patch("/listing/:id", async (req: Request, res: Response) => {
       where: { id },
       data: updateData,
     });
+    await client.index("listings").updateDocuments([
+      {
+        id: updated_listing.id,
+        title: updated_listing.title,
+        description: updated_listing.description,
+        price: updated_listing.price,
+        quantity: updated_listing.quantity,
+      },
+    ]);
     res.json(updated_listing);
   } catch (error) {
     res.json({ message: "Server error", error });
@@ -552,6 +643,7 @@ app.delete("/listing/:id", async (req: Request, res: Response) => {
     await prisma.listing.delete({
       where: { id },
     });
+    await client.index("listings").deleteDocument(id);
     res.json("Deleted!");
   } catch {
     res.json("Server Error");
@@ -774,6 +866,70 @@ app.get("/orders/seller/:id", authenticate, async (req: Request, res: Response) 
     return res
       .status(200)
       .json({ pending_orders, confirmed_orders, cancelled_orders });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+app.post("/review/listing", async (req: Request, res: Response) => {
+  const listing_id = Number(req.body.listing_id);
+  const user_id = Number(req.body.user_id);
+  const rating = Number(req.body.rating);
+  const { title, description } = req.body;
+
+  if (!title || !description) {
+    return res.status(400).json({ message: "Missing title or description" });
+  }
+
+  if (isNaN(listing_id) || isNaN(user_id) || isNaN(rating)) {
+    return res.status(400).json({ message: "Invalid user or listing id" });
+  }
+
+  if (rating < 1 || rating > 5) {
+    return res.status(400).json({ message: "Rating must be 1-5" });
+  }
+  try {
+    const review = await prisma.review.create({
+      data: {
+        listing_id,
+        user_id,
+        title,
+        description,
+        rating,
+      },
+    });
+    return res.status(201).json(review);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+app.put("/review/:id", async (req: Request, res: Response) => {
+  const review_id = Number(req.params.id);
+  const { title, description } = req.body;
+
+  if (isNaN(review_id)) {
+    return res.status(400).json({ message: "Invalid review id" });
+  }
+
+  if (!title && !description) {
+    return res.status(400).json({ message: "Nothing to update" });
+  }
+
+  try {
+    const edited_review = await prisma.review.update({
+      where: {
+        id: review_id,
+      },
+      data: {
+        title,
+        description,
+      },
+    });
+
+    return res.status(200).json(edited_review);
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Server error" });
