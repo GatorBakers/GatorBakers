@@ -1,10 +1,6 @@
-Server/data.ms/auth/data.mdb
-Server/data.ms/auth/lock.mdb
-Server/data.ms/indexes/6328683c-6199-4937-9924-f482e1a5c8bf/data.mdb
-Server/data.ms/indexes/6328683c-6199-4937-9924-f482e1a5c8bf/lock.mdb
-Server/data.ms/instance-uid
-Server/data.ms/tasks/data.mdb
-Server/data.ms/tasks/lock.mdb
-Server/data.ms/VERSION
+**/data.ms/**/data.mdb
+**/data.ms/**/lock.mdb
+**/data.ms/instance-uid
+**/data.ms/VERSION
 Server/meilisearch
 Server/meilisearch.exe
