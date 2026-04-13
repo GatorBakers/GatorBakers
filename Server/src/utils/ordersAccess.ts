@@ -8,7 +8,7 @@ export function getOrdersAccessError(
   requesterUserId: number,
   requestedUserId: number,
 ): AccessError | null {
-  if (Number.isNaN(requestedUserId)) {
+  if (!Number.isInteger(requestedUserId) || requestedUserId <= 0) {
     return { status: 400, message: "Invalid user id" };
   }
 

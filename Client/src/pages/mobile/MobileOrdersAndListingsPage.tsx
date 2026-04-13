@@ -7,6 +7,7 @@ interface Order {
     id: number;
     itemName: string;
     bakerName: string;
+    buyerName: string;
     status: OrderStatus;
     pickupTime: string;
     pickupAddress: string;
@@ -59,7 +60,7 @@ const MobileYourOrdersPage = ({
                             <MobileOrderCard
                                 key={order.id}
                                 itemName={order.itemName}
-                                bakerName={order.bakerName}
+                                otherPartyName={order.buyerName}
                                 status={order.status}
                                 pickupTime={order.pickupTime}
                                 pickupAddress={order.pickupAddress}
@@ -85,7 +86,7 @@ const MobileYourOrdersPage = ({
                             <MobileOrderCard
                                 key={order.id}
                                 itemName={order.itemName}
-                                bakerName={order.bakerName}
+                                otherPartyName={order.bakerName}
                                 status={order.status}
                                 pickupTime={order.pickupTime}
                                 pickupAddress={order.pickupAddress}

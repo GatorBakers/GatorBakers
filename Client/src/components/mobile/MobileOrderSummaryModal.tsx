@@ -71,11 +71,13 @@ const MobileOrderSummaryModal = ({
         setSubmitError(null);
 
         try {
+            const pickupDateTime = `${selectedPickupDate}T${selectedPickupTime}`;
+
             await createOrderMutation.mutateAsync({
                 listingId,
                 payload: {
                     pickup_location: `${selectedPickupLocation.name} (${selectedPickupLocation.address})`,
-                    pickup_time: selectedPickupTime,
+                    pickup_time: pickupDateTime,
                 },
                 sellerUserId,
             });

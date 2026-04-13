@@ -16,6 +16,7 @@ interface Order {
     buyerUserId?: number;
     itemName: string;
     bakerName: string;
+    buyerName: string;
     status: OrderStatus;
     pickupTime: string;
     pickupAddress: string;
@@ -26,6 +27,19 @@ const formatPickupTime = (pickupTime: string | null): string => {
     if (!pickupTime) {
         return 'Time TBD';
     }
+
+    if (pickupTime.includes('T')) {
+        const parsed = new Date(pickupTime);
+        if (!Number.isNaN(parsed.getTime())) {
+            return parsed.toLocaleString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit',
+            });
+        }
+    }
+
     const [hours, minutes] = pickupTime.split(':').map(Number);
     if (Number.isNaN(hours) || Number.isNaN(minutes)) {
         return pickupTime;
@@ -66,6 +80,7 @@ const mapBuyerOrder = (order: BuyerOrder): Order => {
         bakerName: order.listing.user
             ? `${order.listing.user.first_name} ${order.listing.user.last_name}`
             : 'Local baker',
+        buyerName: 'You',
         status: toUiStatus(order.status),
         pickupAddress,
         pickupTime,
@@ -73,7 +88,7 @@ const mapBuyerOrder = (order: BuyerOrder): Order => {
     };
 };
 
-const mapSellerOrder = (order: SellerOrder): Order => {
+const mapSellerOrder = (order: SellerOrder, fallbackBakerName: string): Order => {
     const legacyPickup = parseLegacyPickup(order.pickup_location);
     const pickupAddress = order.pickup_time ? order.pickup_location : legacyPickup.pickupAddress;
     const pickupTime = order.pickup_time ? formatPickupTime(order.pickup_time) : legacyPickup.pickupTime;
@@ -81,7 +96,10 @@ const mapSellerOrder = (order: SellerOrder): Order => {
         id: order.id,
         buyerUserId: order.user.id,
         itemName: order.listing.title,
-        bakerName: `${order.user.first_name} ${order.user.last_name}`,
+        bakerName: order.listing.user
+            ? `${order.listing.user.first_name} ${order.listing.user.last_name}`
+            : fallbackBakerName,
+        buyerName: `${order.user.first_name} ${order.user.last_name}`,
         status: toUiStatus(order.status),
         pickupAddress,
         pickupTime,
@@ -94,6 +112,7 @@ const YourOrdersPage = () => {
     const [actionError, setActionError] = useState<string | null>(null);
     const { profile, isLoading: profileLoading, error: profileError } = useProfile();
     const userId = profile?.id ?? null;
+    const profileName = profile?.name ?? 'You';
     const { orders: buyerOrders, isLoading: buyerLoading, error: buyerError } = useBuyerOrders(userId);
     const { orders: sellerOrders, isLoading: sellerLoading, error: sellerError } = useSellerOrders(userId);
     const updateOrderStatusMutation = useUpdateOrderStatus();
@@ -101,7 +120,7 @@ const YourOrdersPage = () => {
     const incomingOrders = [
         ...sellerOrders.pending_orders,
         ...sellerOrders.confirmed_orders,
-    ].map(mapSellerOrder);
+    ].map((order) => mapSellerOrder(order, profileName));
     const myOrders = buyerOrders
         .filter((order) => order.listing.user?.id !== userId)
         .map(mapBuyerOrder);
@@ -181,7 +200,7 @@ const YourOrdersPage = () => {
                             <OrderCard
                                 key={order.id}
                                 itemName={order.itemName}
-                                bakerName={order.bakerName}
+                                otherPartyName={order.buyerName}
                                 status={order.status}
                                 pickupTime={order.pickupTime}
                                 pickupAddress={order.pickupAddress}
@@ -207,7 +226,7 @@ const YourOrdersPage = () => {
                             <OrderCard
                                 key={order.id}
                                 itemName={order.itemName}
-                                bakerName={order.bakerName}
+                                otherPartyName={order.bakerName}
                                 status={order.status}
                                 pickupTime={order.pickupTime}
                                 pickupAddress={order.pickupAddress}

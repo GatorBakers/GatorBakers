@@ -7,7 +7,7 @@ export type { OrderStatus };
 
 interface MobileOrderCardProps {
     itemName: string;
-    bakerName: string;
+    otherPartyName: string;
     status: OrderStatus;
     pickupTime: string;
     pickupAddress: string;
@@ -19,7 +19,7 @@ interface MobileOrderCardProps {
 
 const MobileOrderCard = ({
     itemName,
-    bakerName,
+    otherPartyName,
     status,
     pickupTime,
     pickupAddress,
@@ -41,7 +41,7 @@ const MobileOrderCard = ({
                 <div className="m-order-card-top-row">
                     <div className="m-order-card-info">
                         <p className="m-order-card-item-name">{itemName}</p>
-                        <p className="m-order-card-baker-name">{bakerName}</p>
+                        <p className="m-order-card-baker-name">{otherPartyName}</p>
                     </div>
                     <StatusBadge status={status} />
                 </div>
