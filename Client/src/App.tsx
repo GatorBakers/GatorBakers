@@ -13,6 +13,7 @@ import SearchPage from './pages/SearchPage';
 import ProfilePage from './pages/ProfilePage';
 import CreateListingPage from './pages/CreateListingPage';
 import MessagesPage from './pages/MessagesPage';
+import ScrollToTop from './components/ScrollToTop';
 
 const queryClient = new QueryClient();
 
@@ -22,6 +23,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
     <AuthProvider>
     <BrowserRouter>
+      <ScrollToTop />
       <Routes>
         {/* Main Layout */}
         <Route element={<MainLayout />}>
