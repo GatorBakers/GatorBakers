@@ -99,6 +99,8 @@ model User {
   listings Listing[]
   orders Order[]
   reviews Review[]
+  customer_channels ChannelConnection[] @relation("CustomerChannels")
+  vendor_channels   ChannelConnection[] @relation("VendorChannels")
 }
 
 model Token {
@@ -161,6 +163,7 @@ model Order {
   pickup_location String 
   pickup_time String?
   status  Listing_Status
+  chat_connection ChannelConnection?
   @@index([user_id])
   @@index([listing_id])
 } 
@@ -179,5 +182,20 @@ model Review {
   @@unique([user_id, listing_id])
   @@index([user_id])
   @@index([listing_id])
+}
+
+model ChannelConnection {
+  id Int @id @default(autoincrement())
+  channel_id String @unique  
+  order_id Int @unique
+  order Order @relation(fields: [order_id], references: [id])
+  customer_id Int
+  customer User @relation("CustomerChannels", fields: [customer_id], references: [id])
+  vendor_id Int
+  vendor User @relation("VendorChannels", fields: [vendor_id], references: [id])
+  created_at DateTime @default(now())
+
+  @@index([customer_id])
+  @@index([vendor_id])
 }
 

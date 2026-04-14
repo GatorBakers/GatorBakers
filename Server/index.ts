@@ -10,6 +10,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dayjs from "dayjs";
 import { validateRegInput, validateLoginInput } from "./src/utils/validation";
+import { StreamChat } from "stream-chat";
 import { getOrdersAccessError } from "./src/utils/ordersAccess";
 
 const saltRounds = 10;
@@ -21,6 +22,17 @@ const client = new MeiliSearch({
   host: process.env.MEILI_HOST!,
   apiKey: process.env.MEILI_API_KEY!,
 });
+
+const STREAM_API_KEY = process.env.STREAM_API_KEY!;
+const STREAM_API_SECRET = process.env.STREAM_API_SECRET!;
+
+if (!STREAM_API_KEY || !STREAM_API_SECRET) {
+  throw new Error(
+    "STREAM_API_KEY and STREAM_API_SECRET must be set in your environment",
+  );
+}
+
+const streamClient = StreamChat.getInstance(STREAM_API_KEY, STREAM_API_SECRET);
 
 export const prisma = new PrismaClient({ adapter });
 export const app = express();
@@ -650,73 +662,77 @@ app.delete("/listing/:id", async (req: Request, res: Response) => {
   }
 });
 
-app.post("/listing/:id/order", authenticate, async (req: Request, res: Response) => {
-  const listing_id = Number(req.params.id);
-  const { id: user_id } = (req as any).user;
-  const pickup_location = req.body.pickup_location;
-  const pickup_time = req.body.pickup_time;
+app.post(
+  "/listing/:id/order",
+  authenticate,
+  async (req: Request, res: Response) => {
+    const listing_id = Number(req.params.id);
+    const { id: user_id } = (req as any).user;
+    const pickup_location = req.body.pickup_location;
+    const pickup_time = req.body.pickup_time;
 
-  if (!listing_id || isNaN(listing_id)) {
-    return res.status(400).json({ message: "Invalid listing id" });
-  }
-  if (!pickup_location || typeof pickup_location !== "string") {
-    return res.status(400).json({ message: "Pickup location is required" });
-  }
-  if (!pickup_time || typeof pickup_time !== "string") {
-    return res.status(400).json({ message: "Pickup time is required" });
-  }
-
-  try {
-    const listing = await prisma.listing.findUnique({
-      where: { id: listing_id },
-    });
-
-    if (!listing) {
-      return res.status(404).json({ message: "Listing does not exist" });
+    if (!listing_id || isNaN(listing_id)) {
+      return res.status(400).json({ message: "Invalid listing id" });
+    }
+    if (!pickup_location || typeof pickup_location !== "string") {
+      return res.status(400).json({ message: "Pickup location is required" });
+    }
+    if (!pickup_time || typeof pickup_time !== "string") {
+      return res.status(400).json({ message: "Pickup time is required" });
     }
 
-    if (listing.user_id === user_id) {
-      return res
-        .status(403)
-        .json({ message: "You cannot place an order on your own listing" });
-    }
+    try {
+      const listing = await prisma.listing.findUnique({
+        where: { id: listing_id },
+      });
 
-    if (listing.quantity < 1) {
+      if (!listing) {
+        return res.status(404).json({ message: "Listing does not exist" });
+      }
+
+      if (listing.user_id === user_id) {
+        return res
+          .status(403)
+          .json({ message: "You cannot place an order on your own listing" });
+      }
+
+      if (listing.quantity < 1) {
+        await prisma.listing.update({
+          where: { id: listing_id },
+          data: {
+            quantity: 0,
+            listing_status: "SOLD",
+          },
+        });
+
+        return res.status(410).json({ message: "Pastry is sold out!" });
+      }
+
       await prisma.listing.update({
         where: { id: listing_id },
         data: {
-          quantity: 0,
-          listing_status: "SOLD",
+          quantity: listing.quantity - 1,
+          pastries_sold: listing.pastries_sold + 1,
         },
       });
 
-      return res.status(410).json({ message: "Pastry is sold out!" });
+      const order = await prisma.order.create({
+        data: {
+          user_id,
+          listing_id,
+          status: "PENDING",
+          pickup_location,
+          pickup_time,
+        },
+      });
+
+      return res.status(201).json(order);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: "Server error" });
     }
-
-    await prisma.listing.update({
-      where: { id: listing_id },
-      data: {
-        quantity: listing.quantity - 1,
-        pastries_sold: listing.pastries_sold + 1,
-      },
-    });
-
-    const order = await prisma.order.create({
-      data: {
-        user_id,
-        listing_id,
-        status: "PENDING",
-        pickup_location,
-        pickup_time,
-      },
-    });
-
-    return res.status(201).json(order);
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Server error" });
-  }
-});
+  },
+);
 
 app.patch("/order/:id", authenticate, async (req: Request, res: Response) => {
   const { id: requester_user_id } = (req as any).user;
@@ -752,7 +768,9 @@ app.patch("/order/:id", authenticate, async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Order does not exist" });
     }
     if (order.listing.user_id !== requester_user_id) {
-      return res.status(403).json({ message: "Forbidden: not your order to update" });
+      return res
+        .status(403)
+        .json({ message: "Forbidden: not your order to update" });
     }
     const updated_order = await prisma.order.update({
       where: {
@@ -769,108 +787,120 @@ app.patch("/order/:id", authenticate, async (req: Request, res: Response) => {
   }
 });
 
-app.get("/orders/user/:id", authenticate, async (req: Request, res: Response) => {
-  const { id: requester_user_id } = (req as any).user;
-  const user_id = Number(req.params.id);
+app.get(
+  "/orders/user/:id",
+  authenticate,
+  async (req: Request, res: Response) => {
+    const { id: requester_user_id } = (req as any).user;
+    const user_id = Number(req.params.id);
 
-  const accessError = getOrdersAccessError(requester_user_id, user_id);
-  if (accessError) {
-    return res.status(accessError.status).json({ message: accessError.message });
-  }
+    const accessError = getOrdersAccessError(requester_user_id, user_id);
+    if (accessError) {
+      return res
+        .status(accessError.status)
+        .json({ message: accessError.message });
+    }
 
-  try {
-    const orders = await prisma.order.findMany({
-      where: { user_id },
-      select: {
-        id: true,
-        created_at: true,
-        pickup_location: true,
-        pickup_time: true,
-        status: true,
-        listing: {
-          select: {
-            id: true,
-            title: true,
-            description: true,
-            price: true,
-            quantity: true,
-            listing_status: true,
-            photo_url: true,
-            ingredients: true,
-            allergens: true,
-            user: {
-              select: {
-                id: true,
-                first_name: true,
-                last_name: true,
+    try {
+      const orders = await prisma.order.findMany({
+        where: { user_id },
+        select: {
+          id: true,
+          created_at: true,
+          pickup_location: true,
+          pickup_time: true,
+          status: true,
+          listing: {
+            select: {
+              id: true,
+              title: true,
+              description: true,
+              price: true,
+              quantity: true,
+              listing_status: true,
+              photo_url: true,
+              ingredients: true,
+              allergens: true,
+              user: {
+                select: {
+                  id: true,
+                  first_name: true,
+                  last_name: true,
+                },
               },
             },
           },
         },
-      },
-    });
+      });
 
-    return res.status(200).json(orders);
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Server error" });
-  }
-});
+      return res.status(200).json(orders);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: "Server error" });
+    }
+  },
+);
 
-app.get("/orders/seller/:id", authenticate, async (req: Request, res: Response) => {
-  const { id: requester_user_id } = (req as any).user;
-  const seller_id = Number(req.params.id);
+app.get(
+  "/orders/seller/:id",
+  authenticate,
+  async (req: Request, res: Response) => {
+    const { id: requester_user_id } = (req as any).user;
+    const seller_id = Number(req.params.id);
 
-  const accessError = getOrdersAccessError(requester_user_id, seller_id);
-  if (accessError) {
-    return res.status(accessError.status).json({ message: accessError.message });
-  }
-  try {
-    const orders = await prisma.order.findMany({
-      where: { listing: { user_id: seller_id } },
-      select: {
-        id: true,
-        created_at: true,
-        pickup_location: true,
-        pickup_time: true,
-        status: true,
-        listing: {
-          select: {
-            id: true,
-            title: true,
-            description: true,
-            price: true,
-            quantity: true,
-            listing_status: true,
-            photo_url: true,
-            ingredients: true,
-            allergens: true,
+    const accessError = getOrdersAccessError(requester_user_id, seller_id);
+    if (accessError) {
+      return res
+        .status(accessError.status)
+        .json({ message: accessError.message });
+    }
+    try {
+      const orders = await prisma.order.findMany({
+        where: { listing: { user_id: seller_id } },
+        select: {
+          id: true,
+          created_at: true,
+          pickup_location: true,
+          pickup_time: true,
+          status: true,
+          listing: {
+            select: {
+              id: true,
+              title: true,
+              description: true,
+              price: true,
+              quantity: true,
+              listing_status: true,
+              photo_url: true,
+              ingredients: true,
+              allergens: true,
+            },
+          },
+          user: {
+            select: {
+              id: true,
+              first_name: true,
+              last_name: true,
+            },
           },
         },
-        user: {
-          select: {
-            id: true,
-            first_name: true,
-            last_name: true,
-          },
-        },
-      },
-    });
+      });
 
-    const pending_orders = orders.filter(o => o.status === "PENDING");
-    const confirmed_orders = orders.filter(o =>
-      ["CONFIRMED", "COMPLETED"].includes(o.status),
-    );
-    const cancelled_orders = orders.filter(o => o.status === "CANCELLED");
+      const pending_orders = orders.filter(o => o.status === "PENDING");
+      const confirmed_orders = orders.filter(o =>
+        ["CONFIRMED", "COMPLETED"].includes(o.status),
+      );
+      const cancelled_orders = orders.filter(o => o.status === "CANCELLED");
 
-    return res
-      .status(200)
-      .json({ pending_orders, confirmed_orders, cancelled_orders });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Server error" });
-  }
-});
+      return res
+        .status(200)
+        .json({ pending_orders, confirmed_orders, cancelled_orders });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: "Server error" });
+    }
+  },
+);
 
 app.post("/review/listing", async (req: Request, res: Response) => {
   const listing_id = Number(req.body.listing_id);
@@ -934,6 +964,69 @@ app.put("/review/:id", async (req: Request, res: Response) => {
     console.error(error);
     return res.status(500).json({ message: "Server error" });
   }
+});
+
+app.post("/chat/:orderId", async (req, res) => {
+  const orderId = Number(req.params.orderId);
+  const customerId = Number(req.body.userId);
+
+  if (!orderId || isNaN(orderId)) {
+    return res.status(400).json({ message: "Invalid order id" });
+  }
+
+  try {
+    const order = await prisma.order.findUnique({
+      where: { id: Number(orderId) },
+      include: { listing: true },
+    });
+
+    if (!order) {
+      return res.status(404).json({ error: "Order not found" });
+    }
+    const vendorId = order.listing.user_id;
+
+    if (customerId !== order.user_id && customerId !== vendorId) {
+      return res.status(403).json({ error: "Unauthorized" });
+    }
+
+    let channel_connection = await prisma.channelConnection.findUnique({
+      where: { order_id: order.id },
+    });
+
+    if (!channel_connection) {
+      await streamClient.upsertUsers([
+        { id: customerId.toString() },
+        { id: vendorId.toString() },
+      ]);
+
+      const channel = streamClient.channel("messaging", orderId.toString(), {
+        members: [customerId.toString(), vendorId.toString()],
+        created_by_id: customerId.toString(),
+      });
+
+      await channel.create();
+
+      channel_connection = await prisma.channelConnection.create({
+        data: {
+          channel_id: orderId.toString(),
+          order_id: Number(orderId),
+          customer_id: customerId,
+          vendor_id: vendorId,
+        },
+      });
+    }
+
+    return res.json({ channelId: channel_connection.channel_id });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+app.get("/chat/token", authenticate, async (req, res) => {
+  const { id } = (req as any).user;
+  const token = streamClient.createToken(id.toString());
+  res.json({ token });
 });
 
 if (process.env.NODE_ENV !== "test" && process.env.VITEST !== "true") {
