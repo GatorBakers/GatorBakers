@@ -12,6 +12,10 @@ import dayjs from "dayjs";
 import { validateRegInput, validateLoginInput } from "./src/utils/validation";
 import { StreamChat } from "stream-chat";
 import { getOrdersAccessError } from "./src/utils/ordersAccess";
+import {
+  canAccessOrderChat,
+  resolveChatParticipants,
+} from "./src/utils/chatParticipants";
 
 const saltRounds = 10;
 const adapter = new PrismaPg({
@@ -966,9 +970,9 @@ app.put("/review/:id", async (req: Request, res: Response) => {
   }
 });
 
-app.post("/chat/:orderId", async (req, res) => {
+app.post("/chat/:orderId", authenticate, async (req: Request, res: Response) => {
   const orderId = Number(req.params.orderId);
-  const customerId = Number(req.body.userId);
+  const { id: requesterId } = (req as any).user;
 
   if (!orderId || isNaN(orderId)) {
     return res.status(400).json({ message: "Invalid order id" });
@@ -983,9 +987,9 @@ app.post("/chat/:orderId", async (req, res) => {
     if (!order) {
       return res.status(404).json({ error: "Order not found" });
     }
-    const vendorId = order.listing.user_id;
+    const { customerId, vendorId, participantIds } = resolveChatParticipants(order);
 
-    if (customerId !== order.user_id && customerId !== vendorId) {
+    if (!canAccessOrderChat(requesterId, customerId, vendorId)) {
       return res.status(403).json({ error: "Unauthorized" });
     }
 
@@ -994,14 +998,20 @@ app.post("/chat/:orderId", async (req, res) => {
     });
 
     if (!channel_connection) {
-      await streamClient.upsertUsers([
-        { id: customerId.toString() },
-        { id: vendorId.toString() },
-      ]);
+      if (participantIds.length < 2) {
+        return res.status(400).json({
+          message:
+            "Invalid order participants: buyer and seller cannot be the same user",
+        });
+      }
+
+      await streamClient.upsertUsers(
+        participantIds.map((id) => ({ id: id.toString() })),
+      );
 
       const channel = streamClient.channel("messaging", orderId.toString(), {
-        members: [customerId.toString(), vendorId.toString()],
-        created_by_id: customerId.toString(),
+        members: participantIds.map((id) => id.toString()),
+        created_by_id: requesterId.toString(),
       });
 
       await channel.create();
@@ -1027,6 +1037,14 @@ app.get("/chat/token", authenticate, async (req, res) => {
   const { id } = (req as any).user;
   const token = streamClient.createToken(id.toString());
   res.json({ token });
+});
+
+app.get("/chat/config", (_req: Request, res: Response) => {
+  if (!STREAM_API_KEY) {
+    return res.status(500).json({ message: "Stream API key is not configured" });
+  }
+
+  return res.json({ apiKey: STREAM_API_KEY });
 });
 
 if (process.env.NODE_ENV !== "test" && process.env.VITEST !== "true") {

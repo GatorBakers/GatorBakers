@@ -15,8 +15,7 @@ interface Order {
     id: number;
     buyerUserId?: number;
     itemName: string;
-    bakerName: string;
-    buyerName: string;
+    otherPartyName: string;
     status: OrderStatus;
     pickupTime: string;
     pickupAddress: string;
@@ -77,10 +76,9 @@ const mapBuyerOrder = (order: BuyerOrder): Order => {
     return {
         id: order.id,
         itemName: order.listing.title,
-        bakerName: order.listing.user
+        otherPartyName: order.listing.user
             ? `${order.listing.user.first_name} ${order.listing.user.last_name}`
             : 'Local baker',
-        buyerName: 'You',
         status: toUiStatus(order.status),
         pickupAddress,
         pickupTime,
@@ -96,10 +94,9 @@ const mapSellerOrder = (order: SellerOrder, fallbackBakerName: string): Order =>
         id: order.id,
         buyerUserId: order.user.id,
         itemName: order.listing.title,
-        bakerName: order.listing.user
+        otherPartyName: order.listing.user
             ? `${order.listing.user.first_name} ${order.listing.user.last_name}`
             : fallbackBakerName,
-        buyerName: `${order.user.first_name} ${order.user.last_name}`,
         status: toUiStatus(order.status),
         pickupAddress,
         pickupTime,
@@ -200,7 +197,7 @@ const YourOrdersPage = () => {
                             <OrderCard
                                 key={order.id}
                                 itemName={order.itemName}
-                                otherPartyName={order.buyerName}
+                                otherPartyName={order.otherPartyName}
                                 status={order.status}
                                 pickupTime={order.pickupTime}
                                 pickupAddress={order.pickupAddress}
@@ -226,7 +223,7 @@ const YourOrdersPage = () => {
                             <OrderCard
                                 key={order.id}
                                 itemName={order.itemName}
-                                otherPartyName={order.bakerName}
+                                otherPartyName={order.otherPartyName}
                                 status={order.status}
                                 pickupTime={order.pickupTime}
                                 pickupAddress={order.pickupAddress}

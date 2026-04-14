@@ -91,6 +91,15 @@
     margin-bottom: 3px;
 }
 
+.inbox-item-order {
+    font-size: 0.74rem;
+    color: var(--color-text-muted);
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .inbox-item-name {
     font-size: 0.9rem;
     font-weight: 600;
@@ -184,18 +193,56 @@
     color: var(--color-text-dark);
 }
 
+.thread-header-meta {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.thread-header-order {
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 /* ── Message bubbles ── */
 .thread-messages {
     flex: 1;
+    min-height: 0;
     overflow-y: auto;
-    padding: 20px 24px;
+    padding: 0;
     display: flex;
     flex-direction: column;
-    gap: 10px;
 }
 
 .thread-empty {
     margin: auto;
+}
+
+.thread-stream-wrapper {
+    height: 100%;
+}
+
+.thread-stream-wrapper .str-chat {
+    height: 100%;
+}
+
+.thread-stream-wrapper .str-chat__channel,
+.thread-stream-wrapper .str-chat__main-panel {
+    height: 100%;
+}
+
+.thread-loading,
+.thread-error,
+.messages-page-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--color-text-secondary);
+    padding: 24px;
 }
 
 .bubble-row {

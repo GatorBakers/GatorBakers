@@ -5,7 +5,7 @@
 		"dev:client": "npm --prefix client run dev",
 		"dev:server": "npm --prefix server run dev",
 		"dev:meili": "npm --prefix server run meili",
-		"dev:all": "concurrently -k -n meili,server,client -c magenta,cyan,green \"npm run dev:meili\" \"npm run dev:server\" \"npm run dev:client\"",
+		"dev:all": "npx concurrently -k -n meili,server,client -c magenta,cyan,green \"npm run dev:meili\" \"npm run dev:server\" \"npm run dev:client\"",
 		"test:server": "npm --prefix server test",
 		"test:client": "npm --prefix client run --if-present test",
 		"test:all": "npm run test:server && npm run test:client"
