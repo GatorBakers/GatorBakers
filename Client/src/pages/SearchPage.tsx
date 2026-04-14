@@ -12,12 +12,19 @@ const SearchPage = () => {
   const isMobile = useIsMobile();
   const { listings, isLoading, error } = useListingsFeed();
   const { profile, isLoading: profileLoading } = useProfile();
-  const [searchResults, setSearchResults] = useState<ListingSummary[]>([]);
+  const [searchResults, setSearchResults] = useState<ListingSummary[] | null>(
+    null,
+  );
   const visibleListings = profile?.id
     ? listings.filter(listing => listing.user_id !== profile.id)
     : listings;
-  const resultsToShow =
-    searchResults.length > 0 ? searchResults : visibleListings;
+  const isSearchActive = searchResults !== null;
+  const resultsToShow = (
+    isSearchActive ? searchResults : visibleListings
+  ).filter((listing): listing is ListingSummary => listing !== null);
+  const shouldShowResults =
+    (isSearchActive && resultsToShow.length > 0) ||
+    (!isSearchActive && visibleListings.length > 0);
 
   if (isMobile) {
     return (
@@ -39,34 +46,30 @@ const SearchPage = () => {
       <div className="search-results">
         {isLoading && <p>Loading results...</p>}
         {error && <p style={{ color: "red" }}>Error: {error}</p>}
-        {!isLoading && (
+        {!isLoading && shouldShowResults && (
           <>
             <p className="search-results-count">
               {resultsToShow.length} results
             </p>
-            {resultsToShow.length === 0 ? (
-              <p>No listings found. Try adjusting your search.</p>
-            ) : (
-              <div className="search-results-grid">
-                {resultsToShow.map(listing => (
-                  <ProductCard
-                    key={listing.id}
-                    listingId={listing.id}
-                    sellerUserId={listing.user_id}
-                    buyerUserId={profile?.id ?? null}
-                    buyerIdentityLoading={profileLoading}
-                    title={listing.title}
-                    bakerName={`${listing.user.first_name} ${listing.user.last_name}`}
-                    price={Number(listing.price)}
-                    imageUrl={listing.photo_url}
-                    variant="to_order"
-                    itemDescription={listing.description}
-                    ingredients={listing.ingredients}
-                    allergens={listing.allergens}
-                  />
-                ))}
-              </div>
-            )}
+            <div className="search-results-grid">
+              {resultsToShow.map(listing => (
+                <ProductCard
+                  key={listing.id}
+                  listingId={listing.id}
+                  sellerUserId={listing.user_id}
+                  buyerUserId={profile?.id ?? null}
+                  buyerIdentityLoading={profileLoading}
+                  title={listing.title}
+                  bakerName={`${listing.user.first_name} ${listing.user.last_name}`}
+                  price={Number(listing.price)}
+                  imageUrl={listing.photo_url}
+                  variant="to_order"
+                  itemDescription={listing.description}
+                  ingredients={listing.ingredients}
+                  allergens={listing.allergens}
+                />
+              ))}
+            </div>
           </>
         )}
       </div>

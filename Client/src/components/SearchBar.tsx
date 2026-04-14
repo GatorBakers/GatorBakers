@@ -13,7 +13,7 @@ const categories = [
 ];
 
 interface SearchBarProps {
-  onSearch?: (results: ListingSummary[]) => void;
+  onSearch?: (results: ListingSummary[] | null) => void;
   onCategoryChange?: (category: string) => void;
 }
 
@@ -23,31 +23,42 @@ const SearchBar = ({ onSearch, onCategoryChange }: SearchBarProps) => {
 
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
-      if (!query) {
-        onSearch?.([]);
+      const searchText = [
+        query.trim(),
+        activeCategory !== "All Items" ? activeCategory : "",
+      ]
+        .filter(Boolean)
+        .join(" ");
+
+      if (!searchText) {
+        onSearch?.(null);
         return;
       }
 
-      console.log("[SearchBar] Fetching for:", query);
+      console.log("[SearchBar] Fetching for:", searchText);
 
       fetch(
-        `http://localhost:4000/search/listings?q=${encodeURIComponent(query)}`,
+        `http://localhost:4000/search/listings?q=${encodeURIComponent(searchText)}`,
       )
         .then(res => res.json())
         .then(data => {
           console.log("API Results:", data);
-          onSearch?.(data);
+          const validResults: ListingSummary[] = Array.isArray(data)
+            ? data.filter((item): item is ListingSummary => item !== null)
+            : [];
+          onSearch?.(validResults);
         })
         .catch(err => console.error("API Error:", err));
-    }, 2000);
+    }, 500);
 
     return () => clearTimeout(delayDebounce);
-  }, [query, onSearch]);
+  }, [query, activeCategory, onSearch]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setQuery(value);
-    console.log("[SearchBar] Query:", value);
+    setActiveCategory("All Items");
+    onCategoryChange?.("All Items");
   };
 
   const handleCategoryClick = (category: string) => {
