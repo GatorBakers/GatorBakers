@@ -1,60 +1,70 @@
-import { useState, useRef, useEffect } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { Channel, Chat, MessageInput, MessageList, Window } from 'stream-chat-react';
+import type { Channel as StreamChannel, StreamChat } from 'stream-chat';
+import { StreamChat as StreamChatClient } from 'stream-chat';
+import type { BuyerOrder, SellerOrder } from '@shared/types';
 import { useIsMobile } from '../hooks/useIsMobile';
 import EmptyState from '../components/EmptyState';
 import MobileMessagesPage from './MobileMessagePage';
+import { useAuth } from '../context/AuthContext';
+import { useProfile } from '../hooks/useProfile';
+import { useBuyerOrders } from '../hooks/useBuyerOrders';
+import { useSellerOrders } from '../hooks/useSellerOrders';
+import { createOrderChannel, fetchChatConfig, fetchChatToken } from '../services/chatService';
 import './MessagesPage.css';
+import 'stream-chat-react/dist/css/v2/index.css';
 
 export interface Conversation {
-    id: string;
+    id: string; // maps to order id string
+    orderId: number;
     participantId: string;
     participantName: string;
     lastMessage: string;
     lastMessageAt: string;
-    unreadCount: number; // number of unread messages in the conversation - should change in backend
-}
-
-export interface Message {
-    id: string;
-    senderId: string;
-    body: string;
-    sentAt: string; // ISO timestamp
+    unreadCount: number;
+    orderLabel: string;
 }
 
 export interface MessagesPageProps {
     conversations: Conversation[];
-    messages: Message[];
     selectedId: string | null;
     setSelectedId: (id: string | null) => void;
-    inputValue: string;
-    setInputValue: (value: string) => void;
-    handleSend: () => void;
-    handleKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
-    messagesEndRef: React.RefObject<HTMLDivElement | null>;
+    selectedConversation: Conversation | null;
+    threadContent: ReactNode;
+    isThreadLoading: boolean;
+    threadError: string | null;
 }
 
-// TODO: Replace CURRENT_USER_ID with the authenticated user's ID
-const CURRENT_USER_ID = 'me';
+const STREAM_API_KEY_FALLBACK = import.meta.env.VITE_STREAM_API_KEY as string | undefined;
 
-// TODO: Remove placeholder conversations
-const PLACEHOLDER_CONVERSATIONS: Conversation[] = [
-    {
-        id: 'conv-1',
-        participantId: 'user-2',
-        participantName: 'Sarah M.',
-        lastMessage: 'Does the cinnamon roll order come with icing?',
-        lastMessageAt: new Date(Date.now() - 1000 * 60 * 10).toISOString(),
+const buildBuyerConversation = (order: BuyerOrder): Conversation => {
+    const counterpartName = order.listing.user
+        ? `${order.listing.user.first_name} ${order.listing.user.last_name}`
+        : 'Seller';
+    const participantId = order.listing.user?.id?.toString() ?? `seller-${order.id}`;
+
+    return {
+        id: String(order.id),
+        orderId: order.id,
+        participantId,
+        participantName: counterpartName,
+        lastMessage: `Order #${order.id}: ${order.listing.title}`,
+        lastMessageAt: order.created_at,
         unreadCount: 0,
-    }
-];
-
-// TODO: Remove placeholder messages
-const PLACEHOLDER_MESSAGES: Record<string, Message[]> = {
-    'conv-1': [
-        { id: 'm1', senderId: 'user-2', body: 'Hi! I saw your cinnamon roll listing.', sentAt: new Date(Date.now() - 1000 * 60 * 30).toISOString() },
-        { id: 'm2', senderId: CURRENT_USER_ID, body: 'Hey! Yes, they\'re fresh-baked every morning.', sentAt: new Date(Date.now() - 1000 * 60 * 25).toISOString() },
-        { id: 'm3', senderId: 'user-2', body: 'Does the cinnamon roll order come with icing?', sentAt: new Date(Date.now() - 1000 * 60 * 10).toISOString() },
-    ]
+        orderLabel: `Order #${order.id} · ${order.listing.title}`,
+    };
 };
+
+const buildSellerConversation = (order: SellerOrder): Conversation => ({
+    id: String(order.id),
+    orderId: order.id,
+    participantId: String(order.user.id),
+    participantName: `${order.user.first_name} ${order.user.last_name}`,
+    lastMessage: `Order #${order.id}: ${order.listing.title}`,
+    lastMessageAt: order.created_at,
+    unreadCount: 0,
+    orderLabel: `Order #${order.id} · ${order.listing.title}`,
+});
 
 export function formatTime(isoString: string): string {
     const date = new Date(isoString);
@@ -78,60 +88,209 @@ export function getInitial(name: string): string {
 
 const MessagesPage = () => {
     const isMobile = useIsMobile();
+    const { accessToken } = useAuth();
+    const { profile, isLoading: profileLoading, error: profileError } = useProfile();
+    const userId = profile?.id ?? null;
+    const { orders: buyerOrders, isLoading: buyerLoading, error: buyerError } = useBuyerOrders(userId);
+    const { orders: sellerOrders, isLoading: sellerLoading, error: sellerError } = useSellerOrders(userId);
+    const [streamClient, setStreamClient] = useState<StreamChat | null>(null);
+    const [activeChannel, setActiveChannel] = useState<StreamChannel | null>(null);
+    const [chatError, setChatError] = useState<string | null>(null);
+    const [isThreadLoading, setIsThreadLoading] = useState(false);
+    const [streamApiKey, setStreamApiKey] = useState<string | null>(null);
+    const createdChannelMapRef = useRef<Record<number, string>>({});
 
-    // TODO: get conversations from backend
-    const conversations = PLACEHOLDER_CONVERSATIONS;
+    const conversations = useMemo(() => {
+        const sellerList = [
+            ...sellerOrders.pending_orders,
+            ...sellerOrders.confirmed_orders,
+            ...sellerOrders.cancelled_orders,
+        ];
+
+        return [...buyerOrders.map(buildBuyerConversation), ...sellerList.map(buildSellerConversation)]
+            .sort((a, b) => new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime());
+    }, [buyerOrders, sellerOrders]);
 
     const [selectedId, setSelectedId] = useState<string | null>(
         !isMobile && conversations.length > 0 ? conversations[0].id : null
     );
-    const [inputValue, setInputValue] = useState('');
-    const [localMessages, setLocalMessages] = useState<Record<string, Message[]>>(PLACEHOLDER_MESSAGES);
-    const messagesEndRef = useRef<HTMLDivElement>(null);
-
-    // TODO: get messages from backend
-    const messages = selectedId ? (localMessages[selectedId] ?? []) : [];
 
     useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [messages]);
-
-    const handleSend = () => {
-        const body = inputValue.trim();
-        if (!body || !selectedId) return;
-
-        // TODO: Replace with useMutation: mutate({ conversationId: selectedId, body })
-        //       then invalidate queryKeys.messages(selectedId) and queryKeys.conversations on success.
-        const newMessage: Message = {
-            id: `local-${Date.now()}`,
-            senderId: CURRENT_USER_ID,
-            body,
-            sentAt: new Date().toISOString(),
-        };
-        setLocalMessages((prev) => ({
-            ...prev,
-            [selectedId]: [...(prev[selectedId] ?? []), newMessage],
-        }));
-        setInputValue('');
-    };
-
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            handleSend();
+        if (isMobile) {
+            return;
         }
-    };
+        if (!selectedId && conversations.length > 0) {
+            setSelectedId(conversations[0].id);
+            return;
+        }
+        if (selectedId && !conversations.some((conversation) => conversation.id === selectedId)) {
+            setSelectedId(conversations[0]?.id ?? null);
+        }
+    }, [conversations, isMobile, selectedId]);
+
+    useEffect(() => {
+        if (!accessToken || !profile) {
+            return;
+        }
+
+        let isMounted = true;
+
+        const initClient = async () => {
+            try {
+                setChatError(null);
+                const [{ token }, config] = await Promise.all([
+                    fetchChatToken(accessToken),
+                    fetchChatConfig(),
+                ]);
+
+                const resolvedApiKey = config.apiKey || STREAM_API_KEY_FALLBACK;
+                if (!resolvedApiKey) {
+                    throw new Error('Stream API key is not configured in backend chat config.');
+                }
+
+                const client = StreamChatClient.getInstance(resolvedApiKey);
+                const expectedUserId = String(profile.id);
+                if (client.userID && client.userID !== expectedUserId) {
+                    await client.disconnectUser();
+                }
+                if (client.userID !== expectedUserId) {
+                    await client.connectUser({ id: expectedUserId, name: profile.name }, token);
+                }
+                if (isMounted) {
+                    setStreamApiKey(resolvedApiKey);
+                    setStreamClient(client);
+                }
+            } catch (error) {
+                if (isMounted) {
+                    setChatError(error instanceof Error ? error.message : 'Failed to initialize chat client.');
+                }
+            }
+        };
+
+        void initClient();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [accessToken, profile]);
+
+    useEffect(() => {
+        if (!selectedId || !streamClient || !accessToken || !userId || !streamApiKey) {
+            setActiveChannel(null);
+            return;
+        }
+
+        const selectedConversation = conversations.find((conversation) => conversation.id === selectedId);
+        if (!selectedConversation) {
+            setActiveChannel(null);
+            return;
+        }
+
+        let isMounted = true;
+
+        const loadChannel = async () => {
+            try {
+                setIsThreadLoading(true);
+                setChatError(null);
+
+                const existingChannelId = createdChannelMapRef.current[selectedConversation.orderId];
+                const channelId = existingChannelId
+                    ? existingChannelId
+                    : (await createOrderChannel(accessToken, selectedConversation.orderId)).channelId;
+
+                createdChannelMapRef.current[selectedConversation.orderId] = channelId;
+                const channel = streamClient.channel('messaging', channelId);
+                await channel.watch();
+
+                if (isMounted) {
+                    setActiveChannel(channel);
+                }
+            } catch (error) {
+                if (isMounted) {
+                    setActiveChannel(null);
+                    setChatError(error instanceof Error ? error.message : 'Failed to load channel.');
+                }
+            } finally {
+                if (isMounted) {
+                    setIsThreadLoading(false);
+                }
+            }
+        };
+
+        void loadChannel();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [accessToken, conversations, selectedId, streamClient, streamApiKey, userId]);
+
+    useEffect(() => {
+        return () => {
+            if (streamClient) {
+                void streamClient.disconnectUser();
+            }
+        };
+    }, [streamClient]);
+
+    const selectedConversation = conversations.find((c) => c.id === selectedId) ?? null;
+
+    const isPageLoading = profileLoading || buyerLoading || sellerLoading;
+    const pageError = profileError || buyerError || sellerError || null;
+
+    const threadContent = (() => {
+        if (!selectedConversation) {
+            return (
+                <div className="thread-placeholder">
+                    <EmptyState
+                        title="Select a conversation"
+                        subtitle="Choose an order conversation from the left to start messaging."
+                    />
+                </div>
+            );
+        }
+
+        if (isThreadLoading) {
+            return <div className="thread-loading">Loading conversation…</div>;
+        }
+
+        if (chatError) {
+            return <div className="thread-error">{chatError}</div>;
+        }
+
+        if (!streamClient || !activeChannel) {
+            return <div className="thread-loading">Preparing chat…</div>;
+        }
+
+        return (
+            <div className="thread-stream-wrapper">
+                <Chat client={streamClient}>
+                    <Channel channel={activeChannel}>
+                        <Window>
+                            <MessageList />
+                            <MessageInput />
+                        </Window>
+                    </Channel>
+                </Chat>
+            </div>
+        );
+    })();
+
+    if (isPageLoading) {
+        return <div className="messages-page-loading">Loading conversations…</div>;
+    }
+
+    if (pageError) {
+        return <div className="messages-page-loading">{pageError}</div>;
+    }
 
     const sharedProps: MessagesPageProps = {
         conversations,
-        messages,
         selectedId,
         setSelectedId,
-        inputValue,
-        setInputValue,
-        handleSend,
-        handleKeyDown,
-        messagesEndRef,
+        selectedConversation,
+        threadContent,
+        isThreadLoading,
+        threadError: chatError,
     };
 
     if (isMobile) return <MobileMessagesPage {...sharedProps} />;
@@ -141,17 +300,11 @@ const MessagesPage = () => {
 
 const DesktopMessagesPage = ({
     conversations,
-    messages,
     selectedId,
     setSelectedId,
-    inputValue,
-    setInputValue,
-    handleSend,
-    handleKeyDown,
-    messagesEndRef,
+    selectedConversation,
+    threadContent,
 }: MessagesPageProps) => {
-    const selectedConversation = conversations.find((c) => c.id === selectedId) ?? null;
-
     return (
         <div className="messages-page">
             {/* ── Inbox sidebar ── */}
@@ -180,6 +333,7 @@ const DesktopMessagesPage = ({
                                         <span className="inbox-item-name">{conv.participantName}</span>
                                         <span className="inbox-item-time">{formatTime(conv.lastMessageAt)}</span>
                                     </div>
+                                    <div className="inbox-item-order">{conv.orderLabel}</div>
                                     <div className="inbox-item-bottom">
                                         <span className="inbox-item-preview">{conv.lastMessage}</span>
                                         {conv.unreadCount > 0 && (
@@ -201,52 +355,13 @@ const DesktopMessagesPage = ({
                             <div className="thread-header-avatar">
                                 {getInitial(selectedConversation.participantName)}
                             </div>
-                            <span className="thread-header-name">{selectedConversation.participantName}</span>
+                            <div className="thread-header-meta">
+                                <span className="thread-header-name">{selectedConversation.participantName}</span>
+                                <span className="thread-header-order">{selectedConversation.orderLabel}</span>
+                            </div>
                         </div>
 
-                        <div className="thread-messages">
-                            {messages.length === 0 ? (
-                                <EmptyState
-                                    title="No messages yet"
-                                    subtitle="Send a message to start the conversation."
-                                    className="thread-empty"
-                                />
-                            ) : (
-                                messages.map((msg) => {
-                                    const isMine = msg.senderId === CURRENT_USER_ID;
-                                    return (
-                                        <div
-                                            key={msg.id}
-                                            className={`bubble-row${isMine ? ' bubble-row--mine' : ''}`}
-                                        >
-                                            <div className={`bubble${isMine ? ' bubble--mine' : ' bubble--theirs'}`}>
-                                                <p className="bubble-text">{msg.body}</p>
-                                                <span className="bubble-time">{formatTime(msg.sentAt)}</span>
-                                            </div>
-                                        </div>
-                                    );
-                                })
-                            )}
-                            <div ref={messagesEndRef} />
-                        </div>
-
-                        <div className="compose-bar">
-                            <textarea
-                                className="compose-input"
-                                placeholder="Type a message… (Enter to send, Shift+Enter for new line)"
-                                value={inputValue}
-                                onChange={(e) => setInputValue(e.target.value)}
-                                onKeyDown={handleKeyDown}
-                                rows={2}
-                            />
-                            <button
-                                className="compose-send"
-                                onClick={handleSend}
-                                disabled={!inputValue.trim()}
-                            >
-                                Send
-                            </button>
-                        </div>
+                        <div className="thread-messages">{threadContent}</div>
                     </>
                 ) : (
                     <div className="thread-placeholder">

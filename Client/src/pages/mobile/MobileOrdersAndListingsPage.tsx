@@ -6,8 +6,7 @@ import './MobileOrdersAndListingsPage.css';
 interface Order {
     id: number;
     itemName: string;
-    bakerName: string;
-    buyerName: string;
+    otherPartyName: string;
     status: OrderStatus;
     pickupTime: string;
     pickupAddress: string;
@@ -60,7 +59,7 @@ const MobileYourOrdersPage = ({
                             <MobileOrderCard
                                 key={order.id}
                                 itemName={order.itemName}
-                                otherPartyName={order.buyerName}
+                                otherPartyName={order.otherPartyName}
                                 status={order.status}
                                 pickupTime={order.pickupTime}
                                 pickupAddress={order.pickupAddress}
@@ -86,7 +85,7 @@ const MobileYourOrdersPage = ({
                             <MobileOrderCard
                                 key={order.id}
                                 itemName={order.itemName}
-                                otherPartyName={order.bakerName}
+                                otherPartyName={order.otherPartyName}
                                 status={order.status}
                                 pickupTime={order.pickupTime}
                                 pickupAddress={order.pickupAddress}
