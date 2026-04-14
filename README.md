@@ -23,6 +23,33 @@
 
 ## Getting Started
 
+### One-Command Local Startup (Recommended)
+
+From the repository root:
+
+```bash
+npm install
+npm run dev:all
+```
+
+This starts:
+
+- MeiliSearch (prefers local `server/meilisearch(.exe)`, falls back to Docker)
+- Backend API (`server/index.ts`)
+- Frontend Vite dev server (`client`)
+
+If Docker is used for MeiliSearch, make sure Docker Desktop is running.
+
+### One-Command Test Run
+
+From the repository root:
+
+```bash
+npm run test:all
+```
+
+This runs server tests and also runs client tests when a client `test` script is present.
+
 ### Frontend
 
 1. Navigate to the frontend directory:
