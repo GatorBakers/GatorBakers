@@ -36,8 +36,8 @@ export interface CreateListingRequest {
 }
 
 export interface CreateOrderRequest {
-  user_id: number;
   pickup_location: string;
+  pickup_time: string;
 }
 
 export interface OrderRecord {
@@ -45,6 +45,7 @@ export interface OrderRecord {
   user_id: number;
   listing_id: number;
   pickup_location: string;
+  pickup_time: string | null;
   status: OrderStatus;
   created_at: string;
 }
@@ -59,12 +60,14 @@ export interface ListingOrderSummary {
   photo_url: string;
   ingredients: string[];
   allergens: string[];
+  user?: ListingAuthor;
 }
 
 export interface BuyerOrder {
   id: number;
   created_at: string;
   pickup_location: string;
+  pickup_time: string | null;
   status: OrderStatus;
   listing: ListingOrderSummary;
 }
@@ -73,6 +76,7 @@ export interface SellerOrder {
   id: number;
   created_at: string;
   pickup_location: string;
+  pickup_time: string | null;
   status: OrderStatus;
   listing: ListingOrderSummary;
   user: {
@@ -96,4 +100,5 @@ export interface ListingFeedParams {
   search?: string;
   category?: string;
   status?: ListingStatus;
+  sortBy?: 'recent' | 'popular';
 }

@@ -7,20 +7,19 @@ export type { OrderStatus };
 
 interface OrderCardProps {
     itemName: string;
-    bakerName: string;
+    otherPartyName: string;
     status: OrderStatus;
     pickupTime: string;
     pickupAddress: string;
     imageUrl?: string;
     onViewDetails?: () => void;
-    // TODO: Wire up onConfirm and onDeny to PATCH with status CONFIRMED or CANCELLED.
     onConfirm?: () => void;
     onDeny?: () => void;
 }
 
 const OrderCard = ({
     itemName,
-    bakerName,
+    otherPartyName,
     status,
     pickupTime,
     pickupAddress,
@@ -40,7 +39,7 @@ const OrderCard = ({
 
             <div className="order-card-info">
                 <p className="order-card-item-name">{itemName}</p>
-                <p className="order-card-baker-name">{bakerName}</p>
+                <p className="order-card-baker-name">{otherPartyName}</p>
             </div>
 
             <div className="order-card-status-block">
