@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import CardImage from './CardImage';
 import './OrderSummaryModal.css';
 import { pickupLocations, type PickupLocation } from '@shared/utils/pickupLocations';
+import { useCreateOrder } from '../hooks/useOrderMutations';
 
 // TODO (Backend): Define the actual service/platform fee logic.
 //       This could come from GET /api/fees or be a fixed percentage returned by the order preview endpoint.
@@ -12,22 +13,41 @@ interface OrderSummaryModalProps {
     isOpen: boolean;
     onClose: () => void;
     onBack: () => void;
+    listingId: number;
+    sellerUserId: number;
+    buyerUserId: number | null;
+    buyerIdentityLoading: boolean;
     title: string;
     bakerName: string;
     price: number;
     imageUrl?: string;
 }
 
-const OrderSummaryModal = ({ isOpen, onClose, onBack, title, bakerName, price, imageUrl }: OrderSummaryModalProps) => {
+const OrderSummaryModal = ({
+    isOpen,
+    onClose,
+    onBack,
+    listingId,
+    sellerUserId,
+    buyerUserId,
+    buyerIdentityLoading,
+    title,
+    bakerName,
+    price,
+    imageUrl,
+}: OrderSummaryModalProps) => {
     const [selectedPickupLocation, setSelectedPickupLocation] = useState<PickupLocation | null>(null);
     const [selectedPickupDate, setSelectedPickupDate] = useState<string>('');
     const [selectedPickupTime, setSelectedPickupTime] = useState<string>('');
+    const [submitError, setSubmitError] = useState<string | null>(null);
+    const createOrderMutation = useCreateOrder();
 
     useEffect(() => {
         if (isOpen) {
             setSelectedPickupLocation(null);
             setSelectedPickupDate('');
             setSelectedPickupTime('');
+            setSubmitError(null);
         }
     }, [isOpen]);
 
@@ -46,25 +66,40 @@ const OrderSummaryModal = ({ isOpen, onClose, onBack, title, bakerName, price, i
 
     const total = price + PLATFORM_FEE;
 
-    // TODO (Backend): Replace this handler with a real API call.
-    //       POST /api/orders — body: { listingId, buyerId }
-    //       On success: navigate to /orders&listings (or show a confirmation screen).
-    //       On error: display an inline error message to the user.
-    const handleConfirmOrder = () => {
-        console.log('TODO: POST /api/orders');
-        
-        const order = {
-            title,
-            bakerName,
-            price,
-            imageUrl,
-            pickupLocation: selectedPickupLocation,
-            pickupDate: selectedPickupDate,
-            pickupTime: selectedPickupTime,
+    const handleConfirmOrder = async () => {
+        if (buyerIdentityLoading) {
+            setSubmitError('Still loading your account. Please try again in a moment.');
+            return;
         }
 
-        console.log('Order:', order);
+        if (!buyerUserId) {
+            setSubmitError('Please log in before placing an order.');
+            return;
+        }
 
+        if (!selectedPickupLocation || !selectedPickupDate || !selectedPickupTime) {
+            setSubmitError('Please select pickup location, pickup date, and pickup time.');
+            return;
+        }
+
+        setSubmitError(null);
+
+        try {
+            const pickupDateTime = `${selectedPickupDate}T${selectedPickupTime}`;
+
+            await createOrderMutation.mutateAsync({
+                listingId,
+                payload: {
+                    pickup_location: `${selectedPickupLocation.name} (${selectedPickupLocation.address})`,
+                    pickup_time: pickupDateTime,
+                },
+                sellerUserId,
+            });
+
+            onClose();
+        } catch (error) {
+            setSubmitError(error instanceof Error ? error.message : 'Failed to place order.');
+        }
     };
 
     return (
@@ -203,11 +238,19 @@ const OrderSummaryModal = ({ isOpen, onClose, onBack, title, bakerName, price, i
                     <button
                         className="order-summary-btn-confirm"
                         onClick={handleConfirmOrder}
-                        disabled={!selectedPickupLocation || !selectedPickupDate || !selectedPickupTime}
+                        disabled={
+                            buyerIdentityLoading ||
+                            !selectedPickupLocation ||
+                            !selectedPickupDate ||
+                            !selectedPickupTime ||
+                            createOrderMutation.isPending
+                        }
                     >
-                        Confirm Order — ${total.toFixed(2)}
+                        {createOrderMutation.isPending ? 'Placing Order...' : `Confirm Order — $${total.toFixed(2)}`}
                     </button>
                 </div>
+
+                {submitError && <p style={{ color: 'red', marginTop: '8px' }}>{submitError}</p>}
 
             </div>
         </div>

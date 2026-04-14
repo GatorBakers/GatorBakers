@@ -4,6 +4,7 @@ import { fetchProfile, type ProfileData } from '../services/profileService';
 import { queryKeys } from './queryKeys';
 
 export interface UserProfile {
+    id: number;
     name: string;
     city: string | null;
     state: string | null;
@@ -16,6 +17,7 @@ export interface UserProfile {
 
 function toUserProfile(data: ProfileData): UserProfile {
     return {
+        id: data.id,
         name: `${data.first_name} ${data.last_name}`,
         city: data.city,
         state: data.state,

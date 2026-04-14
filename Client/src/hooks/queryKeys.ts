@@ -4,11 +4,13 @@ export const queryKeys = {
     profileRoot: ['profile'] as const,
     myListingsRoot: ['my-listings'] as const,
     myListings: (scope: string | number | null) => ['my-listings', scope ?? 'anonymous'] as const,
+    listingsFeedRoot: ['listings-feed'] as const,
     listingsFeed: (params: ListingFeedParams = {}) => [
         'listings-feed',
         params.search ?? '',
         params.category ?? '',
         params.status ?? '',
+        params.sortBy ?? 'recent',
     ] as const,
     buyerOrders: (userId: number) => ['orders', 'buyer', userId] as const,
     sellerOrders: (userId: number) => ['orders', 'seller', userId] as const,

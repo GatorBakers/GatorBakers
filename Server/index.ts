@@ -11,6 +11,7 @@ import jwt from "jsonwebtoken";
 import dayjs from "dayjs";
 import { validateRegInput, validateLoginInput } from "./src/utils/validation";
 import { StreamChat } from "stream-chat";
+import { getOrdersAccessError } from "./src/utils/ordersAccess";
 
 const saltRounds = 10;
 const adapter = new PrismaPg({
@@ -34,7 +35,7 @@ if (!STREAM_API_KEY || !STREAM_API_SECRET) {
 const streamClient = StreamChat.getInstance(STREAM_API_KEY, STREAM_API_SECRET);
 
 export const prisma = new PrismaClient({ adapter });
-const app = express();
+export const app = express();
 const PORT = 4000;
 const access_secret = process.env.ACCESS_TOKEN_SECRET!;
 const refresh_secret = process.env.REFRESH_TOKEN_SECRET!;
@@ -211,7 +212,7 @@ app.get("/search/listings", async (req: Request, res: Response) => {
   try {
     const results = await client.index("listings").search(query, { limit: 20 });
 
-    const ids = results.hits.map((hit: any) => hit.id);
+    const ids: number[] = results.hits.map((hit: any) => Number(hit.id));
 
     if (ids.length === 0) {
       return res.status(200).json([]);
@@ -226,7 +227,7 @@ app.get("/search/listings", async (req: Request, res: Response) => {
     });
 
     const listingsMap = new Map(listings.map(l => [l.id, l]));
-    const orderedListings = ids.map(id => listingsMap.get(id));
+    const orderedListings = ids.map((id: number) => listingsMap.get(id));
 
     return res.status(200).json(orderedListings);
   } catch (error) {
@@ -361,16 +362,22 @@ app.post("/login", async (req: Request, res: Response) => {
 });
 
 app.get("/discovery/listings", async (req: Request, res: Response) => {
-  const sortBy = req.query.sortBy as string;
+  const sortByRaw = req.query.sortBy;
+  const sortBy =
+    typeof sortByRaw === "string" && sortByRaw.length > 0
+      ? sortByRaw
+      : "recent";
 
   let orderBy: any;
 
-  if (sortBy === "Most Popular") {
+  if (sortBy === "popular") {
     orderBy = { pastries_sold: "desc" };
-  } else if (sortBy === "Most Recent") {
+  } else if (sortBy === "recent") {
     orderBy = { created_at: "desc" };
   } else {
-    return res.status(400).json({ message: "Wrong display found" });
+    return res
+      .status(400)
+      .json({ message: 'Invalid sortBy. Allowed values: "recent", "popular"' });
   }
 
   try {
@@ -655,70 +662,83 @@ app.delete("/listing/:id", async (req: Request, res: Response) => {
   }
 });
 
-app.post("/listing/:id/order", async (req: Request, res: Response) => {
-  const listing_id = Number(req.params.id);
-  const user_id = Number(req.body.user_id);
-  const pickup_location = req.body.pickup_location;
+app.post(
+  "/listing/:id/order",
+  authenticate,
+  async (req: Request, res: Response) => {
+    const listing_id = Number(req.params.id);
+    const { id: user_id } = (req as any).user;
+    const pickup_location = req.body.pickup_location;
+    const pickup_time = req.body.pickup_time;
 
-  if (!listing_id || isNaN(listing_id)) {
-    return res.status(400).json({ message: "Invalid listing id" });
-  }
-
-  try {
-    const listing = await prisma.listing.findUnique({
-      where: { id: listing_id },
-    });
-
-    if (!listing) {
-      return res.status(404).json({ message: "Listing does not exist" });
+    if (!listing_id || isNaN(listing_id)) {
+      return res.status(400).json({ message: "Invalid listing id" });
+    }
+    if (!pickup_location || typeof pickup_location !== "string") {
+      return res.status(400).json({ message: "Pickup location is required" });
+    }
+    if (!pickup_time || typeof pickup_time !== "string") {
+      return res.status(400).json({ message: "Pickup time is required" });
     }
 
-    if (listing.user_id == user_id) {
-      return res
-        .status(400)
-        .json({ message: "User is the owner of the listing" });
-    }
+    try {
+      const listing = await prisma.listing.findUnique({
+        where: { id: listing_id },
+      });
 
-    if (listing.quantity < 1) {
+      if (!listing) {
+        return res.status(404).json({ message: "Listing does not exist" });
+      }
+
+      if (listing.user_id === user_id) {
+        return res
+          .status(403)
+          .json({ message: "You cannot place an order on your own listing" });
+      }
+
+      if (listing.quantity < 1) {
+        await prisma.listing.update({
+          where: { id: listing_id },
+          data: {
+            quantity: 0,
+            listing_status: "SOLD",
+          },
+        });
+
+        return res.status(410).json({ message: "Pastry is sold out!" });
+      }
+
       await prisma.listing.update({
         where: { id: listing_id },
         data: {
-          quantity: 0,
-          listing_status: "SOLD",
+          quantity: listing.quantity - 1,
+          pastries_sold: listing.pastries_sold + 1,
         },
       });
 
-      return res.status(410).json({ message: "Pastry is sold out!" });
+      const order = await prisma.order.create({
+        data: {
+          user_id,
+          listing_id,
+          status: "PENDING",
+          pickup_location,
+          pickup_time,
+        },
+      });
+
+      return res.status(201).json(order);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: "Server error" });
     }
+  },
+);
 
-    await prisma.listing.update({
-      where: { id: listing_id },
-      data: {
-        quantity: listing.quantity - 1,
-        pastries_sold: listing.pastries_sold + 1,
-      },
-    });
-
-    const order = await prisma.order.create({
-      data: {
-        user_id,
-        listing_id,
-        status: "PENDING",
-        pickup_location,
-      },
-    });
-
-    return res.status(201).json(order);
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Server error" });
-  }
-});
-
-app.patch("/order/:id", async (req: Request, res: Response) => {
+app.patch("/order/:id", authenticate, async (req: Request, res: Response) => {
+  const { id: requester_user_id } = (req as any).user;
   const order_id = Number(req.params.id);
   const { status } = req.body;
-  const validStatuses = ["PENDING", "CONFIRMED", "COMPLETED", "CANCELLED"];
+  const validStatuses = ["CONFIRMED", "CANCELLED"];
 
   if (!order_id || isNaN(order_id)) {
     return res.status(400).json({ message: "Invalid order id" });
@@ -735,9 +755,22 @@ app.patch("/order/:id", async (req: Request, res: Response) => {
       where: {
         id: order_id,
       },
+      select: {
+        id: true,
+        listing: {
+          select: {
+            user_id: true,
+          },
+        },
+      },
     });
     if (!order) {
       return res.status(404).json({ message: "Order does not exist" });
+    }
+    if (order.listing.user_id !== requester_user_id) {
+      return res
+        .status(403)
+        .json({ message: "Forbidden: not your order to update" });
     }
     const updated_order = await prisma.order.update({
       where: {
@@ -754,91 +787,120 @@ app.patch("/order/:id", async (req: Request, res: Response) => {
   }
 });
 
-app.get("/orders/user/:id", async (req: Request, res: Response) => {
-  const user_id = Number(req.params.id);
+app.get(
+  "/orders/user/:id",
+  authenticate,
+  async (req: Request, res: Response) => {
+    const { id: requester_user_id } = (req as any).user;
+    const user_id = Number(req.params.id);
 
-  if (isNaN(user_id)) {
-    return res.status(400).json({ message: "Invalid user id" });
-  }
+    const accessError = getOrdersAccessError(requester_user_id, user_id);
+    if (accessError) {
+      return res
+        .status(accessError.status)
+        .json({ message: accessError.message });
+    }
 
-  try {
-    const orders = await prisma.order.findMany({
-      where: { user_id },
-      select: {
-        id: true,
-        created_at: true,
-        pickup_location: true,
-        status: true,
-        listing: {
-          select: {
-            id: true,
-            title: true,
-            description: true,
-            price: true,
-            quantity: true,
-            listing_status: true,
-            photo_url: true,
+    try {
+      const orders = await prisma.order.findMany({
+        where: { user_id },
+        select: {
+          id: true,
+          created_at: true,
+          pickup_location: true,
+          pickup_time: true,
+          status: true,
+          listing: {
+            select: {
+              id: true,
+              title: true,
+              description: true,
+              price: true,
+              quantity: true,
+              listing_status: true,
+              photo_url: true,
+              ingredients: true,
+              allergens: true,
+              user: {
+                select: {
+                  id: true,
+                  first_name: true,
+                  last_name: true,
+                },
+              },
+            },
           },
         },
-      },
-    });
+      });
 
-    return res.status(200).json(orders);
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Server error" });
-  }
-});
+      return res.status(200).json(orders);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: "Server error" });
+    }
+  },
+);
 
-app.get("/orders/seller/:id", async (req: Request, res: Response) => {
-  const seller_id = Number(req.params.id);
+app.get(
+  "/orders/seller/:id",
+  authenticate,
+  async (req: Request, res: Response) => {
+    const { id: requester_user_id } = (req as any).user;
+    const seller_id = Number(req.params.id);
 
-  if (isNaN(seller_id)) {
-    return res.status(400).json({ message: "Invalid user id" });
-  }
-  try {
-    const orders = await prisma.order.findMany({
-      where: { listing: { user_id: seller_id } },
-      select: {
-        id: true,
-        created_at: true,
-        pickup_location: true,
-        status: true,
-        listing: {
-          select: {
-            id: true,
-            title: true,
-            description: true,
-            price: true,
-            quantity: true,
-            listing_status: true,
-            photo_url: true,
+    const accessError = getOrdersAccessError(requester_user_id, seller_id);
+    if (accessError) {
+      return res
+        .status(accessError.status)
+        .json({ message: accessError.message });
+    }
+    try {
+      const orders = await prisma.order.findMany({
+        where: { listing: { user_id: seller_id } },
+        select: {
+          id: true,
+          created_at: true,
+          pickup_location: true,
+          pickup_time: true,
+          status: true,
+          listing: {
+            select: {
+              id: true,
+              title: true,
+              description: true,
+              price: true,
+              quantity: true,
+              listing_status: true,
+              photo_url: true,
+              ingredients: true,
+              allergens: true,
+            },
+          },
+          user: {
+            select: {
+              id: true,
+              first_name: true,
+              last_name: true,
+            },
           },
         },
-        user: {
-          select: {
-            id: true,
-            first_name: true,
-            last_name: true,
-          },
-        },
-      },
-    });
+      });
 
-    const pending_orders = orders.filter(o => o.status === "PENDING");
-    const confirmed_orders = orders.filter(o =>
-      ["CONFIRMED", "COMPLETED"].includes(o.status),
-    );
-    const cancelled_orders = orders.filter(o => o.status === "CANCELLED");
+      const pending_orders = orders.filter(o => o.status === "PENDING");
+      const confirmed_orders = orders.filter(o =>
+        ["CONFIRMED", "COMPLETED"].includes(o.status),
+      );
+      const cancelled_orders = orders.filter(o => o.status === "CANCELLED");
 
-    return res
-      .status(200)
-      .json({ pending_orders, confirmed_orders, cancelled_orders });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Server error" });
-  }
-});
+      return res
+        .status(200)
+        .json({ pending_orders, confirmed_orders, cancelled_orders });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: "Server error" });
+    }
+  },
+);
 
 app.post("/review/listing", async (req: Request, res: Response) => {
   const listing_id = Number(req.body.listing_id);
@@ -967,4 +1029,6 @@ app.get("/chat/token", authenticate, async (req, res) => {
   res.json({ token });
 });
 
-app.listen(PORT, () => console.log("Server running on port " + PORT));
+if (process.env.NODE_ENV !== "test" && process.env.VITEST !== "true") {
+  app.listen(PORT, () => console.log("Server running on port " + PORT));
+}

@@ -161,6 +161,7 @@ model Order {
   listing_id Int
   listing Listing @relation(fields: [listing_id], references: [id])
   pickup_location String 
+  pickup_time String?
   status  Listing_Status
   chat_connection ChannelConnection?
   @@index([user_id])
